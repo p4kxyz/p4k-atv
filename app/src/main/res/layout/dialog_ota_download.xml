@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/dialog_background">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đang tải xuống cập nhật"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- App Icon -->
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/ic_launcher"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Download Progress -->
+    <ProgressBar
+        android:id="@+id/download_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginBottom="12dp"
+        android:progressTint="@color/colorPrimary"
+        android:progressBackgroundTint="@color/dark_gray"
+        android:max="100" />
+
+    <!-- Download Status -->
+    <TextView
+        android:id="@+id/download_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đang chuẩn bị tải xuống..."
+        android:textSize="14sp"
+        android:textColor="@color/light_gray"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Download Info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⚠️ Không tắt ứng dụng trong quá trình tải"
+            android:textSize="12sp"
+            android:textColor="@color/yellow"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- Cancel Button -->
+    <Button
+        android:id="@+id/btn_cancel_download"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="Hủy tải"
+        android:textColor="@color/white"
+        android:background="@drawable/button_outline"
+        android:textSize="14sp" />
+
+</LinearLayout>

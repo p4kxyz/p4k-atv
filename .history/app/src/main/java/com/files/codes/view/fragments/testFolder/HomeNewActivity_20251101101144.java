@@ -56,44 +56,22 @@ public class HomeNewActivity extends FragmentActivity {
     
     /**
      * Check and request install permission for Android 8.0+
-     * Skip on Android TV as it doesn't support MANAGE_UNKNOWN_APP_SOURCES
      */
     private void checkInstallPermission() {
-        // Check if running on Android TV
-        if (isAndroidTV()) {
-            Log.d("HomeNewActivity", "📺 Android TV detected, skipping install permission check");
-            startOTACheck();
-            return;
-        }
-        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                if (!getPackageManager().canRequestPackageInstalls()) {
-                    Log.d("HomeNewActivity", "📱 Requesting install permission...");
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
-                    intent.setData(Uri.parse("package:" + getPackageName()));
-                    startActivityForResult(intent, REQUEST_INSTALL_PERMISSION);
-                } else {
-                    // All permissions granted, start OTA check
-                    startOTACheck();
-                }
-            } catch (Exception e) {
-                Log.e("HomeNewActivity", "❌ Error checking install permission: " + e.getMessage());
-                // On error, just proceed with OTA check
+            if (!getPackageManager().canRequestPackageInstalls()) {
+                Log.d("HomeNewActivity", "📱 Requesting install permission...");
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, REQUEST_INSTALL_PERMISSION);
+            } else {
+                // All permissions granted, start OTA check
                 startOTACheck();
             }
         } else {
             // Android < 8.0, no install permission needed
             startOTACheck();
         }
-    }
-    
-    /**
-     * Check if running on Android TV
-     */
-    private boolean isAndroidTV() {
-        return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_TYPE_MASK) 
-                == Configuration.UI_MODE_TYPE_TELEVISION;
     }
     
     /**

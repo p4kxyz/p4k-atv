@@ -146,7 +146,7 @@ public class HomeNewFragment extends BrowseSupportFragment {
         setHeadersState(HEADERS_ENABLED);
         setHeadersTransitionOnBackEnabled(true);
         setBrandColor(getResources().getColor(R.color.colorPrimary));
-        // setTitle(getResources().getString(R.string.app_name)); // Ẩn title app
+        setTitle(getResources().getString(R.string.app_name));
         setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
 
         });

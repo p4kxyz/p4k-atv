@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.session.MediaSession;
@@ -674,108 +673,27 @@ public class PlayerActivity extends Activity {
                 return;
             }
 
-            // Multiple approaches for Google TV compatibility
-            Intent intent = null;
-            boolean launched = false;
+            // Kodi supports ACTION_VIEW with video URLs
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(videoUrl), "video/*");
+            intent.setPackage(packageName);
             
-            // Method 1: Try direct Kodi launch intent first
-            try {
-                intent = new Intent("org.xbmc.kodi.action.PLAY_VIDEO");
-                intent.setPackage(packageName);
-                intent.setData(Uri.parse(videoUrl));
-                intent.putExtra("user-agent", userAgent);
-                intent.putExtra("User-Agent", userAgent);
-                
-                if (model.getTitle() != null) {
-                    intent.putExtra("title", model.getTitle());
-                }
-                
-                if (mStartingPosition > 0) {
-                    intent.putExtra("position", (int) mStartingPosition);
-                }
-                
-                Log.d(TAG, "🎬 Trying Kodi direct action - URL: " + videoUrl);
-                startActivity(intent);
-                launched = true;
-                
-            } catch (Exception e) {
-                Log.d(TAG, "⚠️ Kodi direct action failed, trying standard method: " + e.getMessage());
+            // Kodi accepts headers for HTTP streams
+            intent.putExtra("headers", new String[]{"User-Agent", userAgent});
+            intent.putExtra("user-agent", userAgent);
+            
+            if (model.getTitle() != null) {
+                intent.putExtra("title", model.getTitle());
             }
             
-            // Method 2: Standard ACTION_VIEW if direct action failed
-            if (!launched) {
-                try {
-                    intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(videoUrl), "video/*");
-                    intent.setPackage(packageName);
-                    
-                    // Add flags for Google TV compatibility
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    
-                    // Multiple header formats for compatibility
-                    intent.putExtra("headers", new String[]{"User-Agent", userAgent});
-                    intent.putExtra("user-agent", userAgent);
-                    intent.putExtra("User-Agent", userAgent);
-                    
-                    if (model.getTitle() != null) {
-                        intent.putExtra("title", model.getTitle());
-                        intent.putExtra("name", model.getTitle());
-                    }
-                    
-                    if (mStartingPosition > 0) {
-                        intent.putExtra("position", (int) mStartingPosition);
-                        intent.putExtra("resume", (int) mStartingPosition);
-                    }
-                    
-                    Log.d(TAG, "🎬 Launching Kodi standard method - URL: " + videoUrl);
-                    Log.d(TAG, "📡 User-Agent: " + userAgent);
-                    startActivity(intent);
-                    launched = true;
-                    
-                } catch (Exception e) {
-                    Log.e(TAG, "❌ Standard Kodi launch failed: " + e.getMessage());
-                }
+            if (mStartingPosition > 0) {
+                intent.putExtra("position", (int) mStartingPosition);
             }
-            
-            // Method 3: Fallback - try launching Kodi main activity then send video
-            if (!launched) {
-                try {
-                    Intent kodiIntent = getPackageManager().getLaunchIntentForPackage(packageName);
-                    if (kodiIntent != null) {
-                        kodiIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        kodiIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(kodiIntent);
-                        
-                        // Give Kodi time to start, then try sending video
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Intent playIntent = new Intent(Intent.ACTION_VIEW);
-                                    playIntent.setDataAndType(Uri.parse(videoUrl), "video/*");
-                                    playIntent.setPackage(packageName);
-                                    playIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(playIntent);
-                                } catch (Exception e) {
-                                    Log.e(TAG, "❌ Delayed Kodi video send failed: " + e.getMessage());
-                                }
-                            }
-                        }, 2000);
-                        
-                        launched = true;
-                        Log.d(TAG, "🎬 Launched Kodi with delayed video send");
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "❌ Kodi fallback launch failed: " + e.getMessage());
-                }
-            }
-            
-            if (launched) {
-                finish();
-            } else {
-                new ToastMsg(this).toastIconError("Không thể mở Kodi trên Google TV. Hãy thử trình phát khác.");
-            }
+
+            Log.d(TAG, "🎬 Launching Kodi - URL: " + videoUrl);
+            Log.d(TAG, "📡 User-Agent: " + userAgent);
+            startActivity(intent);
+            finish();
             
         } catch (Exception e) {
             Log.e(TAG, "Error launching Kodi", e);
@@ -1483,8 +1401,7 @@ public class PlayerActivity extends Activity {
 
                     // Reset error flag when video successfully starts playing
                     hasPlayerError = false;
-                    lastErrorTime = 0;
-                    Log.d(TAG, "✅ Player ready and playing - error flags cleared");
+                    Log.d(TAG, "✅ Player ready and playing - error flag cleared");
 
                     // update track button visibility when player is ready and tracks are available
                     updateTrackButtonVisibility();
@@ -1515,43 +1432,42 @@ public class PlayerActivity extends Activity {
                 } else if (playbackState == Player.STATE_ENDED) {
                     // Video finished - check if we should auto-play next episode
                     Log.d(TAG, "📺 Video ended - checking for auto-play next episode");
-                    Log.d(TAG, "🔍 Category: " + category);
-                    Log.d(TAG, "🔍 hasPlayerError: " + hasPlayerError);
-                    Log.d(TAG, "🔍 canNavigateToNext: " + canNavigateToNextEpisode());
                     
-                    // Check if this STATE_ENDED was caused by a recent error (within 5 seconds)
-                    long currentTime = System.currentTimeMillis();
-                    boolean recentError = (lastErrorTime > 0) && (currentTime - lastErrorTime < 5000);
-                    
-                    if (hasPlayerError || recentError) {
-                        Log.d(TAG, "🚫 Video ended due to player error (flag=" + hasPlayerError + ", recent=" + recentError + ") - auto-play disabled");
+                    // Check if this STATE_ENDED was caused by an error
+                    if (hasPlayerError) {
+                        Log.d(TAG, "🚫 Video ended due to player error - auto-play disabled");
                         hasPlayerError = false; // Reset flag for next playback
-                        lastErrorTime = 0; // Reset error timestamp
                         return;
                     }
                     
-                    // Simplified check: just verify we have valid duration
+                    // Additional safety check: verify the video actually reached near the end
                     long currentPosition = player.getCurrentPosition();
                     long duration = player.getDuration();
                     
-                    Log.d(TAG, "📺 Video progress: " + (currentPosition/1000) + "s / " + (duration/1000) + "s");
-                    
-                    // Only skip if duration is invalid or position is clearly at beginning (less than 10% progress)
                     if (duration > 0 && currentPosition > 0) {
                         double progressPercentage = (double) currentPosition / duration * 100;
-                        Log.d(TAG, "� Progress percentage: " + String.format("%.1f", progressPercentage) + "%");
+                        Log.d(TAG, "📺 Video progress: " + (currentPosition/1000) + "s / " + (duration/1000) + "s (" + String.format("%.1f", progressPercentage) + "%)");
                         
-                        // Only prevent auto-next if video barely started (less than 10% watched)
-                        if (progressPercentage < 10.0) {
-                            Log.d(TAG, "🚫 Video ended at " + String.format("%.1f", progressPercentage) + "% - likely an error, auto-play disabled");
+                        // Only auto-next if video reached at least 90% completion
+                        if (progressPercentage < 90.0) {
+                            Log.d(TAG, "🚫 Video ended too early (" + String.format("%.1f", progressPercentage) + "%) - likely an error, auto-play disabled");
                             return;
                         }
                     }
                     
-                    // Auto-navigate to next episode for TV series
+                    // Only auto-play for TV series with navigation data and no errors
                     if (category.equalsIgnoreCase("tvseries") && canNavigateToNextEpisode()) {
-                        Log.d(TAG, "✅ Video completed normally - auto-navigating to next episode");
-                        navigateToNextEpisode();
+                        Log.d(TAG, "📺 Auto-playing next episode in 3 seconds...");
+                        
+                        // Show a brief message or countdown (optional)
+                        // Auto-play after 3 seconds delay
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d(TAG, "📺 Auto-playing next episode now");
+                                navigateToNextEpisode();
+                            }
+                        }, 3000); // 3 second delay
                     } else {
                         Log.d(TAG, "📺 No next episode or not a TV series - video ended normally");
                     }
@@ -1592,18 +1508,10 @@ public class PlayerActivity extends Activity {
                 Log.e("PlayerActivity", "🎬 ExoPlayer Error: " + error.getMessage());
                 progressBar.setVisibility(View.GONE);
                 
-                // Check if this is EOFException (normal at end of file)
-                boolean isEOFException = error.getCause() instanceof java.io.EOFException;
-                
-                if (isEOFException) {
-                    Log.e("PlayerActivity", "📄 EOFException detected - this is normal at end of file, auto-next will proceed");
-                    hasPlayerError = false; // Allow auto-next for EOF
-                } else {
-                    Log.e("PlayerActivity", "🚫 Serious error detected - auto-next disabled");
-                    hasPlayerError = true; // Disable auto-next for other errors
-                }
-                
+                // Set error flag to prevent auto-next on error-induced STATE_ENDED
+                hasPlayerError = true;
                 lastErrorTime = System.currentTimeMillis();
+                Log.e("PlayerActivity", "🚫 Player error detected - auto-next disabled");
                 
                 // Enhanced error detection with detailed logging
                 Log.e("PlayerActivity", "🔍 Error details - Message: " + error.getMessage());
@@ -1685,15 +1593,6 @@ public class PlayerActivity extends Activity {
                 } else if (isUnrecognizedFormat) {
                     Log.e("PlayerActivity", "❌ Unrecognized input format detected - trying HLS fallback");
                     handleUnrecognizedFormat();
-                } else if (error.getCause() instanceof java.io.EOFException) {
-                    Log.e("PlayerActivity", "📄 EOFException detected - triggering auto-next for TV series");
-                    // EOFException means video reached end, trigger auto-next for TV series
-                    if (category != null && category.equalsIgnoreCase("tvseries") && canNavigateToNextEpisode()) {
-                        Log.e("PlayerActivity", "✅ Auto-navigating to next episode due to EOFException");
-                        navigateToNextEpisode();
-                    } else {
-                        Log.e("PlayerActivity", "📺 EOFException but no next episode or not TV series");
-                    }
                 } else if (error.getCause() != null && error.getCause().getMessage() != null 
                     && error.getCause().getMessage().contains("network")) {
                     Log.e("PlayerActivity", "❌ Network connection failed");
@@ -3909,130 +3808,6 @@ public class PlayerActivity extends Activity {
         
         Log.d("PlayerActivity", "🤔 Could not detect format, using default progressive");
         return "video"; // default fallback
-    }
-
-    /**
-     * Show dialog asking user if they want to watch the next episode
-     */
-    private void showNextEpisodeDialog() {
-        if (this.isFinishing() || this.isDestroyed()) {
-            return; // Don't show dialog if activity is finishing
-        }
-
-        // Get next episode info
-        String nextEpisodeTitle = getNextEpisodeTitle();
-        
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
-        builder.setTitle("🎬 Tập đã kết thúc");
-        
-        if (nextEpisodeTitle != null && !nextEpisodeTitle.isEmpty()) {
-            builder.setMessage("Bạn có muốn tiếp tục xem tập tiếp theo?\n\n📺 " + nextEpisodeTitle);
-        } else {
-            builder.setMessage("Bạn có muốn tiếp tục xem tập tiếp theo không?");
-        }
-        
-        builder.setPositiveButton("▶️ Xem ngay", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d(TAG, "✅ User chose to watch next episode");
-                dialog.dismiss();
-                navigateToNextEpisode();
-            }
-        });
-        
-        builder.setNegativeButton("❌ Thoát", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d(TAG, "❌ User chose not to watch next episode");
-                dialog.dismiss();
-                // Just close the player or go back
-                finish();
-            }
-        });
-        
-        builder.setNeutralButton("📋 Chọn tập khác", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d(TAG, "📋 User chose to select different episode");
-                dialog.dismiss();
-                // Go back to episode list
-                finish();
-            }
-        });
-        
-        builder.setCancelable(true);
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                Log.d(TAG, "🚫 Next episode dialog cancelled");
-                finish();
-            }
-        });
-        
-        try {
-            android.app.AlertDialog dialog = builder.create();
-            
-            // Make dialog more TV-friendly
-            dialog.getWindow().getAttributes().dimAmount = 0.8f;
-            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            
-            dialog.show();
-            Log.d(TAG, "📺 Next episode dialog shown");
-            
-            // Auto-dismiss after 30 seconds if no action
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (dialog.isShowing()) {
-                        Log.d(TAG, "⏰ Auto-dismissing next episode dialog after 30s");
-                        dialog.dismiss();
-                        finish();
-                    }
-                }
-            }, 30000); // 30 seconds
-            
-        } catch (Exception e) {
-            Log.e(TAG, "❌ Error showing next episode dialog: " + e.getMessage());
-            // Fallback: just navigate to next episode
-            navigateToNextEpisode();
-        }
-    }
-
-    /**
-     * Get the title of the next episode for display in dialog
-     */
-    private String getNextEpisodeTitle() {
-        if (model == null || model.getAllSeasons() == null) {
-            return null;
-        }
-        
-        try {
-            int currentSeasonIndex = model.getCurrentSeasonIndex();
-            int currentEpisodeIndex = model.getCurrentEpisodeIndex();
-            int totalEpisodesInSeason = model.getTotalEpisodesInSeason();
-            
-            int newSeasonIndex = currentSeasonIndex;
-            int newEpisodeIndex = currentEpisodeIndex + 1;
-            
-            // If we're at the last episode of current season, go to first episode of next season
-            if (newEpisodeIndex >= totalEpisodesInSeason && currentSeasonIndex < model.getAllSeasons().size() - 1) {
-                newSeasonIndex = currentSeasonIndex + 1;
-                newEpisodeIndex = 0;
-            }
-            
-            // Get the next episode info
-            if (newSeasonIndex < model.getAllSeasons().size()) {
-                com.files.codes.model.movieDetails.Season nextSeason = model.getAllSeasons().get(newSeasonIndex);
-                if (nextSeason.getEpisodes() != null && newEpisodeIndex < nextSeason.getEpisodes().size()) {
-                    com.files.codes.model.movieDetails.Episode nextEpisode = nextSeason.getEpisodes().get(newEpisodeIndex);
-                    return "Season " + nextSeason.getSeasonsName() + " - " + nextEpisode.getEpisodesName();
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error getting next episode title: " + e.getMessage());
-        }
-        
-        return null;
     }
 
 

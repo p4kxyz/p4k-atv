@@ -674,108 +674,27 @@ public class PlayerActivity extends Activity {
                 return;
             }
 
-            // Multiple approaches for Google TV compatibility
-            Intent intent = null;
-            boolean launched = false;
+            // Kodi supports ACTION_VIEW with video URLs
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(videoUrl), "video/*");
+            intent.setPackage(packageName);
             
-            // Method 1: Try direct Kodi launch intent first
-            try {
-                intent = new Intent("org.xbmc.kodi.action.PLAY_VIDEO");
-                intent.setPackage(packageName);
-                intent.setData(Uri.parse(videoUrl));
-                intent.putExtra("user-agent", userAgent);
-                intent.putExtra("User-Agent", userAgent);
-                
-                if (model.getTitle() != null) {
-                    intent.putExtra("title", model.getTitle());
-                }
-                
-                if (mStartingPosition > 0) {
-                    intent.putExtra("position", (int) mStartingPosition);
-                }
-                
-                Log.d(TAG, "🎬 Trying Kodi direct action - URL: " + videoUrl);
-                startActivity(intent);
-                launched = true;
-                
-            } catch (Exception e) {
-                Log.d(TAG, "⚠️ Kodi direct action failed, trying standard method: " + e.getMessage());
+            // Kodi accepts headers for HTTP streams
+            intent.putExtra("headers", new String[]{"User-Agent", userAgent});
+            intent.putExtra("user-agent", userAgent);
+            
+            if (model.getTitle() != null) {
+                intent.putExtra("title", model.getTitle());
             }
             
-            // Method 2: Standard ACTION_VIEW if direct action failed
-            if (!launched) {
-                try {
-                    intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(videoUrl), "video/*");
-                    intent.setPackage(packageName);
-                    
-                    // Add flags for Google TV compatibility
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    
-                    // Multiple header formats for compatibility
-                    intent.putExtra("headers", new String[]{"User-Agent", userAgent});
-                    intent.putExtra("user-agent", userAgent);
-                    intent.putExtra("User-Agent", userAgent);
-                    
-                    if (model.getTitle() != null) {
-                        intent.putExtra("title", model.getTitle());
-                        intent.putExtra("name", model.getTitle());
-                    }
-                    
-                    if (mStartingPosition > 0) {
-                        intent.putExtra("position", (int) mStartingPosition);
-                        intent.putExtra("resume", (int) mStartingPosition);
-                    }
-                    
-                    Log.d(TAG, "🎬 Launching Kodi standard method - URL: " + videoUrl);
-                    Log.d(TAG, "📡 User-Agent: " + userAgent);
-                    startActivity(intent);
-                    launched = true;
-                    
-                } catch (Exception e) {
-                    Log.e(TAG, "❌ Standard Kodi launch failed: " + e.getMessage());
-                }
+            if (mStartingPosition > 0) {
+                intent.putExtra("position", (int) mStartingPosition);
             }
-            
-            // Method 3: Fallback - try launching Kodi main activity then send video
-            if (!launched) {
-                try {
-                    Intent kodiIntent = getPackageManager().getLaunchIntentForPackage(packageName);
-                    if (kodiIntent != null) {
-                        kodiIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        kodiIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(kodiIntent);
-                        
-                        // Give Kodi time to start, then try sending video
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Intent playIntent = new Intent(Intent.ACTION_VIEW);
-                                    playIntent.setDataAndType(Uri.parse(videoUrl), "video/*");
-                                    playIntent.setPackage(packageName);
-                                    playIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(playIntent);
-                                } catch (Exception e) {
-                                    Log.e(TAG, "❌ Delayed Kodi video send failed: " + e.getMessage());
-                                }
-                            }
-                        }, 2000);
-                        
-                        launched = true;
-                        Log.d(TAG, "🎬 Launched Kodi with delayed video send");
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "❌ Kodi fallback launch failed: " + e.getMessage());
-                }
-            }
-            
-            if (launched) {
-                finish();
-            } else {
-                new ToastMsg(this).toastIconError("Không thể mở Kodi trên Google TV. Hãy thử trình phát khác.");
-            }
+
+            Log.d(TAG, "🎬 Launching Kodi - URL: " + videoUrl);
+            Log.d(TAG, "📡 User-Agent: " + userAgent);
+            startActivity(intent);
+            finish();
             
         } catch (Exception e) {
             Log.e(TAG, "Error launching Kodi", e);

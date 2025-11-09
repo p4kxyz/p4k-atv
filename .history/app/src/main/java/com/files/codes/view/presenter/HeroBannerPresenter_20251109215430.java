@@ -743,7 +743,9 @@ public class HeroBannerPresenter extends Presenter {
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-                // Keep current image while loading new one - don't replace with placeholder
+                if (heroBackground != null) {
+                    heroBackground.setImageDrawable(placeHolderDrawable);
+                }
             }
         }
     }

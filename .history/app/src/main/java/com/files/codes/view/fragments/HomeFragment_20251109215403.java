@@ -2853,7 +2853,7 @@ public class HomeFragment extends RowsSupportFragment {
             
             @Override
             public void onPrepareLoad(android.graphics.drawable.Drawable placeHolderDrawable) {
-                // Keep current image while loading new one - don't replace with placeholder
+                heroBackground.setImageDrawable(placeHolderDrawable);
             }
         };
         

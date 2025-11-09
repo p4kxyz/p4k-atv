@@ -49,11 +49,6 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MergingMediaSource;
 import com.google.android.exoplayer2.source.SingleSampleMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.MergingMediaSource;
-import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.util.MimeTypes;
-import com.google.android.exoplayer2.MediaItem;
-import java.util.Collections;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -1286,49 +1281,13 @@ public class PlayerActivity extends Activity {
         // Check if we have external subtitles first
         if (video != null && video.getSubtitle() != null && !video.getSubtitle().isEmpty()) {
             Log.d(TAG, "🎬 Creating subtitle dialog with " + video.getSubtitle().size() + " subtitles");
-            for (int i = 0; i < video.getSubtitle().size(); i++) {
-                Subtitle sub = video.getSubtitle().get(i);
-                Log.d(TAG, "🎬 Subtitle " + i + ": " + sub.getLanguage() + " - " + sub.getUrl());
-            }
             // Show external subtitle dialog with playback speed
             AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
             View view = LayoutInflater.from(PlayerActivity.this).inflate(R.layout.layout_subtitle_dialog, null);
             Log.d(TAG, "🎬 Dialog view inflated successfully");
             
-            // Create dialog first
-            builder.setView(view);
-            final AlertDialog dialog = builder.create();
-            
             RecyclerView serverRv = view.findViewById(R.id.serverRv);
             SubtitleListAdapter adapter = new SubtitleListAdapter(PlayerActivity.this, video.getSubtitle());
-            
-            // Set subtitle click listener
-            adapter.setListener(new SubtitleListAdapter.OnSubtitleItemClickListener() {
-                @Override
-                public void onSubtitleItemClick(View view, Subtitle subtitle, int position, SubtitleListAdapter.SubtitleViewHolder holder) {
-                    Log.d(TAG, "🎬 ============ SUBTITLE ITEM CLICKED! ============");
-                    Log.d(TAG, "🎬 Position: " + position);
-                    Log.d(TAG, "🎬 Language: " + subtitle.getLanguage());
-                    Log.d(TAG, "🎬 URL: " + subtitle.getUrl());
-                    Log.d(TAG, "🎬 View: " + (view != null ? "Valid" : "NULL"));
-                    Log.d(TAG, "🎬 Holder: " + (holder != null ? "Valid" : "NULL"));
-                    
-                    // Test VTT URL accessibility
-                    Log.d(TAG, "🎬 Testing VTT URL accessibility...");
-                    
-                    // Load subtitle into ExoPlayer
-                    if (subtitle.getUrl() != null && !subtitle.getUrl().isEmpty()) {
-                        Log.d(TAG, "🎬 Loading subtitle into ExoPlayer...");
-                        loadExternalSubtitle(subtitle.getUrl(), subtitle.getLanguage());
-                        Log.d(TAG, "🎬 Dismissing dialog...");
-                        dialog.dismiss();
-                        Log.d(TAG, "🎬 Dialog dismissed!");
-                    } else {
-                        Log.e(TAG, "🎬 ERROR: Subtitle URL is empty!");
-                    }
-                }
-            });
-            
             serverRv.setLayoutManager(new LinearLayoutManager(PlayerActivity.this));
             serverRv.setHasFixedSize(true);
             serverRv.setAdapter(adapter);
@@ -1344,10 +1303,9 @@ public class PlayerActivity extends Activity {
             Button speed20 = view.findViewById(R.id.speed_2_0);
             Button speed30 = view.findViewById(R.id.speed_3_0);
 
-            // Show dialog
-            Log.d(TAG, "🎬 Showing subtitle dialog...");
+            builder.setView(view);
+            final AlertDialog dialog = builder.create();
             dialog.show();
-            Log.d(TAG, "🎬 Subtitle dialog displayed!");
 
             closeBt.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1448,9 +1406,6 @@ public class PlayerActivity extends Activity {
         if (player != null) {
             player.release();
         }
-        
-        // Store current video URL for subtitle loading
-        this.url = url;
 
         progressBar.setVisibility(VISIBLE);
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(PlayerActivity.this).build();
@@ -4254,55 +4209,6 @@ public class PlayerActivity extends Activity {
         }
         
         return null;
-    }
-    
-    /**
-     * Load external VTT subtitle into ExoPlayer
-     */
-    private void loadExternalSubtitle(String subtitleUrl, String language) {
-        Log.d(TAG, "🎬 Loading external subtitle: " + subtitleUrl);
-        
-        try {
-            if (player == null) {
-                Log.e(TAG, "🎬 Player is null, cannot load subtitle");
-                return;
-            }
-            
-            // Create data source factory
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, "PlayerActivity");
-            
-            // Create subtitle MediaItem with SubtitleConfiguration
-            MediaItem.SubtitleConfiguration subtitleConfig = new MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitleUrl))
-                .setMimeType(MimeTypes.TEXT_VTT)
-                .setLanguage(language)
-                .build();
-            
-            // Create MediaItem with video and subtitle
-            MediaItem mediaItem = new MediaItem.Builder()
-                .setUri(url)
-                .setSubtitleConfigurations(Collections.singletonList(subtitleConfig))
-                .build();
-            
-            // Prepare player with media item
-            Log.d(TAG, "🎬 Preparing player with subtitle...");
-            player.setMediaItem(mediaItem);
-            player.prepare();
-            
-            // Enable subtitle track
-            if (trackSelector != null) {
-                trackSelector.setParameters(
-                    trackSelector.buildUponParameters()
-                        .setPreferredTextLanguage(language)
-                        .setRendererDisabled(C.TRACK_TYPE_TEXT, false)
-                );
-            }
-            
-            Log.d(TAG, "🎬 ✅ External subtitle loaded successfully: " + language);
-            
-        } catch (Exception e) {
-            Log.e(TAG, "🎬 ❌ Error loading external subtitle: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
 

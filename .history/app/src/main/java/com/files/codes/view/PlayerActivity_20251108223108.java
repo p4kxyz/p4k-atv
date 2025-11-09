@@ -1286,10 +1286,6 @@ public class PlayerActivity extends Activity {
         // Check if we have external subtitles first
         if (video != null && video.getSubtitle() != null && !video.getSubtitle().isEmpty()) {
             Log.d(TAG, "🎬 Creating subtitle dialog with " + video.getSubtitle().size() + " subtitles");
-            for (int i = 0; i < video.getSubtitle().size(); i++) {
-                Subtitle sub = video.getSubtitle().get(i);
-                Log.d(TAG, "🎬 Subtitle " + i + ": " + sub.getLanguage() + " - " + sub.getUrl());
-            }
             // Show external subtitle dialog with playback speed
             AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
             View view = LayoutInflater.from(PlayerActivity.this).inflate(R.layout.layout_subtitle_dialog, null);
@@ -1306,25 +1302,14 @@ public class PlayerActivity extends Activity {
             adapter.setListener(new SubtitleListAdapter.OnSubtitleItemClickListener() {
                 @Override
                 public void onSubtitleItemClick(View view, Subtitle subtitle, int position, SubtitleListAdapter.SubtitleViewHolder holder) {
-                    Log.d(TAG, "🎬 ============ SUBTITLE ITEM CLICKED! ============");
-                    Log.d(TAG, "🎬 Position: " + position);
-                    Log.d(TAG, "🎬 Language: " + subtitle.getLanguage());
-                    Log.d(TAG, "🎬 URL: " + subtitle.getUrl());
-                    Log.d(TAG, "🎬 View: " + (view != null ? "Valid" : "NULL"));
-                    Log.d(TAG, "🎬 Holder: " + (holder != null ? "Valid" : "NULL"));
-                    
-                    // Test VTT URL accessibility
-                    Log.d(TAG, "🎬 Testing VTT URL accessibility...");
+                    Log.d(TAG, "🎬 Subtitle clicked: " + subtitle.getLanguage() + " - URL: " + subtitle.getUrl());
                     
                     // Load subtitle into ExoPlayer
                     if (subtitle.getUrl() != null && !subtitle.getUrl().isEmpty()) {
-                        Log.d(TAG, "🎬 Loading subtitle into ExoPlayer...");
                         loadExternalSubtitle(subtitle.getUrl(), subtitle.getLanguage());
-                        Log.d(TAG, "🎬 Dismissing dialog...");
                         dialog.dismiss();
-                        Log.d(TAG, "🎬 Dialog dismissed!");
                     } else {
-                        Log.e(TAG, "🎬 ERROR: Subtitle URL is empty!");
+                        Log.e(TAG, "🎬 Subtitle URL is empty!");
                     }
                 }
             });
@@ -1344,7 +1329,8 @@ public class PlayerActivity extends Activity {
             Button speed20 = view.findViewById(R.id.speed_2_0);
             Button speed30 = view.findViewById(R.id.speed_3_0);
 
-            // Show dialog
+            builder.setView(view);
+            final AlertDialog dialog = builder.create();
             Log.d(TAG, "🎬 Showing subtitle dialog...");
             dialog.show();
             Log.d(TAG, "🎬 Subtitle dialog displayed!");

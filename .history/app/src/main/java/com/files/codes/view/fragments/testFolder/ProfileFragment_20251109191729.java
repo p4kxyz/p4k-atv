@@ -56,9 +56,11 @@ public class ProfileFragment extends GuidedStepSupportFragment {
 
     @Override
     public void onCreateActions(@NonNull List<GuidedAction> actions, Bundle savedInstanceState) {
+        android.util.Log.e("ProfileFragment", "🚨🚨🚨 ProfileFragment onCreateActions CALLED! 🚨🚨🚨");
         SharedPreferences prefs = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
         boolean useExternalPlayer = prefs.getBoolean(PREF_USE_EXTERNAL_PLAYER, false);
         String selectedPlayer = prefs.getString(PREF_SELECTED_PLAYER, "just"); // Default: just player
+        android.util.Log.e("ProfileFragment", "🎮 External player enabled: " + useExternalPlayer + ", Selected: " + selectedPlayer);
         
         // External Player Toggle
         GuidedAction externalPlayerAction = new GuidedAction.Builder(getActivity())

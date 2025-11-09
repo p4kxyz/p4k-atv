@@ -167,6 +167,7 @@ public class MyAccountFragment extends Fragment  {
                 SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE).edit();
                 editor.putBoolean(PREF_USE_EXTERNAL_PLAYER, isChecked);
                 editor.apply();
+                Log.d(TAG, "💾 External player preference saved: " + isChecked);
             }
         });
     }

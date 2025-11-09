@@ -52,8 +52,6 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.MergingMediaSource;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.util.MimeTypes;
-import com.google.android.exoplayer2.MediaItem;
-import java.util.Collections;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -1286,18 +1284,10 @@ public class PlayerActivity extends Activity {
         // Check if we have external subtitles first
         if (video != null && video.getSubtitle() != null && !video.getSubtitle().isEmpty()) {
             Log.d(TAG, "🎬 Creating subtitle dialog with " + video.getSubtitle().size() + " subtitles");
-            for (int i = 0; i < video.getSubtitle().size(); i++) {
-                Subtitle sub = video.getSubtitle().get(i);
-                Log.d(TAG, "🎬 Subtitle " + i + ": " + sub.getLanguage() + " - " + sub.getUrl());
-            }
             // Show external subtitle dialog with playback speed
             AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
             View view = LayoutInflater.from(PlayerActivity.this).inflate(R.layout.layout_subtitle_dialog, null);
             Log.d(TAG, "🎬 Dialog view inflated successfully");
-            
-            // Create dialog first
-            builder.setView(view);
-            final AlertDialog dialog = builder.create();
             
             RecyclerView serverRv = view.findViewById(R.id.serverRv);
             SubtitleListAdapter adapter = new SubtitleListAdapter(PlayerActivity.this, video.getSubtitle());
@@ -1306,25 +1296,14 @@ public class PlayerActivity extends Activity {
             adapter.setListener(new SubtitleListAdapter.OnSubtitleItemClickListener() {
                 @Override
                 public void onSubtitleItemClick(View view, Subtitle subtitle, int position, SubtitleListAdapter.SubtitleViewHolder holder) {
-                    Log.d(TAG, "🎬 ============ SUBTITLE ITEM CLICKED! ============");
-                    Log.d(TAG, "🎬 Position: " + position);
-                    Log.d(TAG, "🎬 Language: " + subtitle.getLanguage());
-                    Log.d(TAG, "🎬 URL: " + subtitle.getUrl());
-                    Log.d(TAG, "🎬 View: " + (view != null ? "Valid" : "NULL"));
-                    Log.d(TAG, "🎬 Holder: " + (holder != null ? "Valid" : "NULL"));
-                    
-                    // Test VTT URL accessibility
-                    Log.d(TAG, "🎬 Testing VTT URL accessibility...");
+                    Log.d(TAG, "🎬 Subtitle clicked: " + subtitle.getLanguage() + " - URL: " + subtitle.getUrl());
                     
                     // Load subtitle into ExoPlayer
                     if (subtitle.getUrl() != null && !subtitle.getUrl().isEmpty()) {
-                        Log.d(TAG, "🎬 Loading subtitle into ExoPlayer...");
                         loadExternalSubtitle(subtitle.getUrl(), subtitle.getLanguage());
-                        Log.d(TAG, "🎬 Dismissing dialog...");
                         dialog.dismiss();
-                        Log.d(TAG, "🎬 Dialog dismissed!");
                     } else {
-                        Log.e(TAG, "🎬 ERROR: Subtitle URL is empty!");
+                        Log.e(TAG, "🎬 Subtitle URL is empty!");
                     }
                 }
             });
@@ -1344,7 +1323,8 @@ public class PlayerActivity extends Activity {
             Button speed20 = view.findViewById(R.id.speed_2_0);
             Button speed30 = view.findViewById(R.id.speed_3_0);
 
-            // Show dialog
+            builder.setView(view);
+            final AlertDialog dialog = builder.create();
             Log.d(TAG, "🎬 Showing subtitle dialog...");
             dialog.show();
             Log.d(TAG, "🎬 Subtitle dialog displayed!");
@@ -4268,27 +4248,34 @@ public class PlayerActivity extends Activity {
                 return;
             }
             
-            // Create data source factory
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, "PlayerActivity");
+            // Create subtitle MediaSource
+            Uri subtitleUri = Uri.parse(subtitleUrl);
+            Format subtitleFormat = Format.createTextSampleFormat(
+                null, // id
+                MimeTypes.TEXT_VTT, // mimeType
+                null, // codecs
+                Format.NO_VALUE, // bitrate
+                0, // selectionFlags
+                language, // language
+                null, // accessibilityChannel
+                Format.OFFSET_SAMPLE_RELATIVE // subsampleOffsetUs
+            );
             
-            // Create subtitle MediaItem with SubtitleConfiguration
-            MediaItem.SubtitleConfiguration subtitleConfig = new MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitleUrl))
-                .setMimeType(MimeTypes.TEXT_VTT)
-                .setLanguage(language)
-                .build();
+            MediaSource subtitleSource = new SingleSampleMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(subtitleUri, subtitleFormat, C.TIME_UNSET);
             
-            // Create MediaItem with video and subtitle
-            MediaItem mediaItem = new MediaItem.Builder()
-                .setUri(url)
-                .setSubtitleConfigurations(Collections.singletonList(subtitleConfig))
-                .build();
+            // Create merged MediaSource with video and subtitle
+            MediaSource videoSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.parse(currentVideoUrl));
+                
+            MediaSource mergedSource = new MergingMediaSource(videoSource, subtitleSource);
             
-            // Prepare player with media item
+            // Prepare player with merged source
             Log.d(TAG, "🎬 Preparing player with subtitle...");
-            player.setMediaItem(mediaItem);
+            player.setMediaSource(mergedSource);
             player.prepare();
             
-            // Enable subtitle track
+            // Show subtitle track
             if (trackSelector != null) {
                 trackSelector.setParameters(
                     trackSelector.buildUponParameters()

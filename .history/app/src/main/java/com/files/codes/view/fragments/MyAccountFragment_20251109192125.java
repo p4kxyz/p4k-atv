@@ -166,6 +166,7 @@ public class MyAccountFragment extends Fragment  {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE).edit();
                 editor.putBoolean(PREF_USE_EXTERNAL_PLAYER, isChecked);
+import android.util.Log;
                 editor.apply();
             }
         });

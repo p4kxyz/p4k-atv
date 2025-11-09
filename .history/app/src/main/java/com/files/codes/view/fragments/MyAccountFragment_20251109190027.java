@@ -50,7 +50,7 @@ public class MyAccountFragment extends Fragment  {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
@@ -61,14 +61,6 @@ public class MyAccountFragment extends Fragment  {
         // Inflate the layout for this fragment directly
         View view = inflater.inflate(R.layout.fragment_my_account, container, false);
         db = new DatabaseHelper(getContext());
-        
-        // FORCE hiển thị external player container ngay từ đầu
-        View externalPlayerContainer = view.findViewById(R.id.external_player_setting_container);
-        
-        if (externalPlayerContainer != null) {
-            externalPlayerContainer.setVisibility(View.VISIBLE);
-        }
-        
         initViews(view);
 
         sign_out.setOnClickListener(new View.OnClickListener() {
@@ -102,11 +94,13 @@ public class MyAccountFragment extends Fragment  {
         status_tv = view.findViewById(R.id.status_tv);
         externalPlayerSwitch = view.findViewById(R.id.external_player_switch);
         
-        // Tìm và hiển thị external player container - LUÔN HIỂN THỊ
-        View externalPlayerContainer = view.findViewById(R.id.external_player_setting_container);
-        if (externalPlayerContainer != null) {
-            externalPlayerContainer.setVisibility(View.VISIBLE);
+        // Debug log
+        Log.d(TAG, "🔍 External Player Switch found: " + (externalPlayerSwitch != null ? "YES ✅" : "NULL ❌"));
+        if (externalPlayerSwitch != null) {
+            Log.d(TAG, "🔍 Switch visibility: " + externalPlayerSwitch.getVisibility());
         }
+
+        Log.e(TAG, "initViews: isUserLoggedIn: " + PreferenceUtils.isLoggedIn(getContext()));
         if (PreferenceUtils.isLoggedIn(getContext())) {
             login.setVisibility(View.GONE);
             user_name.setText(db.getUserData().getName());
@@ -123,7 +117,7 @@ public class MyAccountFragment extends Fragment  {
             status_tv.setText(R.string.you_are_not_logged_in);
         }
         
-        // Setup external player switch sau khi init views - LUÔN GỌI
+        // Setup external player switch sau khi init views
         setupExternalPlayerSwitch();
     }
 
@@ -152,13 +146,18 @@ public class MyAccountFragment extends Fragment  {
     
     private void setupExternalPlayerSwitch() {
         if (externalPlayerSwitch == null) {
+            Log.e(TAG, "❌ External Player Switch is NULL! Cannot setup.");
             return;
         }
+        
+        Log.d(TAG, "✅ Setting up External Player Switch");
         
         // Load saved preference
         SharedPreferences prefs = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
         boolean useExternalPlayer = prefs.getBoolean(PREF_USE_EXTERNAL_PLAYER, false);
         externalPlayerSwitch.setChecked(useExternalPlayer);
+        
+        Log.d(TAG, "📱 External player preference loaded: " + useExternalPlayer);
         
         // Handle switch changes
         externalPlayerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -167,6 +166,7 @@ public class MyAccountFragment extends Fragment  {
                 SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE).edit();
                 editor.putBoolean(PREF_USE_EXTERNAL_PLAYER, isChecked);
                 editor.apply();
+                Log.d(TAG, "💾 External player preference saved: " + isChecked);
             }
         });
     }

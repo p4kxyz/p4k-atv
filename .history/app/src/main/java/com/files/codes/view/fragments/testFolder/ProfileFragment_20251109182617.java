@@ -1,6 +1,5 @@
 package com.files.codes.view.fragments.testFolder;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -14,7 +13,6 @@ import com.files.codes.database.DatabaseHelper;
 import com.files.codes.model.subscription.ActiveStatus;
 import com.files.codes.utils.Constants;
 import com.files.codes.utils.PreferenceUtils;
-import com.files.codes.view.LoginChooserActivity;
 
 import java.util.List;
 
@@ -24,7 +22,6 @@ public class ProfileFragment extends GuidedStepSupportFragment {
     private static final int ACTION_ID_SIGN_OUT = 1;
     private static final int ACTION_ID_EXTERNAL_PLAYER = 2;
     private static final int ACTION_ID_CHOOSE_PLAYER = 3;
-    private static final int ACTION_ID_LOGIN = 4;
     private static final String PREF_USE_EXTERNAL_PLAYER = "use_external_player";
     private static final String PREF_SELECTED_PLAYER = "selected_player";
     private DatabaseHelper db;
@@ -47,8 +44,7 @@ public class ProfileFragment extends GuidedStepSupportFragment {
             String des = packageTitle + "\n" + expireDate;
             guidance = new GuidanceStylist.Guidance(db.getUserData().getName(), des, db.getUserData().getEmail(), null);
         } else {
-            // Show account options even when not logged in
-            guidance = new GuidanceStylist.Guidance("Tài khoản", "Cài đặt trình phát và tùy chọn khác", "Chưa đăng nhập", null);
+            guidance = new GuidanceStylist.Guidance(getResources().getString(R.string.something_went_wrong), "", "", null);
         }
 
         return guidance;
@@ -56,49 +52,41 @@ public class ProfileFragment extends GuidedStepSupportFragment {
 
     @Override
     public void onCreateActions(@NonNull List<GuidedAction> actions, Bundle savedInstanceState) {
-        SharedPreferences prefs = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
-        boolean useExternalPlayer = prefs.getBoolean(PREF_USE_EXTERNAL_PLAYER, false);
-        String selectedPlayer = prefs.getString(PREF_SELECTED_PLAYER, "just"); // Default: just player
-        
-        // External Player Toggle
-        GuidedAction externalPlayerAction = new GuidedAction.Builder(getActivity())
-                .id(ACTION_ID_EXTERNAL_PLAYER)
-                .title("⚙️ " + getResources().getString(R.string.use_external_player))
-                .description(getResources().getString(R.string.external_player_description))
-                .checkSetId(GuidedAction.DEFAULT_CHECK_SET_ID)
-                .checked(useExternalPlayer)
-                .build();
-        actions.add(externalPlayerAction);
-        
-        // Choose Player Action (only show if external player is enabled)
-        if (useExternalPlayer) {
-            String playerName = getPlayerDisplayName(selectedPlayer);
-            GuidedAction choosePlayerAction = new GuidedAction.Builder(getActivity())
-                    .id(ACTION_ID_CHOOSE_PLAYER)
-                    .title("📱 " + getResources().getString(R.string.choose_player))
-                    .description("Hiện tại: " + playerName)
-                    .build();
-            actions.add(choosePlayerAction);
-        }
-        
-        // Sign Out or Login Action
+        // Chỉ hiển thị external player options khi user đã đăng nhập
         if (PreferenceUtils.isLoggedIn(getContext())) {
-            GuidedAction signOutAction = new GuidedAction.Builder(getActivity())
-                    .id(ACTION_ID_SIGN_OUT)
-                    .title(getResources().getString(R.string.signout))
-                    .editable(false)
+            SharedPreferences prefs = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
+            boolean useExternalPlayer = prefs.getBoolean(PREF_USE_EXTERNAL_PLAYER, false);
+            String selectedPlayer = prefs.getString(PREF_SELECTED_PLAYER, "just"); // Default: just player
+            
+            // External Player Toggle
+            GuidedAction externalPlayerAction = new GuidedAction.Builder(getActivity())
+                    .id(ACTION_ID_EXTERNAL_PLAYER)
+                    .title("⚙️ " + getResources().getString(R.string.use_external_player))
+                    .description(getResources().getString(R.string.external_player_description))
+                    .checkSetId(GuidedAction.DEFAULT_CHECK_SET_ID)
+                    .checked(useExternalPlayer)
                     .build();
-            actions.add(signOutAction);
-        } else {
-            // Add Login action when not logged in
-            GuidedAction loginAction = new GuidedAction.Builder(getActivity())
-                    .id(ACTION_ID_LOGIN)
-                    .title("🔑 Đăng nhập")
-                    .description("Đăng nhập để sử dụng đầy đủ tính năng")
-                    .editable(false)
-                    .build();
-            actions.add(loginAction);
+            actions.add(externalPlayerAction);
+            
+            // Choose Player Action (only show if external player is enabled)
+            if (useExternalPlayer) {
+                String playerName = getPlayerDisplayName(selectedPlayer);
+                GuidedAction choosePlayerAction = new GuidedAction.Builder(getActivity())
+                        .id(ACTION_ID_CHOOSE_PLAYER)
+                        .title("📱 " + getResources().getString(R.string.choose_player))
+                        .description("Hiện tại: " + playerName)
+                        .build();
+                actions.add(choosePlayerAction);
+            }
         }
+        
+        // Sign Out Action - luôn hiện
+        GuidedAction signOutAction = new GuidedAction.Builder(getActivity())
+                .id(ACTION_ID_SIGN_OUT)
+                .title(getResources().getString(R.string.signout))
+                .editable(false)
+                .build();
+        actions.add(signOutAction);
 
     }
 
@@ -131,10 +119,6 @@ public class ProfileFragment extends GuidedStepSupportFragment {
         } else if (action.getId() == ACTION_ID_SIGN_OUT) {
             GuidedStepSupportFragment fragment = new SignOutFragment();
             add(getFragmentManager(), fragment);
-        } else if (action.getId() == ACTION_ID_LOGIN) {
-            // Launch login activity
-            Intent intent = new Intent(getContext(), LoginChooserActivity.class);
-            startActivity(intent);
         }
     }
     
@@ -220,6 +204,11 @@ public class ProfileFragment extends GuidedStepSupportFragment {
     
     // Helper method for PlayerActivity to check preference
     public static boolean shouldUseExternalPlayer(android.content.Context context) {
+        // Chỉ cho phép external player khi user đã đăng nhập
+        if (!com.files.codes.utils.PreferenceUtils.isLoggedIn(context)) {
+            return false;
+        }
+        
         SharedPreferences prefs = context.getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
         return prefs.getBoolean(PREF_USE_EXTERNAL_PLAYER, false);
     }

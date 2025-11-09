@@ -28,10 +28,15 @@ public class ProfileFragment extends GuidedStepSupportFragment {
     private static final String PREF_USE_EXTERNAL_PLAYER = "use_external_player";
     private static final String PREF_SELECTED_PLAYER = "selected_player";
     private DatabaseHelper db;
+    
+    public ProfileFragment() {
+        android.util.Log.e("ProfileFragment", "🚨🚨🚨 ProfileFragment CONSTRUCTOR CALLED! 🚨🚨🚨");
+    }
 
     @NonNull
     @Override
     public GuidanceStylist.Guidance onCreateGuidance(Bundle savedInstanceState) {
+        android.util.Log.e("ProfileFragment", "🚨🚨🚨 ProfileFragment onCreateGuidance CALLED! 🚨🚨🚨");
         GuidanceStylist.Guidance guidance;
         db = new DatabaseHelper(getActivity());
         if (PreferenceUtils.isLoggedIn(getContext())) {
@@ -56,9 +61,11 @@ public class ProfileFragment extends GuidedStepSupportFragment {
 
     @Override
     public void onCreateActions(@NonNull List<GuidedAction> actions, Bundle savedInstanceState) {
+        android.util.Log.e("ProfileFragment", "🚨🚨🚨 ProfileFragment onCreateActions CALLED! 🚨🚨🚨");
         SharedPreferences prefs = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
         boolean useExternalPlayer = prefs.getBoolean(PREF_USE_EXTERNAL_PLAYER, false);
         String selectedPlayer = prefs.getString(PREF_SELECTED_PLAYER, "just"); // Default: just player
+        android.util.Log.e("ProfileFragment", "🎮 External player enabled: " + useExternalPlayer + ", Selected: " + selectedPlayer);
         
         // External Player Toggle
         GuidedAction externalPlayerAction = new GuidedAction.Builder(getActivity())
@@ -131,10 +138,6 @@ public class ProfileFragment extends GuidedStepSupportFragment {
         } else if (action.getId() == ACTION_ID_SIGN_OUT) {
             GuidedStepSupportFragment fragment = new SignOutFragment();
             add(getFragmentManager(), fragment);
-        } else if (action.getId() == ACTION_ID_LOGIN) {
-            // Launch login activity
-            Intent intent = new Intent(getContext(), LoginChooserActivity.class);
-            startActivity(intent);
         }
     }
     

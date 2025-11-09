@@ -24,15 +24,6 @@ public class SubtitleListAdapter extends RecyclerView.Adapter<SubtitleListAdapte
     public SubtitleListAdapter(Context context, List<Subtitle> subtitleList) {
         this.context = context;
         this.subtitleList = subtitleList;
-        android.util.Log.d("SubtitleListAdapter", "🎬 Adapter created with " + 
-            (subtitleList != null ? subtitleList.size() + " subtitles" : "NULL list"));
-        if (subtitleList != null) {
-            for (int i = 0; i < subtitleList.size(); i++) {
-                Subtitle sub = subtitleList.get(i);
-                android.util.Log.d("SubtitleListAdapter", "🎬 Item " + i + ": " + 
-                    sub.getLanguage() + " - " + sub.getUrl());
-            }
-        }
     }
 
     @NonNull

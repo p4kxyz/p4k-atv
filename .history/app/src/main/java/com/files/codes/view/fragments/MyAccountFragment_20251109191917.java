@@ -152,13 +152,18 @@ public class MyAccountFragment extends Fragment  {
     
     private void setupExternalPlayerSwitch() {
         if (externalPlayerSwitch == null) {
+            Log.e(TAG, "❌ External Player Switch is NULL! Cannot setup.");
             return;
         }
+        
+        Log.d(TAG, "✅ Setting up External Player Switch");
         
         // Load saved preference
         SharedPreferences prefs = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
         boolean useExternalPlayer = prefs.getBoolean(PREF_USE_EXTERNAL_PLAYER, false);
         externalPlayerSwitch.setChecked(useExternalPlayer);
+        
+        Log.d(TAG, "📱 External player preference loaded: " + useExternalPlayer);
         
         // Handle switch changes
         externalPlayerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -167,6 +172,7 @@ public class MyAccountFragment extends Fragment  {
                 SharedPreferences.Editor editor = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE).edit();
                 editor.putBoolean(PREF_USE_EXTERNAL_PLAYER, isChecked);
                 editor.apply();
+                Log.d(TAG, "💾 External player preference saved: " + isChecked);
             }
         });
     }

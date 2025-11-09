@@ -1306,25 +1306,17 @@ public class PlayerActivity extends Activity {
             adapter.setListener(new SubtitleListAdapter.OnSubtitleItemClickListener() {
                 @Override
                 public void onSubtitleItemClick(View view, Subtitle subtitle, int position, SubtitleListAdapter.SubtitleViewHolder holder) {
-                    Log.d(TAG, "🎬 ============ SUBTITLE ITEM CLICKED! ============");
-                    Log.d(TAG, "🎬 Position: " + position);
-                    Log.d(TAG, "🎬 Language: " + subtitle.getLanguage());
-                    Log.d(TAG, "🎬 URL: " + subtitle.getUrl());
-                    Log.d(TAG, "🎬 View: " + (view != null ? "Valid" : "NULL"));
-                    Log.d(TAG, "🎬 Holder: " + (holder != null ? "Valid" : "NULL"));
+                    Log.d(TAG, "🎬 Subtitle clicked: " + subtitle.getLanguage() + " - URL: " + subtitle.getUrl());
                     
                     // Test VTT URL accessibility
-                    Log.d(TAG, "🎬 Testing VTT URL accessibility...");
+                    Log.d(TAG, "🎬 Testing VTT URL: " + subtitle.getUrl());
                     
                     // Load subtitle into ExoPlayer
                     if (subtitle.getUrl() != null && !subtitle.getUrl().isEmpty()) {
-                        Log.d(TAG, "🎬 Loading subtitle into ExoPlayer...");
                         loadExternalSubtitle(subtitle.getUrl(), subtitle.getLanguage());
-                        Log.d(TAG, "🎬 Dismissing dialog...");
                         dialog.dismiss();
-                        Log.d(TAG, "🎬 Dialog dismissed!");
                     } else {
-                        Log.e(TAG, "🎬 ERROR: Subtitle URL is empty!");
+                        Log.e(TAG, "🎬 Subtitle URL is empty!");
                     }
                 }
             });

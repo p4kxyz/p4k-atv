@@ -1,0 +1,23 @@
+<vector
+    android:height="24dp"
+    android:tint="#FFFFFF"
+    android:viewportHeight="24"
+    android:viewportWidth="24"
+    android:width="24dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Rectangle representing screen -->
+    <path android:fillColor="#FF000000" 
+          android:pathData="M3,6h18v12H3V6z" 
+          android:strokeColor="#FFFFFF" 
+          android:strokeWidth="1.5" 
+          android:fillType="evenOdd"/>
+    <!-- Corner marks to indicate aspect ratio adjustment -->
+    <path android:fillColor="#FFFFFF" 
+          android:pathData="M5,8h2v2H5V8z"/>
+    <path android:fillColor="#FFFFFF" 
+          android:pathData="M17,8h2v2h-2V8z"/>
+    <path android:fillColor="#FFFFFF" 
+          android:pathData="M5,14h2v2H5V14z"/>
+    <path android:fillColor="#FFFFFF" 
+          android:pathData="M17,14h2v2h-2V14z"/>
+</vector>

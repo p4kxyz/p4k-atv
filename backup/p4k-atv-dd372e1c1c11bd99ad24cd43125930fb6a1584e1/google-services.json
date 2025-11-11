@@ -1,0 +1,170 @@
+{
+  "project_info": {
+    "project_number": "398569952194",
+    "project_id": "website-19a7d",
+    "storage_bucket": "website-19a7d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398569952194:android:5e33e4973a963517bf3c5b",
+        "android_client_info": {
+          "package_name": "com.oxootv.spagreen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398569952194-hui30ig11aakvds7jjoc6sbht03n803d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.oxootv.spagreen",
+            "certificate_hash": "aeae97e7569e256df444c3918cb111238fab6727"
+          }
+        },
+        {
+          "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa4Ly5xBctJLVZcG6Ns7LK10HKxVo38rg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "398569952194-7h4q4ojtt38s2kc4b78hqjuukd2f8f3b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.qphim.ios"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398569952194:android:a159403d1eb2fde3bf3c5b",
+        "android_client_info": {
+          "package_name": "com.qphim.tv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398569952194-nct3cn6icinkpk5p11lq3tqtkpqn6dpj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qphim.tv",
+            "certificate_hash": "8ab4b390bba069daa4911dbddae1f8ab8379470f"
+          }
+        },
+        {
+          "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa4Ly5xBctJLVZcG6Ns7LK10HKxVo38rg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "398569952194-7h4q4ojtt38s2kc4b78hqjuukd2f8f3b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.qphim.ios"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398569952194:android:6ffb1fb7b7c0882abf3c5b",
+        "android_client_info": {
+          "package_name": "com.xyz.phim4k"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa4Ly5xBctJLVZcG6Ns7LK10HKxVo38rg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "398569952194-7h4q4ojtt38s2kc4b78hqjuukd2f8f3b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.qphim.ios"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398569952194:android:b2e68dc9fcff49d2bf3c5b",
+        "android_client_info": {
+          "package_name": "net.qphim.atv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa4Ly5xBctJLVZcG6Ns7LK10HKxVo38rg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398569952194-8je3m3mprih9a637t8kevsr83b20fojq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "398569952194-7h4q4ojtt38s2kc4b78hqjuukd2f8f3b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.qphim.ios"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

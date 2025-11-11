@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -153,6 +154,13 @@ public class HomeNewFragment extends BrowseSupportFragment {
                     @Override
                     public ViewHolder onCreateViewHolder(ViewGroup parent) {
                         View view = getActivity().getLayoutInflater().inflate(R.layout.icon_header_item, parent, false);
+                        
+                        // Disable all default focus effects (scaling, background, etc.)
+                        view.setBackground(null);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            view.setStateListAnimator(null);
+                        }
+                        
                         return new ViewHolder(view);
                     }
 
@@ -204,6 +212,7 @@ public class HomeNewFragment extends BrowseSupportFragment {
         setHeadersState(HEADERS_ENABLED);
         setHeadersTransitionOnBackEnabled(true);
         setBrandColor(getResources().getColor(R.color.colorPrimary));
+        
         // setTitle(getResources().getString(R.string.app_name)); // Ẩn title app
         setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
 

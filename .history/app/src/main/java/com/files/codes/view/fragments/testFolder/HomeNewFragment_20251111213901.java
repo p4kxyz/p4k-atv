@@ -204,6 +204,11 @@ public class HomeNewFragment extends BrowseSupportFragment {
         setHeadersState(HEADERS_ENABLED);
         setHeadersTransitionOnBackEnabled(true);
         setBrandColor(getResources().getColor(R.color.colorPrimary));
+        
+        // Disable default header focus effects - only use our custom red color effect
+        getHeadersSupportFragment().getVerticalGridView().setItemAlignmentOffset(0);
+        getHeadersSupportFragment().getVerticalGridView().setItemAlignmentOffsetPercent(0);
+        
         // setTitle(getResources().getString(R.string.app_name)); // Ẩn title app
         setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
 

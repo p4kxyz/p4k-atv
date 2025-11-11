@@ -20,7 +20,6 @@ import androidx.leanback.widget.FocusHighlight;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.PresenterSelector;
-import androidx.leanback.widget.RowHeaderPresenter;
 import com.files.codes.view.IconHeaderItem;
 import com.files.codes.view.presenter.IconHeaderItemPresenter;
 import androidx.leanback.widget.OnItemViewClickedListener;
@@ -141,7 +140,7 @@ public class HomeNewFragment extends BrowseSupportFragment {
         PageRow pageRow6 = new PageRow(headerItem6);
         mRowsAdapter.add(pageRow6);
 
-        IconHeaderItem headerItem7 = new IconHeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT, R.drawable.ic_baseline_account_circle_24);
+        IconHeaderItem headerItem7 = new IconHeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT, R.drawable.ic_exit_to_app_black_24dp);
         PageRow pageRow7 = new PageRow(headerItem7);
         mRowsAdapter.add(pageRow7);
 
@@ -149,7 +148,7 @@ public class HomeNewFragment extends BrowseSupportFragment {
         setHeaderPresenterSelector(new PresenterSelector() {
             @Override
             public Presenter getPresenter(Object item) {
-                return new RowHeaderPresenter() {
+                return new Presenter() {
                     @Override
                     public ViewHolder onCreateViewHolder(ViewGroup parent) {
                         View view = getActivity().getLayoutInflater().inflate(R.layout.icon_header_item, parent, false);
@@ -157,7 +156,7 @@ public class HomeNewFragment extends BrowseSupportFragment {
                     }
 
                     @Override
-                    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
+                    public void onBindViewHolder(ViewHolder viewHolder, Object item) {
                         PageRow pageRow = (PageRow) item;
                         IconHeaderItem iconHeaderItem = (IconHeaderItem) pageRow.getHeaderItem();
                         
@@ -174,26 +173,10 @@ public class HomeNewFragment extends BrowseSupportFragment {
                         }
                         
                         label.setText(iconHeaderItem.getName());
-                        
-                        // Set focus change listener for red color effect
-                        rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                            @Override
-                            public void onFocusChange(View v, boolean hasFocus) {
-                                if (hasFocus) {
-                                    // Focus: Red color
-                                    label.setTextColor(getResources().getColor(android.R.color.holo_red_light));
-                                    iconView.setColorFilter(getResources().getColor(android.R.color.holo_red_light));
-                                } else {
-                                    // No focus: White color (default)
-                                    label.setTextColor(getResources().getColor(android.R.color.white));
-                                    iconView.clearColorFilter();
-                                }
-                            }
-                        });
                     }
 
                     @Override
-                    public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {}
+                    public void onUnbindViewHolder(ViewHolder viewHolder) {}
                 };
             }
         });

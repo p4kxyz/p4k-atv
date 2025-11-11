@@ -174,22 +174,6 @@ public class HomeNewFragment extends BrowseSupportFragment {
                         }
                         
                         label.setText(iconHeaderItem.getName());
-                        
-                        // Set focus change listener for red color effect
-                        rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                            @Override
-                            public void onFocusChange(View v, boolean hasFocus) {
-                                if (hasFocus) {
-                                    // Focus: Red color
-                                    label.setTextColor(getResources().getColor(android.R.color.holo_red_light));
-                                    iconView.setColorFilter(getResources().getColor(android.R.color.holo_red_light));
-                                } else {
-                                    // No focus: White color (default)
-                                    label.setTextColor(getResources().getColor(android.R.color.white));
-                                    iconView.clearColorFilter();
-                                }
-                            }
-                        });
                     }
 
                     @Override

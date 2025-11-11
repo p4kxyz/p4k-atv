@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -20,8 +19,7 @@ import androidx.leanback.widget.FocusHighlight;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.PresenterSelector;
-import androidx.leanback.widget.RowHeaderPresenter;
-import com.files.codes.view.IconHeaderItem;
+import com.files.codes.view.presenter.IconHeaderItem;
 import com.files.codes.view.presenter.IconHeaderItemPresenter;
 import androidx.leanback.widget.OnItemViewClickedListener;
 import androidx.leanback.widget.PageRow;
@@ -141,60 +139,15 @@ public class HomeNewFragment extends BrowseSupportFragment {
         PageRow pageRow6 = new PageRow(headerItem6);
         mRowsAdapter.add(pageRow6);
 
-        IconHeaderItem headerItem7 = new IconHeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT, R.drawable.ic_baseline_account_circle_24);
+        IconHeaderItem headerItem7 = new IconHeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT, R.drawable.ic_exit_to_app_black_24dp);
         PageRow pageRow7 = new PageRow(headerItem7);
         mRowsAdapter.add(pageRow7);
 
-        // Set presenter selector to display icons for PageRow
+        // Set presenter selector to display icons
         setHeaderPresenterSelector(new PresenterSelector() {
             @Override
             public Presenter getPresenter(Object item) {
-                return new RowHeaderPresenter() {
-                    @Override
-                    public ViewHolder onCreateViewHolder(ViewGroup parent) {
-                        View view = getActivity().getLayoutInflater().inflate(R.layout.icon_header_item, parent, false);
-                        return new ViewHolder(view);
-                    }
-
-                    @Override
-                    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-                        PageRow pageRow = (PageRow) item;
-                        IconHeaderItem iconHeaderItem = (IconHeaderItem) pageRow.getHeaderItem();
-                        
-                        View rootView = viewHolder.view;
-                        android.widget.ImageView iconView = rootView.findViewById(R.id.header_icon);
-                        android.widget.TextView label = rootView.findViewById(R.id.header_label);
-                        
-                        int iconResId = iconHeaderItem.getIconResId();
-                        if (iconResId != IconHeaderItem.ICON_NONE) {
-                            iconView.setImageResource(iconResId);
-                            iconView.setVisibility(View.VISIBLE);
-                        } else {
-                            iconView.setVisibility(View.GONE);
-                        }
-                        
-                        label.setText(iconHeaderItem.getName());
-                        
-                        // Set focus change listener for red color effect
-                        rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                            @Override
-                            public void onFocusChange(View v, boolean hasFocus) {
-                                if (hasFocus) {
-                                    // Focus: Red color
-                                    label.setTextColor(getResources().getColor(android.R.color.holo_red_light));
-                                    iconView.setColorFilter(getResources().getColor(android.R.color.holo_red_light));
-                                } else {
-                                    // No focus: White color (default)
-                                    label.setTextColor(getResources().getColor(android.R.color.white));
-                                    iconView.clearColorFilter();
-                                }
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {}
-                };
+                return new IconHeaderItemPresenter();
             }
         });
 

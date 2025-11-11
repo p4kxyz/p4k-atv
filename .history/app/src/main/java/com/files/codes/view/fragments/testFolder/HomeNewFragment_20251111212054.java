@@ -141,7 +141,7 @@ public class HomeNewFragment extends BrowseSupportFragment {
         PageRow pageRow6 = new PageRow(headerItem6);
         mRowsAdapter.add(pageRow6);
 
-        IconHeaderItem headerItem7 = new IconHeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT, R.drawable.ic_baseline_account_circle_24);
+        IconHeaderItem headerItem7 = new IconHeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT, R.drawable.ic_exit_to_app_black_24dp);
         PageRow pageRow7 = new PageRow(headerItem7);
         mRowsAdapter.add(pageRow7);
 
@@ -174,22 +174,6 @@ public class HomeNewFragment extends BrowseSupportFragment {
                         }
                         
                         label.setText(iconHeaderItem.getName());
-                        
-                        // Set focus change listener for red color effect
-                        rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                            @Override
-                            public void onFocusChange(View v, boolean hasFocus) {
-                                if (hasFocus) {
-                                    // Focus: Red color
-                                    label.setTextColor(getResources().getColor(android.R.color.holo_red_light));
-                                    iconView.setColorFilter(getResources().getColor(android.R.color.holo_red_light));
-                                } else {
-                                    // No focus: White color (default)
-                                    label.setTextColor(getResources().getColor(android.R.color.white));
-                                    iconView.clearColorFilter();
-                                }
-                            }
-                        });
                     }
 
                     @Override

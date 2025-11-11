@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -153,6 +154,11 @@ public class HomeNewFragment extends BrowseSupportFragment {
                     @Override
                     public ViewHolder onCreateViewHolder(ViewGroup parent) {
                         View view = getActivity().getLayoutInflater().inflate(R.layout.icon_header_item, parent, false);
+                        
+                        // Disable all default focus effects (scaling, background, etc.)
+                        view.setBackground(null);
+                        view.setStateListAnimator(null);
+                        
                         return new ViewHolder(view);
                     }
 
@@ -204,6 +210,11 @@ public class HomeNewFragment extends BrowseSupportFragment {
         setHeadersState(HEADERS_ENABLED);
         setHeadersTransitionOnBackEnabled(true);
         setBrandColor(getResources().getColor(R.color.colorPrimary));
+        
+        // Disable default header focus effects - only use our custom red color effect
+        getHeadersSupportFragment().getVerticalGridView().setItemAlignmentOffset(0);
+        getHeadersSupportFragment().getVerticalGridView().setItemAlignmentOffsetPercent(0);
+        
         // setTitle(getResources().getString(R.string.app_name)); // Ẩn title app
         setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
 

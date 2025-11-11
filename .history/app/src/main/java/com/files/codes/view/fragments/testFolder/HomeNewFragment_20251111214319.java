@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -153,7 +154,32 @@ public class HomeNewFragment extends BrowseSupportFragment {
                     @Override
                     public ViewHolder onCreateViewHolder(ViewGroup parent) {
                         View view = getActivity().getLayoutInflater().inflate(R.layout.icon_header_item, parent, false);
+                        
+                        // Disable all default focus effects (scaling, background, dim, etc.)
+                        view.setBackground(null);
+                        view.setAlpha(1.0f); // Always full opacity
+                        view.setFocusable(true);
+                        view.setFocusableInTouchMode(true);
+                        
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            view.setStateListAnimator(null);
+                        }
+                        
+                        // Disable dim/alpha effects
+                        view.clearAnimation();
+                        view.animate().cancel();
+                        
                         return new ViewHolder(view);
+                    }
+
+                    // Remove onSelectLevelChanged as it doesn't exist in RowHeaderPresenter
+
+                    @Override
+                    public void onViewAttachedToWindow(ViewHolder holder) {
+                        super.onViewAttachedToWindow(holder);
+                        // Ensure no effects when attached
+                        holder.view.setAlpha(1.0f);
+                        holder.view.clearAnimation();
                     }
 
                     @Override
@@ -179,6 +205,10 @@ public class HomeNewFragment extends BrowseSupportFragment {
                         rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                             @Override
                             public void onFocusChange(View v, boolean hasFocus) {
+                                // Always maintain full opacity - no dim effect
+                                v.setAlpha(1.0f);
+                                v.clearAnimation();
+                                
                                 if (hasFocus) {
                                     // Focus: Red color
                                     label.setTextColor(getResources().getColor(android.R.color.holo_red_light));
@@ -204,6 +234,9 @@ public class HomeNewFragment extends BrowseSupportFragment {
         setHeadersState(HEADERS_ENABLED);
         setHeadersTransitionOnBackEnabled(true);
         setBrandColor(getResources().getColor(R.color.colorPrimary));
+        
+        // Disable browse fragment effects
+        
         // setTitle(getResources().getString(R.string.app_name)); // Ẩn title app
         setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
 

@@ -53,8 +53,7 @@ public class RelatedPresenter extends Presenter {
         ((ViewHolder) viewHolder).mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                android.util.Log.d("RelatedPresenter", "Opening related video: " + video.getTitle() + " (ID: " + video.getVideosId() + ")");
-                Intent intent = new Intent(mContext, HeroStyleVideoDetailsActivity.class);
+                Intent intent = new Intent(mContext, VideoDetailsActivity.class);
                 intent.putExtra("id", video.getVideosId());
                 intent.putExtra("type", video.getType());
                 intent.putExtra("thumbImage", video.getThumbnailUrl());

@@ -55,8 +55,7 @@ public class ActorMovieAdapter extends RecyclerView.Adapter<ActorMovieAdapter.Vi
         
         // Click listener
         holder.itemView.setOnClickListener(v -> {
-            android.util.Log.d("ActorMovieAdapter", "Opening movie: " + movie.getTitle() + " (ID: " + movie.getVideosId() + ")");
-            Intent intent = new Intent(context, HeroStyleVideoDetailsActivity.class);
+            Intent intent = new Intent(context, VideoDetailsActivity.class);
             intent.putExtra("id", movie.getVideosId());
             intent.putExtra("type", movie.getIsTvseries().equals("1") ? "tvseries" : "movie");
             

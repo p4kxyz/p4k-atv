@@ -204,8 +204,7 @@ public class SearchFragment extends SearchSupportFragment implements SearchSuppo
                         break;
                     }
                     case "tvseries": {
-                        Log.d(TAG, "SearchFragment - Opening tvseries: " + searchContent.getTitle() + " (ID: " + searchContent.getId() + ")");
-                        Intent intent = new Intent(getActivity(), HeroStyleVideoDetailsActivity.class);
+                        Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                         intent.putExtra("id", searchContent.getId());
                         intent.putExtra("type", "tvseries");
                         intent.putExtra("thumbImage", searchContent.getThumbnailUrl());
@@ -217,8 +216,7 @@ public class SearchFragment extends SearchSupportFragment implements SearchSuppo
                         break;
                     }
                     case "movie": {
-                        Log.d(TAG, "SearchFragment - Opening movie: " + searchContent.getTitle() + " (ID: " + searchContent.getId() + ")");
-                        Intent intent = new Intent(getActivity(), HeroStyleVideoDetailsActivity.class);
+                        Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                         intent.putExtra("id", searchContent.getId());
                         intent.putExtra("type", "movie");
                         intent.putExtra("thumbImage", searchContent.getThumbnailUrl());

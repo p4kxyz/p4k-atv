@@ -541,8 +541,7 @@ public class HeroBannerPresenter extends Presenter {
         }
 
         private void openVideoDetails(VideoContent video) {
-            Log.d(TAG, "HeroBannerPresenter - Opening video: " + video.getTitle() + " (ID: " + video.getId() + ")");
-            Intent intent = new Intent(mContext, HeroStyleVideoDetailsActivity.class);
+            Intent intent = new Intent(mContext, VideoDetailsActivity.class);
             intent.putExtra("id", video.getId());
             
             // Determine type from isTvseries field

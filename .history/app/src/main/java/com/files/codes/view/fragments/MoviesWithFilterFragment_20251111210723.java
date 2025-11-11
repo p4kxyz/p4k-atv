@@ -529,8 +529,7 @@ public class MoviesWithFilterFragment extends GridFragment {
             public void onItemClicked(Presenter.ViewHolder viewHolder, Object o,
                                       RowPresenter.ViewHolder viewHolder2, Row row) {
                 Movie movie = (Movie) o;
-                Log.d("MoviesWithFilterFragment", "Opening movie: " + movie.getTitle() + " (ID: " + movie.getVideosId() + ")");
-                Intent intent = new Intent(getActivity(), HeroStyleVideoDetailsActivity.class);
+                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                 intent.putExtra("id", movie.getVideosId());
                 intent.putExtra("type", "movie");
                 intent.putExtra("thumbImage", movie.getThumbnailUrl());

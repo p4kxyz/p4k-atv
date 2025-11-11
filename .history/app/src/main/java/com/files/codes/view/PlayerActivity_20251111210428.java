@@ -252,8 +252,7 @@ public class PlayerActivity extends Activity {
             DatabaseHelper db = new DatabaseHelper(PlayerActivity.this);
             final String status = db.getActiveStatusData() != null ? db.getActiveStatusData().getStatus() : "inactive";
             if (!status.equals("active")) {
-                Log.d(TAG, "PlayerActivity - Redirecting to HeroStyle (inactive subscription) - ID: " + model.getMovieId() + ", Type: " + model.getCategory());
-                Intent redirectIntent = new Intent(PlayerActivity.this, HeroStyleVideoDetailsActivity.class);
+                Intent redirectIntent = new Intent(PlayerActivity.this, VideoDetailsActivity.class);
                 redirectIntent.putExtra("type", model.getCategory());
                 redirectIntent.putExtra("id", model.getMovieId());
                 redirectIntent.putExtra("thumbImage", model.getCardImageUrl());
@@ -567,9 +566,9 @@ public class PlayerActivity extends Activity {
                     Log.d(TAG, "🔙 KEYCODE_BACK - From watch history: " + fromWatchHistory);
                     
                     if (fromWatchHistory && model != null) {
-                        Log.d(TAG, "🔙 Redirecting to HeroStyleVideoDetailsActivity - ID: " + model.getMovieId() + ", Type: " + model.getCategory());
+                        Log.d(TAG, "🔙 Redirecting to VideoDetailsActivity - ID: " + model.getMovieId() + ", Type: " + model.getCategory());
                         // Go to video details page
-                        Intent intent = new Intent(PlayerActivity.this, HeroStyleVideoDetailsActivity.class);
+                        Intent intent = new Intent(PlayerActivity.this, VideoDetailsActivity.class);
                         intent.putExtra("id", model.getMovieId());
                         intent.putExtra("type", model.getCategory());
                         intent.putExtra("thumbImage", model.getCardImageUrl());
@@ -2183,9 +2182,9 @@ public class PlayerActivity extends Activity {
             Log.d(TAG, "🔙 From watch history: " + fromWatchHistory);
             
             if (fromWatchHistory && model != null) {
-                Log.d(TAG, "🔙 Redirecting to HeroStyleVideoDetailsActivity - ID: " + model.getMovieId() + ", Type: " + model.getCategory());
+                Log.d(TAG, "🔙 Redirecting to VideoDetailsActivity - ID: " + model.getMovieId() + ", Type: " + model.getCategory());
                 // Go to video details page
-                Intent intent = new Intent(PlayerActivity.this, HeroStyleVideoDetailsActivity.class);
+                Intent intent = new Intent(PlayerActivity.this, VideoDetailsActivity.class);
                 intent.putExtra("id", model.getMovieId());
                 intent.putExtra("type", model.getCategory());
                 intent.putExtra("thumbImage", model.getCardImageUrl());

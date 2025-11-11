@@ -4135,7 +4135,7 @@ public class HomeFragment extends RowsSupportFragment {
 
     /**
      * Load movie logo from API pattern and handle fallback to text title
-     * URL pattern: https://api.phim4k.lol/uploads/logo/{id}.jpg
+     * URL pattern: https://api.phim4k.lol/uploads/video_thumb/Videos_{id}.jpg
      */
     private void loadMovieLogo(String videoId, android.widget.ImageView logoImageView, 
                                android.widget.TextView titleView, android.widget.TextView titleLine2View) {

@@ -2992,9 +2992,6 @@ public class HomeFragment extends RowsSupportFragment {
             }
             loadBackgroundImage(imageUrl, heroBackground);
             
-            // Load movie logo
-            loadMovieLogo(video.getId(), heroMovieLogo, heroTitle, heroTitleLine2);
-            
             // Update text content directly (no animation)
             updateTextContent(heroTitle, heroTitleLine2, heroDescription, heroImdbRating, 
                             heroYear, heroQuality, heroImdbContainer, heroQualityContainer, video);
@@ -4135,7 +4132,7 @@ public class HomeFragment extends RowsSupportFragment {
 
     /**
      * Load movie logo from API pattern and handle fallback to text title
-     * URL pattern: https://api.phim4k.lol/uploads/logo/{id}.jpg
+     * URL pattern: https://api.phim4k.lol/uploads/video_thumb/Videos_{id}.jpg
      */
     private void loadMovieLogo(String videoId, android.widget.ImageView logoImageView, 
                                android.widget.TextView titleView, android.widget.TextView titleLine2View) {
@@ -4145,7 +4142,7 @@ public class HomeFragment extends RowsSupportFragment {
             return;
         }
         
-        String logoUrl = "https://api.phim4k.lol/uploads/logo/" + videoId.trim() + ".jpg";
+        String logoUrl = "https://api.phim4k.lol/uploads/video_thumb/" + videoId.trim() + ".jpg";
         
         // Try to load logo with Picasso
         com.squareup.picasso.Picasso.get()
@@ -4161,7 +4158,7 @@ public class HomeFragment extends RowsSupportFragment {
                 
                 @Override
                 public void onError(Exception e) {
-                    // Logo failed to load - show both titles as fallback (normal behavior)
+                    // Logo failed to load - show text titles as fallback
                     logoImageView.setVisibility(View.GONE);
                     if (titleView != null) titleView.setVisibility(View.VISIBLE);
                     if (titleLine2View != null && titleLine2View.getText() != null && !titleLine2View.getText().toString().isEmpty()) {

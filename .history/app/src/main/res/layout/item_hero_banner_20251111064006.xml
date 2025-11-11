@@ -54,7 +54,7 @@
             android:id="@+id/hero_movie_logo"
             android:layout_width="wrap_content"
             android:layout_height="80dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="16dp"
             android:scaleType="fitStart"
             android:adjustViewBounds="true"
             android:maxWidth="400dp"

@@ -1,0 +1,121 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+// translation
+if ( ! function_exists('trans')):
+	function trans($phrase){
+        return ucwords(str_replace('_', ' ', $phrase));
+  //       $translate_phrase = $phrase;
+	 //    $ci =& get_instance();
+		// $ci->load->helper('language');
+		// $active_language = $ci->language_model->get_active_language();
+		// $ci->lang->load('site_lang',$active_language);
+		// $ci->config->set_item('language', $active_language);
+  //       if($ci->lang->line($phrase) == FALSE):
+  //           //$ci->language_model->create_phrase($active_language,$phrase);            
+  //       else:
+  //           $translate_phrase = $ci->lang->line($phrase,FALSE);
+  //       endif;
+	 //    return $translate_phrase;
+    }
+endif;
+
+// configuration helper
+if (! function_exists('ovoo_config')):
+	function ovoo_config($title)
+    {
+    	$ci =& get_instance();
+        return $ci->common_model->get_config($title);
+    }
+endif;
+
+if (! function_exists('is_demo')):
+    function is_demo()
+    {
+        $ci =& get_instance();
+        return ($ci->config->item('is_demo') === true ) ? true : false;
+    }
+endif;
+
+
+// theme helper
+if (! function_exists('active_theme')):
+	function active_theme()
+    {
+    	$ci =& get_instance();
+        return $ci->common_model->get_active_theme();
+    }
+endif;
+
+//generate slug
+if (!function_exists('str_slug')) {
+    function str_slug($str)
+    {
+        return url_title($str, "-", true);
+    }
+}
+
+// Remove Vietnamese accents for search
+if (!function_exists('remove_vietnamese_accents')) {
+    function remove_vietnamese_accents($str) {
+        // Convert to lowercase first
+        $str = mb_strtolower($str, 'UTF-8');
+        
+        // Replace Vietnamese characters
+        $from = array(
+            'á', 'à', 'ả', 'ã', 'ạ', 'ă', 'ắ', 'ằ', 'ẳ', 'ẵ', 'ặ', 'â', 'ấ', 'ầ', 'ẩ', 'ẫ', 'ậ',
+            'đ',
+            'é', 'è', 'ẻ', 'ẽ', 'ẹ', 'ê', 'ế', 'ề', 'ể', 'ễ', 'ệ',
+            'í', 'ì', 'ỉ', 'ĩ', 'ị',
+            'ó', 'ò', 'ỏ', 'õ', 'ọ', 'ô', 'ố', 'ồ', 'ổ', 'ỗ', 'ộ', 'ơ', 'ớ', 'ờ', 'ở', 'ỡ', 'ợ',
+            'ú', 'ù', 'ủ', 'ũ', 'ụ', 'ư', 'ứ', 'ừ', 'ử', 'ữ', 'ự',
+            'ý', 'ỳ', 'ỷ', 'ỹ', 'ỵ'
+        );
+        
+        $to = array(
+            'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
+            'd',
+            'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e',
+            'i', 'i', 'i', 'i', 'i',
+            'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o',
+            'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u',
+            'y', 'y', 'y', 'y', 'y'
+        );
+        
+        return str_replace($from, $to, $str);
+    }
+}
+
+// Normalize name by replacing hyphens with spaces
+if (!function_exists('normalize_name')) {
+    function normalize_name($str) {
+        // Replace hyphens with spaces
+        $str = str_replace('-', ' ', $str);
+        // Remove extra spaces
+        $str = preg_replace('/\s+/', ' ', trim($str));
+        return $str;
+    }
+}
+
+// Split search query into words for fuzzy search
+if (!function_exists('get_search_keywords')) {
+    function get_search_keywords($query) {
+        // Replace hyphens with spaces first (for names like Lee-Min-Ho)
+        $query = str_replace('-', ' ', $query);
+        
+        // Remove extra spaces
+        $query = preg_replace('/\s+/', ' ', trim($query));
+        
+        // Remove special characters but keep Vietnamese characters
+        $query = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $query);
+        
+        // Split into words
+        $keywords = explode(' ', $query);
+        
+        // Remove words shorter than 2 characters and filter empty
+        $keywords = array_filter($keywords, function($word) {
+            return mb_strlen($word, 'UTF-8') >= 2;
+        });
+        
+        return array_values($keywords); // Re-index array
+    }
+}

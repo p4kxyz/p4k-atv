@@ -521,7 +521,7 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     private void toggleFavorite() {
         // Check if user is logged in before allowing favorites
         if (!PreferenceUtils.isLoggedIn(getContext())) {
-            new ToastMsg(getActivity()).toastIconError("You need to login first to use favorites");
+            new ToastMsg(getActivity()).toastIconError("Bạn cần đăng nhập để sử dụng tính năng yêu thích");
             return;
         }
         
@@ -925,13 +925,13 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                             // Show server error message or default
                             String errorMsg = response.body().getMessage();
                             if (errorMsg == null || errorMsg.isEmpty()) {
-                                errorMsg = "You are not logged in";
+                                errorMsg = "Bạn chưa đăng nhập";
                             }
                             new ToastMsg(getActivity()).toastIconError(errorMsg);
                         }
                     } else {
                         Log.e(TAG, "AddToFav failed - Code: " + response.code() + ", Body: " + (response.body() != null));
-                        new ToastMsg(getActivity()).toastIconError("Failed to add to favorites");
+                        new ToastMsg(getActivity()).toastIconError("Không thể thêm vào yêu thích");
                     }
                 }
             }
@@ -940,7 +940,7 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             public void onFailure(Call<FavoriteModel> call, Throwable t) {
                 Log.e(TAG, "AddToFav API failure", t);
                 if (getActivity() != null && isAdded()) {
-                    new ToastMsg(getActivity()).toastIconError("Failed to add to favorites");
+                    new ToastMsg(getActivity()).toastIconError("Không thể thêm vào yêu thích");
                 }
             }
         });
@@ -971,13 +971,13 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                             // Show server error message or default
                             String errorMsg = response.body().getMessage();
                             if (errorMsg == null || errorMsg.isEmpty()) {
-                                errorMsg = "You are not logged in";
+                                errorMsg = "Bạn chưa đăng nhập";
                             }
                             new ToastMsg(getActivity()).toastIconError(errorMsg);
                         }
                     } else {
                         Log.e(TAG, "RemoveFromFav failed - Code: " + response.code() + ", Body: " + (response.body() != null));
-                        new ToastMsg(getActivity()).toastIconError("Failed to remove from favorites");
+                        new ToastMsg(getActivity()).toastIconError("Không thể xóa khỏi yêu thích");
                     }
                 }
             }
@@ -986,7 +986,7 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             public void onFailure(Call<FavoriteModel> call, Throwable t) {
                 Log.e(TAG, "RemoveFromFav API failure", t);
                 if (getActivity() != null && isAdded()) {
-                    new ToastMsg(getActivity()).toastIconError("Failed to remove from favorites");
+                    new ToastMsg(getActivity()).toastIconError("Không thể xóa khỏi yêu thích");
                 }
             }
         });

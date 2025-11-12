@@ -1330,7 +1330,7 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         playbackModel.setMovieId(videoId); // Main series ID for watch history
         playbackModel.setTitle(movieDetails.getTitle() + " - " + episode.getEpisodesName());
         playbackModel.setDescription(movieDetails.getDescription());
-        playbackModel.setCategory("tvseries");
+        playbackModel.setCategory("episode");
         
         // Create video object from episode
         Video episodeVideo = new Video();

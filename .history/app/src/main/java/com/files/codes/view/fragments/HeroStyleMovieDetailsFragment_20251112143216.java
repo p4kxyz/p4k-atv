@@ -1330,7 +1330,7 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         playbackModel.setMovieId(videoId); // Main series ID for watch history
         playbackModel.setTitle(movieDetails.getTitle() + " - " + episode.getEpisodesName());
         playbackModel.setDescription(movieDetails.getDescription());
-        playbackModel.setCategory("tvseries");
+        playbackModel.setCategory("episode");
         
         // Create video object from episode
         Video episodeVideo = new Video();
@@ -1352,10 +1352,8 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         // Set episode navigation data for next/previous episode buttons
         if (movieDetails.getSeason() != null && !movieDetails.getSeason().isEmpty()) {
             playbackModel.setAllSeasons(movieDetails.getSeason());
-            Log.d(TAG, "Set allSeasons, total seasons: " + movieDetails.getSeason().size());
             
             // Find current season and episode index
-            boolean foundEpisode = false;
             for (int seasonIndex = 0; seasonIndex < movieDetails.getSeason().size(); seasonIndex++) {
                 Season season = movieDetails.getSeason().get(seasonIndex);
                 if (season.getEpisodes() != null) {
@@ -1365,21 +1363,11 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                             playbackModel.setCurrentSeasonIndex(seasonIndex);
                             playbackModel.setCurrentEpisodeIndex(episodeIndex);
                             playbackModel.setTotalEpisodesInSeason(season.getEpisodes().size());
-                            foundEpisode = true;
-                            Log.d(TAG, "Found episode in season " + seasonIndex + ", episode " + episodeIndex + 
-                                    ", total episodes in season: " + season.getEpisodes().size());
                             break;
                         }
                     }
-                    if (foundEpisode) break;
                 }
             }
-            
-            if (!foundEpisode) {
-                Log.w(TAG, "Episode not found in seasons data for navigation: " + episode.getEpisodesId());
-            }
-        } else {
-            Log.w(TAG, "No season data available for episode navigation");
         }
         
         Intent intent = new Intent(getActivity(), PlayerActivity.class);

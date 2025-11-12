@@ -19,7 +19,7 @@
     <FrameLayout
         android:id="@+id/hero_banner_container"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="250dp"
         android:layout_gravity="top|start"
         android:elevation="10dp"
         android:visibility="visible"

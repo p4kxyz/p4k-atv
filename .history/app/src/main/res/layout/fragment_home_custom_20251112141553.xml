@@ -8,7 +8,8 @@
         android:id="@+id/browse_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="400dp" />
+        android:layout_marginTop="400dp" />
+        android:background="#20FF0000" />
 
     <!-- Fixed Hero Banner (on top, doesn't scroll) -->
     <FrameLayout

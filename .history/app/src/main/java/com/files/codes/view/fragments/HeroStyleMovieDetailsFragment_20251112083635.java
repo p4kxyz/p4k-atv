@@ -90,7 +90,7 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     private List<Season> allSeasons;
     private int currentSeasonIndex = 0;
     private int currentEpisodePage = 0;
-    private static final int EPISODES_PER_PAGE = 4; // Optimized for 4K screen display
+    private static final int EPISODES_PER_PAGE = 10; // Increased for better 4K display
     
     // UI Animation State
     private LinearLayout hideableContentContainer;

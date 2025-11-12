@@ -8,13 +8,13 @@
         android:id="@+id/browse_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="400dp" />
+        android:layout_marginTop="50dp" />
 
     <!-- Fixed Hero Banner (on top, doesn't scroll) -->
     <FrameLayout
         android:id="@+id/hero_banner_fixed_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="200dp"
         android:layout_gravity="top"
         android:focusable="false"
         android:focusableInTouchMode="false"

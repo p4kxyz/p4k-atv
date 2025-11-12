@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Filter Bar Only (to be inserted into wrapper layout) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/filter_panel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/header_gradient_bg"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:elevation="4dp"
+    android:gravity="center_vertical">
+
+    <!-- Filter Title Icon -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔍 Bộ Lọc:"
+        android:textSize="14sp"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginEnd="12dp"/>
+
+    <!-- Genre Filter Button -->
+    <Button
+        android:id="@+id/btn_filter_genre"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="🎬 Thể Loại"
+        android:textSize="12sp"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:background="@drawable/filter_button_bg"
+        android:gravity="center"
+        android:minWidth="100dp"
+        android:elevation="2dp"
+        android:focusable="true"
+        android:layout_marginEnd="8dp"
+        android:nextFocusDown="@+id/grid_fragment_container"/>
+
+    <!-- Country Filter Button -->
+    <Button
+        android:id="@+id/btn_filter_country"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="🌍 Quốc Gia"
+        android:textSize="12sp"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:background="@drawable/filter_button_bg"
+        android:gravity="center"
+        android:minWidth="100dp"
+        android:elevation="2dp"
+        android:focusable="true"
+        android:layout_marginEnd="8dp"
+        android:nextFocusDown="@+id/grid_fragment_container"/>
+
+    <!-- Year Filter Button -->
+    <Button
+        android:id="@+id/btn_filter_year"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="📅 Năm"
+        android:textSize="12sp"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:background="@drawable/filter_button_bg"
+        android:gravity="center"
+        android:minWidth="80dp"
+        android:elevation="2dp"
+        android:focusable="true"
+        android:layout_marginEnd="8dp"
+        android:nextFocusDown="@+id/grid_fragment_container"/>
+
+    <!-- Clear All Filters Button -->
+    <Button
+        android:id="@+id/btn_clear_filters"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="✖️ Xóa"
+        android:textSize="12sp"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        android:background="@drawable/clear_filter_button_bg"
+        android:gravity="center"
+        android:minWidth="80dp"
+        android:elevation="2dp"
+        android:focusable="true"
+        android:layout_marginEnd="12dp"
+        android:nextFocusDown="@+id/grid_fragment_container"/>
+
+    <!-- Active Filters Display -->
+    <TextView
+        android:id="@+id/tv_active_filters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="11sp"
+        android:textColor="#FFC107"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:background="#2a2a2a"
+        android:gravity="center"
+        android:maxWidth="150dp"
+        android:visibility="gone"/>
+
+</LinearLayout>

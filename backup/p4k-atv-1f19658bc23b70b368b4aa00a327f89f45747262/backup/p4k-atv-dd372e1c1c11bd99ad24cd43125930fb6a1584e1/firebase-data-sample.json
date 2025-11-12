@@ -1,0 +1,18 @@
+{
+  "app_updates": {
+    "oxoo_tv": {
+      "version_code": 19,
+      "version_name": "1.9.7",
+      "download_url": "https://phim4k.xyz/downloads/androidtv/Phim4K-v1.9.7.apk",
+      "file_size": 8100000,
+      "release_notes": "🔥 Phim4K TV v1.9.7\n\n✅ Các cải tiến trong phiên bản này:\n- Sửa lỗi crash khi xem từ lịch sử\n- Cải thiện chọn phụ đề\n- Tối ưu hiệu suất phát video 4K\n- Hỗ trợ cập nhật OTA tự động\n- Sửa lỗi tương thích Android TV\n\n⚠️ Khuyến nghị cập nhật để có trải nghiệm tốt nhất!",
+      "force_update": false,
+      "min_supported_version": 15,
+      "release_date": "2025-09-25T10:00:00Z",
+      "changelog": {
+        "vi": "- Sửa lỗi crash khi phát video từ lịch sử xem\n- Cải thiện giao diện chọn phụ đề\n- Tối ưu hiệu suất phát video 4K\n- Thêm tính năng cập nhật OTA tự động\n- Sửa lỗi tương thích Android TV",
+        "en": "- Fixed crash when playing videos from watch history\n- Improved subtitle selection interface\n- Optimized 4K video playback performance\n- Added automatic OTA update feature\n- Fixed Android TV compatibility issues"
+      }
+    }
+  }
+}

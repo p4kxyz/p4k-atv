@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="?android:attr/borderlessButtonStyle"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/button_focus"
+    android:includeFontPadding="false"
+    android:lines="1"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    tools:text="Play now"
+    android:drawableStart="@drawable/action_button_image"
+    android:drawableTint="@android:color/white" />

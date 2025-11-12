@@ -1,0 +1,32 @@
+{
+  "app_updates": {
+    "oxoo_tv": {
+      "version_code": 20,
+      "version_name": "1.9.8",
+      "download_url": "https://phim4k.xyz/downloads/androidtv/Phim4K-v1.9.8.apk",
+      "file_size": 8350000,
+      "release_notes": "🚀 Phim4K TV v1.9.8 - BẢN CẬP NHẬT QUAN TRỌNG\n\n✨ TÍNH NĂNG MỚI:\n• 🔄 Hệ thống cập nhật OTA hoàn toàn mới\n• 🎬 Cải thiện player hỗ trợ codec mới\n• 📱 Giao diện Android TV được tối ưu\n• 🔊 Nâng cấp âm thanh Dolby Digital+\n\n🛠️ SỬA LỖI:\n• ✅ Khắc phục crash khi phát 4K HDR\n• ✅ Sửa lỗi đồng bộ phụ đề\n• ✅ Tối ưu hiệu suất trên TV Box cũ\n• ✅ Khắc phục lỗi mất kết nối internet\n\n⚡ HIỆU SUẤT:\n• 🚀 Tăng tốc độ tải nội dung 40%\n• 💾 Giảm RAM usage 25%\n• 🔋 Tối ưu pin cho tablet\n\n⚠️ KHUYẾN NGHỊ CẬP NHẬT NGAY để có trải nghiệm xem phim tốt nhất!",
+      "force_update": false,
+      "min_supported_version": 15,
+      "release_date": "2025-09-25T15:30:00Z",
+      "changelog": {
+        "vi": "🔥 CẬP NHẬT QUAN TRỌNG v1.9.8:\n\n✨ TÍNH NĂNG MỚI:\n- Hệ thống OTA update tự động\n- Player engine mới hỗ trợ codec AV1\n- UI/UX Android TV được redesign\n- Dolby Digital+ 7.1 surround sound\n- Smart download với pause/resume\n- Tính năng xem offline cải tiến\n\n🛠️ SỬA LỖI & TỐI ÔU:\n- Sửa crash khi phát 4K HDR content\n- Khắc phục lỗi subtitle timing\n- Tối ưu performance cho Amlogic chipset\n- Fix memory leak khi xem dài\n- Cải thiện network stability\n- Sửa lỗi remote control lag\n\n⚡ HIỆU SUẤT:\n- Startup time nhanh hơn 50%\n- Video buffer optimization\n- RAM usage giảm đáng kể\n- Battery optimization cho tablet",
+        "en": "🔥 MAJOR UPDATE v1.9.8:\n\n✨ NEW FEATURES:\n- Automatic OTA update system\n- New player engine with AV1 codec support\n- Redesigned Android TV UI/UX\n- Dolby Digital+ 7.1 surround sound\n- Smart download with pause/resume\n- Enhanced offline viewing\n\n🛠️ BUG FIXES & OPTIMIZATION:\n- Fixed crash when playing 4K HDR content\n- Resolved subtitle timing issues\n- Optimized performance for Amlogic chipsets\n- Fixed memory leak during long playback\n- Improved network stability\n- Fixed remote control lag\n\n⚡ PERFORMANCE:\n- 50% faster startup time\n- Video buffer optimization\n- Significantly reduced RAM usage\n- Battery optimization for tablets"
+      },
+      "update_priority": "high",
+      "rollout_percentage": 100,
+      "supported_android_versions": {
+        "min": 21,
+        "max": 34
+      },
+      "features": [
+        "ota_update_system",
+        "av1_codec_support", 
+        "dolby_digital_plus",
+        "smart_downloads",
+        "offline_viewing",
+        "android_tv_optimized"
+      ]
+    }
+  }
+}

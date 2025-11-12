@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="#1a1a1a">
+
+    <!-- Left Side: Filter Panel (Vertical, Centered) -->
+    <LinearLayout
+        android:id="@+id/filter_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/header_gradient_bg"
+        android:padding="6dp"
+        android:elevation="4dp"
+        android:gravity="center_vertical">
+
+        <!-- Single Advanced Filter Button (Compact, Left Side) -->
+        <Button
+            android:id="@+id/btn_advanced_filters"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="⚙️\nLọc"
+            android:textSize="12sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:background="@drawable/filter_button_bg"
+            android:gravity="center"
+            android:minWidth="65dp"
+            android:elevation="2dp"
+            android:focusable="true"
+            android:nextFocusRight="@+id/search_fragment"/>
+
+        <!-- Active Filters Display (Below Button) -->
+        <TextView
+            android:id="@+id/tv_active_filters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✨"
+            android:textSize="9sp"
+            android:textColor="#FFC107"
+            android:textStyle="bold"
+            android:padding="4dp"
+            android:layout_marginTop="6dp"
+            android:background="#2a2a2a"
+            android:gravity="center"
+            android:maxWidth="70dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <!-- Right Side: SearchFragment (takes remaining space) -->
+    <fragment
+        android:name="com.files.codes.view.fragments.SearchFragment"
+        android:id="@+id/search_fragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+
+</LinearLayout>

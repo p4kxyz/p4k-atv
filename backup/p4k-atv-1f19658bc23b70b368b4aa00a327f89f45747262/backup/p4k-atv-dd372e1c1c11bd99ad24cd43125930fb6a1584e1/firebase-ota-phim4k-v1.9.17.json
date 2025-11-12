@@ -1,0 +1,13 @@
+{
+  "app_name": "Phim4K",
+  "version_code": 23,
+  "version_name": "1.9.17",
+  "download_url": "https://phim4k.xyz/downloads/androidtv/Phim4K-v1.9.17.apk",
+  "file_size": 13200000,
+  "force_update": false,
+  "checksum": "sha256:p4k1917release",
+  "changelog": {
+    "vi": "✨ Tính năng mới v1.9.17:\n\n🎬 HỖ TRỢ 9 TRÌNH PHÁT NGOÀI:\n• Kodi - Media Center mạnh nhất\n• Just Player - Nhẹ, đơn giản\n• MX Player - Phổ biến nhất\n• VLC Player - Đa nền tảng\n• nPlayer - Tối ưu cho Android TV\n• Dune HD (Realtek + Amlogic)\n• Zidoo (Realtek + Amlogic với Dolby Vision)\n\n⚙️ Cài đặt trình phát:\n• Vào My Account → Profile\n• Bật 'Phát video bằng trình phát ngoài'\n• Chọn trình phát yêu thích\n• User-Agent tự động truyền đi\n\n🐛 Cải thiện:\n• Tối ưu phát video HLS\n• Cải thiện hiệu suất\n• Firebase OTA path: phim4k\n• Hỗ trợ Dolby Vision (Zidoo Amlogic)\n\n📱 Hỗ trợ đầy đủ Android TV",
+    "en": "✨ What's New in v1.9.17:\n\n🎬 SUPPORT 9 EXTERNAL PLAYERS:\n• Kodi - Most powerful media center\n• Just Player - Lightweight & simple\n• MX Player - Most popular\n• VLC Player - Cross-platform\n• nPlayer - Optimized for Android TV\n• Dune HD (Realtek + Amlogic)\n• Zidoo (Realtek + Amlogic with Dolby Vision)\n\n⚙️ Player Settings:\n• Go to My Account → Profile\n• Enable 'Use external player'\n• Choose your favorite player\n• User-Agent automatically passed\n\n🐛 Improvements:\n• HLS playback optimization\n• Performance improvements\n• Firebase OTA path: phim4k\n• Dolby Vision support (Zidoo Amlogic)\n\n📱 Full Android TV support"
+  }
+}

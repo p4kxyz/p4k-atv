@@ -2540,19 +2540,13 @@ public class PlayerActivity extends Activity {
                 String videoQuality = model.getVideoQuality() != null ? model.getVideoQuality() : "";
                 String isTvSeries = model.getIsTvSeries() != null ? model.getIsTvSeries() : "0";
                 
-                // For TV series, save with episode ID instead of series ID for proper episode tracking
-                String saveId = model.getMovieId(); // Default: series/movie ID
-                if (isTvSeries.equals("1") && model.getId() > 0) {
-                    saveId = String.valueOf(model.getId()); // Use episode ID for TV series
-                }
-                
-                Log.d(TAG, "💾 Saving watch history - ID: " + saveId + " (originalMovieId: " + model.getMovieId() + ")" +
+                Log.d(TAG, "💾 Saving watch history - ID: " + model.getMovieId() + 
                           ", Type: " + (model.getVideoType() != null ? model.getVideoType() : "movie") + 
                           ", isTvSeries: " + isTvSeries + 
                           ", Position: " + currentPosition + "ms");
                 
                 watchHistorySyncManager.addWatchHistoryItemWithMetadata(
-                    saveId, 
+                    model.getMovieId(), 
                     model.getTitle(), 
                     description,
                     model.getCardImageUrl() != null ? model.getCardImageUrl() : "",
@@ -4678,7 +4672,7 @@ public class PlayerActivity extends Activity {
         Log.d("PlayerActivity", "Fetching season data for movie ID: " + movieId);
         
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-        Call<MovieSingleDetails> call = apiService.getSingleDetail(AppConfig.API_KEY, "tvseries", movieId);
+        Call<MovieSingleDetails> call = apiService.getMovieDetails(com.files.codes.AppConfig.API_KEY, movieId);
         
         call.enqueue(new Callback<MovieSingleDetails>() {
             @Override

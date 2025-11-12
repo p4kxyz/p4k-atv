@@ -2542,7 +2542,7 @@ public class PlayerActivity extends Activity {
                 
                 // For TV series, save with episode ID instead of series ID for proper episode tracking
                 String saveId = model.getMovieId(); // Default: series/movie ID
-                if (isTvSeries.equals("1") && model.getId() > 0) {
+                if (isTvSeries.equals("1") && model.getId() != null) {
                     saveId = String.valueOf(model.getId()); // Use episode ID for TV series
                 }
                 

@@ -94,7 +94,6 @@ import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 import com.files.codes.R;
-import com.files.codes.AppConfig;
 import com.files.codes.database.DatabaseHelper;
 import com.files.codes.model.PlaybackModel;
 import com.files.codes.model.Video;
@@ -2540,19 +2539,13 @@ public class PlayerActivity extends Activity {
                 String videoQuality = model.getVideoQuality() != null ? model.getVideoQuality() : "";
                 String isTvSeries = model.getIsTvSeries() != null ? model.getIsTvSeries() : "0";
                 
-                // For TV series, save with episode ID instead of series ID for proper episode tracking
-                String saveId = model.getMovieId(); // Default: series/movie ID
-                if (isTvSeries.equals("1") && model.getId() > 0) {
-                    saveId = String.valueOf(model.getId()); // Use episode ID for TV series
-                }
-                
-                Log.d(TAG, "💾 Saving watch history - ID: " + saveId + " (originalMovieId: " + model.getMovieId() + ")" +
+                Log.d(TAG, "💾 Saving watch history - ID: " + model.getMovieId() + 
                           ", Type: " + (model.getVideoType() != null ? model.getVideoType() : "movie") + 
                           ", isTvSeries: " + isTvSeries + 
                           ", Position: " + currentPosition + "ms");
                 
                 watchHistorySyncManager.addWatchHistoryItemWithMetadata(
-                    saveId, 
+                    model.getMovieId(), 
                     model.getTitle(), 
                     description,
                     model.getCardImageUrl() != null ? model.getCardImageUrl() : "",
@@ -4669,74 +4662,6 @@ public class PlayerActivity extends Activity {
             Log.e(TAG, "🎬 ❌ Error loading external subtitle: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Fetch season data for TV series to enable episode navigation from watch history
-     */
-    private void fetchSeasonDataForNavigation(String movieId) {
-        Log.d("PlayerActivity", "Fetching season data for movie ID: " + movieId);
-        
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-        Call<MovieSingleDetails> call = apiService.getSingleDetail(AppConfig.API_KEY, "tvseries", movieId);
-        
-        call.enqueue(new Callback<MovieSingleDetails>() {
-            @Override
-            public void onResponse(Call<MovieSingleDetails> call, Response<MovieSingleDetails> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    MovieSingleDetails movieDetails = response.body();
-                    
-                    if (movieDetails.getSeason() != null && !movieDetails.getSeason().isEmpty()) {
-                        Log.d("PlayerActivity", "Successfully fetched season data, seasons count: " + 
-                                movieDetails.getSeason().size());
-                        
-                        // Update model with season data
-                        model.setAllSeasons(movieDetails.getSeason());
-                        
-                        // Try to find current episode in seasons
-                        String currentVideoUrl = model.getVideoUrl();
-                        boolean foundEpisode = false;
-                        
-                        for (int seasonIndex = 0; seasonIndex < movieDetails.getSeason().size(); seasonIndex++) {
-                            Season season = movieDetails.getSeason().get(seasonIndex);
-                            if (season.getEpisodes() != null) {
-                                for (int episodeIndex = 0; episodeIndex < season.getEpisodes().size(); episodeIndex++) {
-                                    Episode episode = season.getEpisodes().get(episodeIndex);
-                                    if (episode.getFileUrl() != null && episode.getFileUrl().equals(currentVideoUrl)) {
-                                        model.setCurrentSeasonIndex(seasonIndex);
-                                        model.setCurrentEpisodeIndex(episodeIndex);
-                                        model.setTotalEpisodesInSeason(season.getEpisodes().size());
-                                        foundEpisode = true;
-                                        Log.d("PlayerActivity", "Found current episode at season " + seasonIndex + 
-                                                ", episode " + episodeIndex);
-                                        break;
-                                    }
-                                }
-                                if (foundEpisode) break;
-                            }
-                        }
-                        
-                        // Setup navigation buttons now that we have data
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setupEpisodeNavigationButtons();
-                            }
-                        });
-                        
-                    } else {
-                        Log.w("PlayerActivity", "No season data found in movie details");
-                    }
-                } else {
-                    Log.e("PlayerActivity", "Failed to fetch movie details: " + response.code());
-                }
-            }
-            
-            @Override
-            public void onFailure(Call<MovieSingleDetails> call, Throwable t) {
-                Log.e("PlayerActivity", "API call failed for movie details", t);
-            }
-        });
     }
 
 

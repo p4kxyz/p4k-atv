@@ -2540,19 +2540,13 @@ public class PlayerActivity extends Activity {
                 String videoQuality = model.getVideoQuality() != null ? model.getVideoQuality() : "";
                 String isTvSeries = model.getIsTvSeries() != null ? model.getIsTvSeries() : "0";
                 
-                // For TV series, save with episode ID instead of series ID for proper episode tracking
-                String saveId = model.getMovieId(); // Default: series/movie ID
-                if (isTvSeries.equals("1") && model.getId() > 0) {
-                    saveId = String.valueOf(model.getId()); // Use episode ID for TV series
-                }
-                
-                Log.d(TAG, "💾 Saving watch history - ID: " + saveId + " (originalMovieId: " + model.getMovieId() + ")" +
+                Log.d(TAG, "💾 Saving watch history - ID: " + model.getMovieId() + 
                           ", Type: " + (model.getVideoType() != null ? model.getVideoType() : "movie") + 
                           ", isTvSeries: " + isTvSeries + 
                           ", Position: " + currentPosition + "ms");
                 
                 watchHistorySyncManager.addWatchHistoryItemWithMetadata(
-                    saveId, 
+                    model.getMovieId(), 
                     model.getTitle(), 
                     description,
                     model.getCardImageUrl() != null ? model.getCardImageUrl() : "",

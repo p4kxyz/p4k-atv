@@ -102,15 +102,32 @@ public class SearchActivity extends LeanbackActivity {
             query = intent.getStringExtra("query");
         }
         
-        Log.d(TAG, "🔍 handleSearchIntent - Query received: " + query);
+        // Xử lý encoding cho tiếng Việt
+        if (query != null) {
+            try {
+                // Thử decode nếu query bị encode sai
+                byte[] queryBytes = query.getBytes("ISO-8859-1");
+                String decodedQuery = new String(queryBytes, "UTF-8");
+                if (decodedQuery.length() < query.length()) {
+                    query = decodedQuery;
+                    Log.d(TAG, "🔄 Query decoded from ISO to UTF-8: " + query);
+                }
+            } catch (Exception e) {
+                Log.d(TAG, "⚠️ Query encoding conversion failed, using original: " + e.getMessage());
+            }
+        }
+        
+        Log.d(TAG, "🔍 handleSearchIntent - Query received: '" + query + "'");
+        Log.d(TAG, "🔍 Query length: " + (query != null ? query.length() : "null"));
+        Log.d(TAG, "🔍 Query bytes: " + (query != null ? java.util.Arrays.toString(query.getBytes()) : "null"));
         
         if (query != null && !query.isEmpty() && searchFragment != null) {
             // Post delayed to ensure fragment is fully initialized
-            final String finalQuery = query;
+            final String finalQuery = query.trim(); // Trim whitespace
             new android.os.Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "🎯 Setting search query: " + finalQuery);
+                    Log.d(TAG, "🎯 Setting search query: '" + finalQuery + "'");
                     searchFragment.setSearchQuery(finalQuery);
                 }
             }, 300);

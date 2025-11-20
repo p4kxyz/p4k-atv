@@ -106,12 +106,11 @@ public class SearchActivity extends LeanbackActivity {
         
         if (query != null && !query.isEmpty() && searchFragment != null) {
             // Post delayed to ensure fragment is fully initialized
-            final String finalQuery = query;
             new android.os.Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "🎯 Setting search query: " + finalQuery);
-                    searchFragment.setSearchQuery(finalQuery);
+                    Log.d(TAG, "🎯 Setting search query: " + query);
+                    searchFragment.setSearchQuery(query);
                 }
             }, 300);
         }

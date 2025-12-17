@@ -815,35 +815,6 @@ public class PlayerActivity extends Activity {
                             Log.d(TAG, "MX Player Extra: " + key + " = " + extras.get(key));
                         }
                     }
-                    
-                    // Fallback: Check if returned URI matches any episode
-                    Uri returnedUri = data.getData();
-                    if (returnedUri != null && model != null && model.getAllSeasons() != null) {
-                        Log.d(TAG, "🔄 MX Player returned URI: " + returnedUri + ". Searching for match...");
-                        String returnedUriString = returnedUri.toString();
-                        
-                        int currentIndex = 0;
-                        boolean found = false;
-                        for (Season season : model.getAllSeasons()) {
-                            if (season.getEpisodes() != null) {
-                                for (Episode episode : season.getEpisodes()) {
-                                    String epUrl = episode.getFileUrl();
-                                    if (epUrl != null) {
-                                        String cleanEpUrl = cleanVideoUrl(epUrl);
-                                        // Check for match (exact or contains)
-                                        if (cleanEpUrl.equals(returnedUriString) || returnedUriString.contains(cleanEpUrl) || cleanEpUrl.contains(returnedUriString)) {
-                                            Log.d(TAG, "✅ Found matching episode by URI at index: " + currentIndex);
-                                            lastPlayedIndex = currentIndex;
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-                                    currentIndex++;
-                                }
-                            }
-                            if (found) break;
-                        }
-                    }
                 }
                 
                 if (lastPlayedIndex != -1 && model != null && model.getAllSeasons() != null) {
@@ -871,23 +842,11 @@ public class PlayerActivity extends Activity {
                                     if (seriesTitle != null && !seriesTitle.isEmpty() && epName != null) {
                                         model.setTitle(seriesTitle + " - " + epName);
                                     } else if (epName != null) {
-                                        // Fallback: Try to extract base title from current title
-                                        String currentTitle = model.getTitle();
-                                        String baseTitle = currentTitle;
-                                        
-                                        if (currentTitle != null && currentTitle.contains(" - ")) {
-                                            // Assume format "Series Name - Old Episode Name"
-                                            // We want to keep "Series Name" and replace "Old Episode Name"
-                                            int lastDashIndex = currentTitle.lastIndexOf(" - ");
-                                            if (lastDashIndex > 0) {
-                                                baseTitle = currentTitle.substring(0, lastDashIndex);
-                                            }
-                                        }
-                                        
-                                        if (baseTitle != null && !baseTitle.isEmpty()) {
-                                            model.setTitle(baseTitle + " - " + epName);
-                                        } else {
-                                            model.setTitle(epName);
+                                        // Fallback: If current title already has " - ", maybe replace the suffix?
+                                        // Or just append if it's short?
+                                        // Safest: Just use epName if series title missing, or keep original title if it looks like a series title
+                                        if (model.getTitle() != null && !model.getTitle().contains(epName)) {
+                                             model.setTitle(model.getTitle() + " - " + epName);
                                         }
                                     }
                                     Log.d(TAG, "   - Updated Title: " + model.getTitle());
@@ -1270,21 +1229,8 @@ public class PlayerActivity extends Activity {
                                     if (epName == null) epName = "Episode " + (index + 1);
                                     
                                     // Prepend Series Title for better context in player
-                                    // Use episode.getTvSeriesTitle() if available, otherwise use model.getTitle()
-                                    String seriesTitle = episode.getTvSeriesTitle();
-                                    if (seriesTitle == null || seriesTitle.isEmpty()) {
-                                        seriesTitle = model.getTitle();
-                                        // Clean series title if it contains " - Episode" or similar
-                                        if (seriesTitle != null && seriesTitle.contains(" - ")) {
-                                            String[] parts = seriesTitle.split(" - ");
-                                            if (parts.length > 0) {
-                                                seriesTitle = parts[0];
-                                            }
-                                        }
-                                    }
-                                    
-                                    if (seriesTitle != null && !seriesTitle.isEmpty()) {
-                                        epName = seriesTitle + " - " + epName;
+                                    if (model.getTitle() != null && !model.getTitle().isEmpty()) {
+                                        epName = model.getTitle() + " - " + epName;
                                     }
                                     
                                     nameList.add(epName);

@@ -815,35 +815,6 @@ public class PlayerActivity extends Activity {
                             Log.d(TAG, "MX Player Extra: " + key + " = " + extras.get(key));
                         }
                     }
-                    
-                    // Fallback: Check if returned URI matches any episode
-                    Uri returnedUri = data.getData();
-                    if (returnedUri != null && model != null && model.getAllSeasons() != null) {
-                        Log.d(TAG, "🔄 MX Player returned URI: " + returnedUri + ". Searching for match...");
-                        String returnedUriString = returnedUri.toString();
-                        
-                        int currentIndex = 0;
-                        boolean found = false;
-                        for (Season season : model.getAllSeasons()) {
-                            if (season.getEpisodes() != null) {
-                                for (Episode episode : season.getEpisodes()) {
-                                    String epUrl = episode.getFileUrl();
-                                    if (epUrl != null) {
-                                        String cleanEpUrl = cleanVideoUrl(epUrl);
-                                        // Check for match (exact or contains)
-                                        if (cleanEpUrl.equals(returnedUriString) || returnedUriString.contains(cleanEpUrl) || cleanEpUrl.contains(returnedUriString)) {
-                                            Log.d(TAG, "✅ Found matching episode by URI at index: " + currentIndex);
-                                            lastPlayedIndex = currentIndex;
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-                                    currentIndex++;
-                                }
-                            }
-                            if (found) break;
-                        }
-                    }
                 }
                 
                 if (lastPlayedIndex != -1 && model != null && model.getAllSeasons() != null) {
@@ -871,23 +842,11 @@ public class PlayerActivity extends Activity {
                                     if (seriesTitle != null && !seriesTitle.isEmpty() && epName != null) {
                                         model.setTitle(seriesTitle + " - " + epName);
                                     } else if (epName != null) {
-                                        // Fallback: Try to extract base title from current title
-                                        String currentTitle = model.getTitle();
-                                        String baseTitle = currentTitle;
-                                        
-                                        if (currentTitle != null && currentTitle.contains(" - ")) {
-                                            // Assume format "Series Name - Old Episode Name"
-                                            // We want to keep "Series Name" and replace "Old Episode Name"
-                                            int lastDashIndex = currentTitle.lastIndexOf(" - ");
-                                            if (lastDashIndex > 0) {
-                                                baseTitle = currentTitle.substring(0, lastDashIndex);
-                                            }
-                                        }
-                                        
-                                        if (baseTitle != null && !baseTitle.isEmpty()) {
-                                            model.setTitle(baseTitle + " - " + epName);
-                                        } else {
-                                            model.setTitle(epName);
+                                        // Fallback: If current title already has " - ", maybe replace the suffix?
+                                        // Or just append if it's short?
+                                        // Safest: Just use epName if series title missing, or keep original title if it looks like a series title
+                                        if (model.getTitle() != null && !model.getTitle().contains(epName)) {
+                                             model.setTitle(model.getTitle() + " - " + epName);
                                         }
                                     }
                                     Log.d(TAG, "   - Updated Title: " + model.getTitle());

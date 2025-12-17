@@ -871,23 +871,11 @@ public class PlayerActivity extends Activity {
                                     if (seriesTitle != null && !seriesTitle.isEmpty() && epName != null) {
                                         model.setTitle(seriesTitle + " - " + epName);
                                     } else if (epName != null) {
-                                        // Fallback: Try to extract base title from current title
-                                        String currentTitle = model.getTitle();
-                                        String baseTitle = currentTitle;
-                                        
-                                        if (currentTitle != null && currentTitle.contains(" - ")) {
-                                            // Assume format "Series Name - Old Episode Name"
-                                            // We want to keep "Series Name" and replace "Old Episode Name"
-                                            int lastDashIndex = currentTitle.lastIndexOf(" - ");
-                                            if (lastDashIndex > 0) {
-                                                baseTitle = currentTitle.substring(0, lastDashIndex);
-                                            }
-                                        }
-                                        
-                                        if (baseTitle != null && !baseTitle.isEmpty()) {
-                                            model.setTitle(baseTitle + " - " + epName);
-                                        } else {
-                                            model.setTitle(epName);
+                                        // Fallback: If current title already has " - ", maybe replace the suffix?
+                                        // Or just append if it's short?
+                                        // Safest: Just use epName if series title missing, or keep original title if it looks like a series title
+                                        if (model.getTitle() != null && !model.getTitle().contains(epName)) {
+                                             model.setTitle(model.getTitle() + " - " + epName);
                                         }
                                     }
                                     Log.d(TAG, "   - Updated Title: " + model.getTitle());

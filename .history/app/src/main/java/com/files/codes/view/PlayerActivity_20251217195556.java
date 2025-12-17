@@ -292,10 +292,10 @@ public class PlayerActivity extends Activity {
         // Fetch complete movie data for enhanced watch history if not already available
         if (completeMovieData == null && model != null && model.getMovieId() != null && 
             !model.getMovieId().equals("null") && !model.getMovieId().isEmpty()) {
-            // Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
+            Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
             fetchCompleteMovieDataForWatchHistory(model.getMovieId(), model.getVideoType() != null ? model.getVideoType() : "movie");
         } else if (model != null) {
-            // Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
+            Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
         }
 
         // Check if external player is enabled (check ProfileFragment first, then MyAccountFragment)

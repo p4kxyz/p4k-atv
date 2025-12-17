@@ -204,11 +204,10 @@ public class PlayerActivity extends Activity {
         // Retrieve complete movie data if available (from HeroStyleVideoDetailsFragment)
         if (intent != null && intent.hasExtra("complete_movie_data")) {
             completeMovieData = (MovieSingleDetails) intent.getSerializableExtra("complete_movie_data");
-            // Log.d(TAG, "📥 onCreate - Received complete movie data: " + (completeMovieData != null ? completeMovieData.getTitle() : "null"));
+            Log.d(TAG, "📥 onCreate - Received complete movie data: " + (completeMovieData != null ? completeMovieData.getTitle() : "null"));
             
             // Debug complete movie data immediately
             if (completeMovieData != null) {
-                /*
                 Log.d(TAG, "🔍 onCreate - Complete movie data debug:");
                 Log.d(TAG, "  - VideosId: '" + completeMovieData.getVideosId() + "'");
                 Log.d(TAG, "  - Title: '" + completeMovieData.getTitle() + "'");
@@ -217,7 +216,6 @@ public class PlayerActivity extends Activity {
                 Log.d(TAG, "  - Description: '" + completeMovieData.getDescription() + "'");
                 Log.d(TAG, "  - Release: '" + completeMovieData.getRelease() + "'");
                 Log.d(TAG, "  - Genre count: " + (completeMovieData.getGenre() != null ? completeMovieData.getGenre().size() : 0));
-                */
                 
                 // Check if we need to fetch more complete data
                 boolean hasCompleteInfo = completeMovieData.getTitle() != null && 
@@ -227,14 +225,14 @@ public class PlayerActivity extends Activity {
                                         completeMovieData.getGenre().size() > 0;
                 
                 if (!hasCompleteInfo && completeMovieData.getVideosId() != null && !completeMovieData.getVideosId().equals("null")) {
-                    // Log.w(TAG, "⚠️ CompleteMovieData incomplete, fetching from API for ID: " + completeMovieData.getVideosId());
+                    Log.w(TAG, "⚠️ CompleteMovieData incomplete, fetching from API for ID: " + completeMovieData.getVideosId());
                     fetchCompleteMovieDataForWatchHistory(completeMovieData.getVideosId(), 
                         completeMovieData.getType() != null ? completeMovieData.getType() : "movie");
                 }
             }
         } else {
             // If no complete data provided, fetch from API for complete watch history
-            // Log.d(TAG, "📥 onCreate - No complete movie data provided, will fetch from API");
+            Log.d(TAG, "📥 onCreate - No complete movie data provided, will fetch from API");
         }
         
         if (model == null && intent != null && intent.hasExtra("id")) {
@@ -248,7 +246,7 @@ public class PlayerActivity extends Activity {
             long position = intent.getLongExtra("position", -1L);
             boolean fromWatchHistory = intent.getBooleanExtra("from_watch_history", false);
             
-            // Log.d(TAG, "📥 onCreate - Watch History Intent: fromWatchHistory=" + fromWatchHistory + ", ID=" + videoId + ", Type=" + videoType);
+            Log.d(TAG, "📥 onCreate - Watch History Intent: fromWatchHistory=" + fromWatchHistory + ", ID=" + videoId + ", Type=" + videoType);
             
             // Create a PlaybackModel from the extras for watch history
             model = new PlaybackModel();
@@ -263,10 +261,10 @@ public class PlayerActivity extends Activity {
             // Set isTvSeries based on video type for proper watch history saving
             if (videoType != null && (videoType.equalsIgnoreCase("tvseries") || videoType.equalsIgnoreCase("tv") || videoType.equalsIgnoreCase("episode"))) {
                 model.setIsTvSeries("1");
-                // Log.d(TAG, "📥 Set isTvSeries = 1 for type: " + videoType);
+                Log.d(TAG, "📥 Set isTvSeries = 1 for type: " + videoType);
             } else {
                 model.setIsTvSeries("0");
-                // Log.d(TAG, "📥 Set isTvSeries = 0 for type: " + videoType);
+                Log.d(TAG, "📥 Set isTvSeries = 0 for type: " + videoType);
             }
             
             // Set the resume position
@@ -292,10 +290,10 @@ public class PlayerActivity extends Activity {
         // Fetch complete movie data for enhanced watch history if not already available
         if (completeMovieData == null && model != null && model.getMovieId() != null && 
             !model.getMovieId().equals("null") && !model.getMovieId().isEmpty()) {
-            // Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
+            Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
             fetchCompleteMovieDataForWatchHistory(model.getMovieId(), model.getVideoType() != null ? model.getVideoType() : "movie");
         } else if (model != null) {
-            // Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
+            Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
         }
 
         // Check if external player is enabled (check ProfileFragment first, then MyAccountFragment)

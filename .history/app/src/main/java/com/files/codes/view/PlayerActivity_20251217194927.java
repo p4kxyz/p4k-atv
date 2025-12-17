@@ -204,11 +204,10 @@ public class PlayerActivity extends Activity {
         // Retrieve complete movie data if available (from HeroStyleVideoDetailsFragment)
         if (intent != null && intent.hasExtra("complete_movie_data")) {
             completeMovieData = (MovieSingleDetails) intent.getSerializableExtra("complete_movie_data");
-            // Log.d(TAG, "📥 onCreate - Received complete movie data: " + (completeMovieData != null ? completeMovieData.getTitle() : "null"));
+            Log.d(TAG, "📥 onCreate - Received complete movie data: " + (completeMovieData != null ? completeMovieData.getTitle() : "null"));
             
             // Debug complete movie data immediately
             if (completeMovieData != null) {
-                /*
                 Log.d(TAG, "🔍 onCreate - Complete movie data debug:");
                 Log.d(TAG, "  - VideosId: '" + completeMovieData.getVideosId() + "'");
                 Log.d(TAG, "  - Title: '" + completeMovieData.getTitle() + "'");
@@ -217,7 +216,6 @@ public class PlayerActivity extends Activity {
                 Log.d(TAG, "  - Description: '" + completeMovieData.getDescription() + "'");
                 Log.d(TAG, "  - Release: '" + completeMovieData.getRelease() + "'");
                 Log.d(TAG, "  - Genre count: " + (completeMovieData.getGenre() != null ? completeMovieData.getGenre().size() : 0));
-                */
                 
                 // Check if we need to fetch more complete data
                 boolean hasCompleteInfo = completeMovieData.getTitle() != null && 
@@ -227,14 +225,14 @@ public class PlayerActivity extends Activity {
                                         completeMovieData.getGenre().size() > 0;
                 
                 if (!hasCompleteInfo && completeMovieData.getVideosId() != null && !completeMovieData.getVideosId().equals("null")) {
-                    // Log.w(TAG, "⚠️ CompleteMovieData incomplete, fetching from API for ID: " + completeMovieData.getVideosId());
+                    Log.w(TAG, "⚠️ CompleteMovieData incomplete, fetching from API for ID: " + completeMovieData.getVideosId());
                     fetchCompleteMovieDataForWatchHistory(completeMovieData.getVideosId(), 
                         completeMovieData.getType() != null ? completeMovieData.getType() : "movie");
                 }
             }
         } else {
             // If no complete data provided, fetch from API for complete watch history
-            // Log.d(TAG, "📥 onCreate - No complete movie data provided, will fetch from API");
+            Log.d(TAG, "📥 onCreate - No complete movie data provided, will fetch from API");
         }
         
         if (model == null && intent != null && intent.hasExtra("id")) {
@@ -248,7 +246,7 @@ public class PlayerActivity extends Activity {
             long position = intent.getLongExtra("position", -1L);
             boolean fromWatchHistory = intent.getBooleanExtra("from_watch_history", false);
             
-            // Log.d(TAG, "📥 onCreate - Watch History Intent: fromWatchHistory=" + fromWatchHistory + ", ID=" + videoId + ", Type=" + videoType);
+            Log.d(TAG, "📥 onCreate - Watch History Intent: fromWatchHistory=" + fromWatchHistory + ", ID=" + videoId + ", Type=" + videoType);
             
             // Create a PlaybackModel from the extras for watch history
             model = new PlaybackModel();
@@ -263,10 +261,10 @@ public class PlayerActivity extends Activity {
             // Set isTvSeries based on video type for proper watch history saving
             if (videoType != null && (videoType.equalsIgnoreCase("tvseries") || videoType.equalsIgnoreCase("tv") || videoType.equalsIgnoreCase("episode"))) {
                 model.setIsTvSeries("1");
-                // Log.d(TAG, "📥 Set isTvSeries = 1 for type: " + videoType);
+                Log.d(TAG, "📥 Set isTvSeries = 1 for type: " + videoType);
             } else {
                 model.setIsTvSeries("0");
-                // Log.d(TAG, "📥 Set isTvSeries = 0 for type: " + videoType);
+                Log.d(TAG, "📥 Set isTvSeries = 0 for type: " + videoType);
             }
             
             // Set the resume position
@@ -292,10 +290,10 @@ public class PlayerActivity extends Activity {
         // Fetch complete movie data for enhanced watch history if not already available
         if (completeMovieData == null && model != null && model.getMovieId() != null && 
             !model.getMovieId().equals("null") && !model.getMovieId().isEmpty()) {
-            // Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
+            Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
             fetchCompleteMovieDataForWatchHistory(model.getMovieId(), model.getVideoType() != null ? model.getVideoType() : "movie");
         } else if (model != null) {
-            // Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
+            Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
         }
 
         // Check if external player is enabled (check ProfileFragment first, then MyAccountFragment)
@@ -3605,10 +3603,11 @@ public class PlayerActivity extends Activity {
             TrackGroup group = trackGroups.get(groupIndex);
             for (int trackIndex = 0; trackIndex < group.length; trackIndex++) {
                 Format format = group.getFormat(trackIndex);
-                String label = buildAudioTrackLabel(format);
-                if (label == null || label.isEmpty()) {
-                    label = "Audio " + (labels.size() + 1);
-                }
+                String label = null;
+                if (format.label != null && !format.label.isEmpty()) label = format.label;
+                else if (format.language != null && !format.language.isEmpty()) label = format.language;
+                else if (format.sampleMimeType != null) label = format.sampleMimeType;
+                else label = "Audio " + (labels.size() + 1);
 
                 labels.add(label);
                 selectionPairs.add(new int[]{groupIndex, trackIndex});
@@ -3648,7 +3647,7 @@ public class PlayerActivity extends Activity {
                 }
                 
             } catch (Exception e) {
-                // Log.e(TAG, "Error changing audio track", e);
+                Log.e(TAG, "Error changing audio track", e);
                 Toast.makeText(this, "Error changing audio track", Toast.LENGTH_SHORT).show();
             }
         });
@@ -5451,7 +5450,7 @@ public class PlayerActivity extends Activity {
                     
                     // If we were waiting for this data and it failed, save with basic data
                     if (isWaitingForCompleteData) {
-                        // Log.w(TAG, "⚠️ API fetch failed, falling back to basic save");
+                        Log.w(TAG, "⚠️ API fetch failed, falling back to basic save");
                         isWaitingForCompleteData = false;
                         runOnUiThread(new Runnable() {
                             @Override
@@ -5465,68 +5464,11 @@ public class PlayerActivity extends Activity {
 
             @Override
             public void onFailure(Call<MovieSingleDetails> call, Throwable t) {
-                // Log.e(TAG, "❌ API call failed for complete movie data", t);
+                Log.e(TAG, "❌ API call failed for complete movie data", t);
                 completeMovieData = null;
             }
         });
     }
 
-    private String buildAudioTrackLabel(Format format) {
-        StringBuilder labelBuilder = new StringBuilder();
 
-        // 1. Language or Label
-        if (format.label != null && !format.label.isEmpty()) {
-            labelBuilder.append(format.label);
-        } else if (format.language != null && !format.language.isEmpty()) {
-            Locale locale = new Locale(format.language);
-            labelBuilder.append(locale.getDisplayLanguage());
-        } else {
-            labelBuilder.append("Unknown Language");
-        }
-
-        // 2. Codec
-        String codec = getCodecName(format.sampleMimeType);
-        if (codec != null) {
-            labelBuilder.append(" - ").append(codec);
-        }
-
-        // 3. Channels
-        if (format.channelCount != Format.NO_VALUE) {
-            labelBuilder.append(" ").append(getChannelConfig(format.channelCount));
-        }
-        
-        // 4. Bitrate (optional)
-        if (format.bitrate != Format.NO_VALUE) {
-             labelBuilder.append(String.format(Locale.US, " (%d kbps)", format.bitrate / 1000));
-        }
-
-        return labelBuilder.toString();
-    }
-
-    private String getCodecName(String mimeType) {
-        if (mimeType == null) return null;
-        switch (mimeType) {
-            case MimeTypes.AUDIO_AAC: return "AAC";
-            case MimeTypes.AUDIO_AC3: return "Dolby Digital";
-            case MimeTypes.AUDIO_E_AC3: return "Dolby Digital Plus";
-            case MimeTypes.AUDIO_E_AC3_JOC: return "Dolby Atmos";
-            case MimeTypes.AUDIO_TRUEHD: return "Dolby TrueHD";
-            case MimeTypes.AUDIO_DTS: return "DTS";
-            case MimeTypes.AUDIO_DTS_HD: return "DTS-HD";
-            case MimeTypes.AUDIO_DTS_EXPRESS: return "DTS Express";
-            case MimeTypes.AUDIO_FLAC: return "FLAC";
-            case MimeTypes.AUDIO_MPEG: return "MP3";
-            case MimeTypes.AUDIO_VORBIS: return "Vorbis";
-            case MimeTypes.AUDIO_OPUS: return "Opus";
-            default: return null;
-        }
-    }
-
-    private String getChannelConfig(int channelCount) {
-        if (channelCount == 1) return "Mono";
-        if (channelCount == 2) return "Stereo";
-        if (channelCount == 6) return "5.1";
-        if (channelCount == 8) return "7.1";
-        return channelCount + "ch";
-    }
 }

@@ -72,15 +72,8 @@ public class HomeActivity extends FragmentActivity {
         Log.d("HomeActivity", "🔴 onCreate() STARTED - Basic setup complete");
 
         orbView = findViewById(R.id.custom_search_orb);
-        // Set search orb colors (normal and focus/bright state)
-        orbView.setOrbColor(getResources().getColor(R.color.search_opaque)); // Normal: orange
-        orbView.setOrbColors(
-            getResources().getColor(R.color.search_opaque),      // Bright/Focus: orange
-            getResources().getColor(R.color.search_icon_color)   // Icon color: red
-        );
+        orbView.setOrbColor(getResources().getColor(R.color.colorPrimary));
         orbView.bringToFront();
-        orbView.setFocusable(true);
-        orbView.setFocusableInTouchMode(true);
         orbView.setOnOrbClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -395,7 +388,7 @@ public class HomeActivity extends FragmentActivity {
 
             // calculate destination
             final int headersDestination = (doOpen ? 0 : (int) (0 - delta));
-            final int rowsDestination = (doOpen ? (Utils.dpToPx(300, this)) : 0);
+            final int rowsDestination = (doOpen ? (Utils.dpToPx(150, this)) : 0);
 
             // calculate the delta (destination - current)
             final int headersDelta = headersDestination - currentHeadersMargin;

@@ -72,10 +72,8 @@ public class HomeActivity extends FragmentActivity {
         Log.d("HomeActivity", "🔴 onCreate() STARTED - Basic setup complete");
 
         orbView = findViewById(R.id.custom_search_orb);
-        orbView.setOrbColor(getResources().getColor(R.color.search_opaque)); // Orange color
+        orbView.setOrbColor(getResources().getColor(R.color.colorPrimary));
         orbView.bringToFront();
-        orbView.setFocusable(true);
-        orbView.setFocusableInTouchMode(true);
         orbView.setOnOrbClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -252,12 +250,16 @@ public class HomeActivity extends FragmentActivity {
                     // 🎯 Special handling for hero thumbnails grid
                     if (focusedId == R.id.hero_thumbnails_grid || isViewInsideHeroThumbnails(focused)) {
                         Log.d("HomeActivity", "🎬 Focus is in hero thumbnails - force go to menu");
+                        forceShowHeaders();
                         return getVerticalGridView(headersFragment);
                     }
                     
                     if (isVerticalScrolling() || navigationDrawerOpen) {
                         return focused;
                     }
+                    
+                    // Fix for Android 7.1: Force headers visible before returning them as focus target
+                    forceShowHeaders();
                     return getVerticalGridView(headersFragment);
                 } else if (direction == View.FOCUS_RIGHT) {
                     if (isVerticalScrolling() || !navigationDrawerOpen) {
@@ -390,7 +392,7 @@ public class HomeActivity extends FragmentActivity {
 
             // calculate destination
             final int headersDestination = (doOpen ? 0 : (int) (0 - delta));
-            final int rowsDestination = (doOpen ? (Utils.dpToPx(300, this)) : 0);
+            final int rowsDestination = (doOpen ? (Utils.dpToPx(150, this)) : 0);
 
             // calculate the delta (destination - current)
             final int headersDelta = headersDestination - currentHeadersMargin;
@@ -536,6 +538,39 @@ public class HomeActivity extends FragmentActivity {
             if (e.getCause() != null) {
                 Log.e("HomeActivity", "❌ Cause: " + e.getCause().getMessage());
             }
+        }
+    }
+    
+    private void forceShowHeaders() {
+        try {
+            if (headersFragment == null || headersFragment.getView() == null) return;
+            
+            View headersContainer = (View) headersFragment.getView().getParent();
+            if (headersContainer != null) {
+                // 1. Make visible
+                headersContainer.setVisibility(View.VISIBLE);
+                
+                // 2. Force margin to 0 immediately (skip animation)
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) headersContainer.getLayoutParams();
+                params.leftMargin = 0;
+                headersContainer.setLayoutParams(params);
+                
+                // 3. Move rows container
+                if (rowsFragment != null && rowsFragment.getView() != null) {
+                    View rowsContainer = (View) rowsFragment.getView().getParent();
+                    if (rowsContainer != null) {
+                        ViewGroup.MarginLayoutParams rowsParams = (ViewGroup.MarginLayoutParams) rowsContainer.getLayoutParams();
+                        rowsParams.leftMargin = Utils.dpToPx(150, this);
+                        rowsContainer.setLayoutParams(rowsParams);
+                    }
+                }
+                
+                // 4. Update state
+                navigationDrawerOpen = true;
+                Log.d("HomeActivity", "✅ forceShowHeaders executed - Menu forced open for focus");
+            }
+        } catch (Exception e) {
+            Log.e("HomeActivity", "Error in forceShowHeaders", e);
         }
     }
     

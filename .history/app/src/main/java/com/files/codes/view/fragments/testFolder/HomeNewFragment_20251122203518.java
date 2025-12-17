@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -18,12 +19,17 @@ import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.FocusHighlight;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRowPresenter;
+import androidx.leanback.widget.PresenterSelector;
+import androidx.leanback.widget.RowHeaderPresenter;
+import com.files.codes.view.IconHeaderItem;
+import com.files.codes.view.presenter.IconHeaderItemPresenter;
 import androidx.leanback.widget.OnItemViewClickedListener;
 import androidx.leanback.widget.PageRow;
 import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.VerticalGridPresenter;
+import androidx.leanback.widget.VerticalGridView;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -112,33 +118,86 @@ public class HomeNewFragment extends BrowseSupportFragment {
     }
 
     private void createRows() {
-        HeaderItem headerItem1 = new HeaderItem(HEADER_ID_HOME, HEADER_NAME_HOME);
+        IconHeaderItem headerItem1 = new IconHeaderItem(HEADER_ID_HOME, HEADER_NAME_HOME, R.drawable.outline_home_24);
         PageRow pageRow1 = new PageRow(headerItem1);
         mRowsAdapter.add(pageRow1);
 
-        HeaderItem headerItem2 = new HeaderItem(HEADER_ID_MOVIE, HEADER_NAME_MOVIE);
+        IconHeaderItem headerItem2 = new IconHeaderItem(HEADER_ID_MOVIE, HEADER_NAME_MOVIE, R.drawable.outline_movie_24);
         PageRow pageRow2 = new PageRow(headerItem2);
         mRowsAdapter.add(pageRow2);
 
-        HeaderItem headerItem3 = new HeaderItem(HEADER_ID_TV_SERIES, HEADER_NAME_TV_SERIES);
+        IconHeaderItem headerItem3 = new IconHeaderItem(HEADER_ID_TV_SERIES, HEADER_NAME_TV_SERIES, R.drawable.outline_local_movies_24);
         PageRow pageRow3 = new PageRow(headerItem3);
         mRowsAdapter.add(pageRow3);
 
-        HeaderItem headerItem4 = new HeaderItem(HEADER_ID_GENRE, HEADER_NAME_GENRE);
+        IconHeaderItem headerItem4 = new IconHeaderItem(HEADER_ID_GENRE, HEADER_NAME_GENRE, R.drawable.outline_folder_24);
         PageRow pageRow4 = new PageRow(headerItem4);
         mRowsAdapter.add(pageRow4);
 
-        HeaderItem headerItem5 = new HeaderItem(HEADER_ID_COUNTRY, HEADER_NAME_COUNTRY);
+        IconHeaderItem headerItem5 = new IconHeaderItem(HEADER_ID_COUNTRY, HEADER_NAME_COUNTRY, R.drawable.outline_outlined_flag_24);
         PageRow pageRow5 = new PageRow(headerItem5);
         mRowsAdapter.add(pageRow5);
 
-        HeaderItem headerItem6 = new HeaderItem(HEADER_ID_FAVOURITE, HEADER_NAME_FAVOURITE);
+        IconHeaderItem headerItem6 = new IconHeaderItem(HEADER_ID_FAVOURITE, HEADER_NAME_FAVOURITE, R.drawable.ic_favorite_border_black_24dp);
         PageRow pageRow6 = new PageRow(headerItem6);
         mRowsAdapter.add(pageRow6);
 
-        HeaderItem headerItem7 = new HeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT);
+        IconHeaderItem headerItem7 = new IconHeaderItem(HEADER_ID_ACCOUNT, HEADER_NAME_ACCOUNT, R.drawable.ic_baseline_account_circle_24);
         PageRow pageRow7 = new PageRow(headerItem7);
         mRowsAdapter.add(pageRow7);
+
+        // Set presenter selector to display icons for PageRow
+        setHeaderPresenterSelector(new PresenterSelector() {
+            @Override
+            public Presenter getPresenter(Object item) {
+                return new RowHeaderPresenter() {
+                    @Override
+                    public ViewHolder onCreateViewHolder(ViewGroup parent) {
+                        View view = getActivity().getLayoutInflater().inflate(R.layout.icon_header_item, parent, false);
+                        return new ViewHolder(view);
+                    }
+
+                    @Override
+                    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
+                        PageRow pageRow = (PageRow) item;
+                        IconHeaderItem iconHeaderItem = (IconHeaderItem) pageRow.getHeaderItem();
+                        
+                        View rootView = viewHolder.view;
+                        android.widget.ImageView iconView = rootView.findViewById(R.id.header_icon);
+                        android.widget.TextView label = rootView.findViewById(R.id.header_label);
+                        
+                        int iconResId = iconHeaderItem.getIconResId();
+                        if (iconResId != IconHeaderItem.ICON_NONE) {
+                            iconView.setImageResource(iconResId);
+                            iconView.setVisibility(View.VISIBLE);
+                        } else {
+                            iconView.setVisibility(View.GONE);
+                        }
+                        
+                        label.setText(iconHeaderItem.getName());
+                        
+                        // Set focus change listener for red color effect
+                        rootView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                            @Override
+                            public void onFocusChange(View v, boolean hasFocus) {
+                                if (hasFocus) {
+                                    // Focus: Red color
+                                    label.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+                                    iconView.setColorFilter(getResources().getColor(android.R.color.holo_red_light));
+                                } else {
+                                    // No focus: White color (default)
+                                    label.setTextColor(getResources().getColor(android.R.color.white));
+                                    iconView.clearColorFilter();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {}
+                };
+            }
+        });
 
     }
 
@@ -463,5 +522,14 @@ public class HomeNewFragment extends BrowseSupportFragment {
         }
     }
 
+    /**
+     * Expose headers grid view for activity to handle focus
+     */
+    public VerticalGridView getHeadersGrid() {
+        if (getHeadersSupportFragment() != null) {
+            return getHeadersSupportFragment().getVerticalGridView();
+        }
+        return null;
+    }
 }
 

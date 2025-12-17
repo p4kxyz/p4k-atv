@@ -33,6 +33,9 @@ public class HomeNewActivity extends FragmentActivity {
         
         // Request permissions first, then check for updates
         requestAllPermissions();
+        
+        // Setup focus handling for headers grid
+        setupFocusHandling();
     }
     
     /**
@@ -178,6 +181,50 @@ public class HomeNewActivity extends FragmentActivity {
             }
         } catch (Exception e) {
             Log.e("HomeNewActivity", "❌ Error cleaning up OTA Manager: " + e.getMessage());
+        }
+    }
+    
+    private void setupFocusHandling() {
+        try {
+            com.files.codes.view.CustomFrameLayout customFrameLayout = findViewById(R.id.custom_frame_layout);
+            if (customFrameLayout != null) {
+                customFrameLayout.setOnFocusSearchListener(new com.files.codes.view.CustomFrameLayout.OnFocusSearchListener() {
+                    @Override
+                    public android.view.View onFocusSearch(android.view.View focused, int direction) {
+                        if (direction == android.view.View.FOCUS_LEFT) {
+                            Log.d("HomeNewActivity", "⬅️ LEFT pressed in HomeNewActivity");
+                            HomeNewFragment fragment = (HomeNewFragment) getSupportFragmentManager().findFragmentById(R.id.page_list_fragment);
+                            if (fragment != null) {
+                                androidx.leanback.widget.VerticalGridView headersGrid = fragment.getHeadersGrid();
+                                if (headersGrid != null) {
+                                    Log.d("HomeNewActivity", "🎯 Found headers grid, forcing focus to it");
+                                    // Force headers to be visible/open
+                                    fragment.startHeadersTransition(true);
+                                    
+                                    // Explicitly request focus on headers grid with delay (fix for Android 7.1)
+                                    final androidx.leanback.widget.VerticalGridView finalGrid = headersGrid;
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (!finalGrid.hasFocus()) {
+                                                finalGrid.requestFocus();
+                                                if (finalGrid.getChildCount() > 0) {
+                                                    finalGrid.getChildAt(0).requestFocus();
+                                                }
+                                            }
+                                        }
+                                    }, 50);
+                                    
+                                    return headersGrid;
+                                }
+                            }
+                        }
+                        return null;
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.e("HomeNewActivity", "Error setting up focus handling", e);
         }
     }
 }

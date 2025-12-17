@@ -274,6 +274,12 @@ public class PlayerActivity extends Activity {
             // IMPORTANT: Load movie details to get subtitle information
             if (videoId != null) {
                 loadMovieDetailsForWatchHistory(videoId, videoType);
+                
+                // Also fetch season data for navigation if it's a TV series
+                if (model.getIsTvSeries() != null && model.getIsTvSeries().equals("1")) {
+                    Log.d(TAG, "📥 Fetching season data for TV series from Watch History: " + videoId);
+                    fetchSeasonDataForNavigation(videoId);
+                }
             }
         }
 
@@ -304,6 +310,60 @@ public class PlayerActivity extends Activity {
         Log.e(TAG, "🔍 onCreate - External Player Check: " + useExternalPlayer);
 
         if (useExternalPlayer) {
+            // If it's a TV series from Watch History, we need to wait for season data before launching
+            // to ensure playlist support works
+            if (model.getIsTvSeries() != null && model.getIsTvSeries().equals("1") && 
+                (model.getAllSeasons() == null || model.getAllSeasons().isEmpty())) {
+                
+                Log.d(TAG, "⏳ Waiting for season data before launching external player...");
+                
+                // Show loading indicator
+                // We can't easily show UI here since we haven't called setContentView or initViews yet if we return early
+                // But setContentView IS called at the top of onCreate.
+                // Let's show a toast or progress dialog
+                
+                // We need to fetch data synchronously or use a callback. 
+                // Since fetchSeasonDataForNavigation is async, we can't just wait here.
+                // We should modify the flow:
+                // 1. If data missing, show loading UI, fetch data.
+                // 2. In callback of fetch, launch external player.
+                
+                // However, fetchSeasonDataForNavigation is already called above.
+                // We can just return here and let the callback handle the launch?
+                // But fetchSeasonDataForNavigation currently only calls setupEpisodeNavigationButtons.
+                
+                // Let's modify fetchSeasonDataForNavigation to accept a callback or handle external player launch
+                // For now, let's just launch it. The playlist won't be there for the FIRST launch,
+                // but if they close and reopen, it might be? No, activity is destroyed.
+                
+                // CRITICAL FIX: We must fetch data BEFORE launching if we want playlist support.
+                // But we can't block the main thread.
+                
+                // Let's rely on the fact that we called fetchSeasonDataForNavigation above.
+                // We will NOT return here. We will let the activity continue to load (showing black screen or loading).
+                // And we will launch the external player inside the callback of fetchSeasonDataForNavigation?
+                
+                // Actually, the cleanest way is to delay the launch until data arrives.
+                // But that requires significant refactoring.
+                
+                // Alternative: Launch immediately (no playlist), but that's what the user is complaining about.
+                
+                // Let's try to fetch synchronously? No, network on main thread exception.
+                
+                // Solution: Show a loading screen, fetch data, then launch.
+                setContentView(R.layout.activity_player); // Ensure layout is set
+                intiViews(); // Initialize views to show progress bar
+                if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+                
+                // We already called fetchSeasonDataForNavigation above.
+                // We need to tell it to launch external player when done.
+                // Since we can't easily change the method signature right now without breaking other calls,
+                // let's add a flag or just duplicate the fetch logic here with a specific callback.
+                
+                fetchSeasonDataAndLaunchExternal(model.getMovieId());
+                return;
+            }
+            
             Log.e(TAG, "🚀 onCreate - Launching External Player sequence...");
             launchExternalPlayer();
             // finish(); // Don't finish here, wait for onActivityResult
@@ -369,32 +429,31 @@ public class PlayerActivity extends Activity {
         Log.d(TAG, "🎬 Subtitle settings button setup - subtitleSettingsButton: " + (subtitleSettingsButton != null ? "FOUND ✅" : "NULL ❌"));
         audioTrackButton = findViewById(R.id.img_audio);
         aspectRatioButton = findViewById(R.id.img_aspect_ratio);
-        // Try to find rewind button in multiple ways
-        rewindButton = exoPlayerView.findViewById(R.id.btn_internal_rewind);
-        if (rewindButton == null) {
-             rewindButton = findViewById(R.id.btn_internal_rewind);
-        }
-        // Fallback: try to find by tag or traverse view hierarchy if needed
-        if (rewindButton == null) {
-            // Try finding by the original ID just in case layout didn't update
-            rewindButton = exoPlayerView.findViewById(R.id.exo_rew);
-        }
-        
-        Log.d(TAG, "🔍 intiViews - rewindButton final check: " + (rewindButton != null));
-        
-        if (rewindButton != null) {
-            Log.d(TAG, "🔍 intiViews - rewindButton initial visibility: " + rewindButton.getVisibility());
-            rewindButton.setVisibility(View.VISIBLE);
-            Log.d(TAG, "🔍 intiViews - rewindButton forced VISIBLE");
-        }
-        
         fastForwardButton = findViewById(R.id.exo_ffwd);
-        if (fastForwardButton == null) {
-            fastForwardButton = exoPlayerView.findViewById(R.id.exo_ffwd);
-        }
         previousEpisodeButton = findViewById(R.id.btn_previous_episode);
         nextEpisodeButton = findViewById(R.id.btn_next_episode);
         liveTvTextInController = findViewById(R.id.live_tv);
+        
+        // NEW: Custom seek buttons - outside PlayerView, in main activity layout (using Button, not ImageButton)
+        Button customRewindButton = findViewById(R.id.btn_custom_rewind);
+        Button customForwardButton = findViewById(R.id.btn_custom_forward);
+        
+        Log.d("PlayerActivity", "🔍 Custom button check - rewindButton: " + (customRewindButton != null ? "FOUND ✅" : "NULL ❌"));
+        Log.d("PlayerActivity", "🔍 Custom button check - forwardButton: " + (customForwardButton != null ? "FOUND ✅" : "NULL ❌"));
+        
+        // Setup click listeners immediately (buttons are in activity layout, not PlayerView)
+        if (customRewindButton != null) {
+            customRewindButton.setOnClickListener(v -> {
+                seekBackward(10000);
+                Toast.makeText(this, "⏪ -10s", Toast.LENGTH_SHORT).show();
+            });
+        }
+        if (customForwardButton != null) {
+            customForwardButton.setOnClickListener(v -> {
+                seekForward(10000);
+                Toast.makeText(this, "⏩ +10s", Toast.LENGTH_SHORT).show();
+            });
+        }
         
         seekBarLayout = findViewById(R.id.seekbar_layout);
         if (category.equalsIgnoreCase("tv")) {
@@ -402,6 +461,10 @@ public class PlayerActivity extends Activity {
             subtitleButton.setVisibility(View.GONE);
             //seekBarLayout.setVisibility(View.GONE);
             fastForwardButton.setVisibility(View.GONE);
+            
+            // Hide custom seek buttons for live TV (using LinearLayout container)
+            View customSeekButtons = findViewById(R.id.custom_seek_buttons);
+            if (customSeekButtons != null) customSeekButtons.setVisibility(View.GONE);
             
             liveTvTextInController.setVisibility(View.VISIBLE);
             posterImageView.setVisibility(View.GONE);
@@ -3179,22 +3242,18 @@ public class PlayerActivity extends Activity {
      * Setup seek buttons (rewind 10s and fast forward 10s) click listeners
      */
     private void setupSeekButtons() {
-        Log.d(TAG, "🔍 setupSeekButtons called");
         // Setup rewind button (backward 10s)
         if (rewindButton != null) {
-            Log.d(TAG, "🔍 setupSeekButtons - Setting onClickListener for rewindButton");
             rewindButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "🔍 rewindButton CLICKED");
                     seekBackward(10000); // 10 seconds backward
                     Toast.makeText(PlayerActivity.this, "⏪ -10s", Toast.LENGTH_SHORT).show();
                 }
             });
-            rewindButton.setVisibility(View.VISIBLE);
-            Log.d("PlayerActivity", "✅ Rewind button (10s) setup complete and set to VISIBLE");
+            Log.d("PlayerActivity", "✅ Rewind button (10s) setup complete");
         } else {
-            Log.e("PlayerActivity", "❌ Rewind button not found in layout (NULL)");
+            Log.w("PlayerActivity", "⚠️ Rewind button not found in layout");
         }
         
         // Fast forward button already has default ExoPlayer behavior
@@ -5245,6 +5304,13 @@ public class PlayerActivity extends Activity {
                             @Override
                             public void run() {
                                 setupEpisodeNavigationButtons();
+                                
+                                // If external player is waiting for playlist data, we might need to relaunch it?
+                                // Or better: The external player launch logic should wait for this data if possible.
+                                // But since launchExternalPlayer is called in onCreate, it might have already run.
+                                // However, for Watch History, we might want to delay launch until we have this data?
+                                // For now, this fixes the internal player navigation.
+                                // For external player, we need to ensure this data is available BEFORE launch.
                             }
                         });
                         

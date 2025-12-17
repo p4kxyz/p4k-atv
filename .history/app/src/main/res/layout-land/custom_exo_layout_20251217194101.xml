@@ -148,7 +148,7 @@
             android:background="@drawable/player_button_modern"
             android:padding="8dp"
             android:elevation="4dp"
-            android:src="@drawable/ic_server_white_24dp"
+            android:src="@drawable/ic_settings_white"
             android:contentDescription="Server Settings" />
 
         <ImageButton
@@ -184,7 +184,7 @@
             android:padding="8dp"
             android:background="@drawable/player_button_modern"
             android:elevation="4dp"
-            android:src="@drawable/ic_audiotrack_white_24dp"
+            android:src="@drawable/ic_settings_white"
             android:contentDescription="Audio Settings" />
 
         <ImageButton

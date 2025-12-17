@@ -369,32 +369,38 @@ public class PlayerActivity extends Activity {
         Log.d(TAG, "🎬 Subtitle settings button setup - subtitleSettingsButton: " + (subtitleSettingsButton != null ? "FOUND ✅" : "NULL ❌"));
         audioTrackButton = findViewById(R.id.img_audio);
         aspectRatioButton = findViewById(R.id.img_aspect_ratio);
-        // Try to find rewind button in multiple ways
-        rewindButton = exoPlayerView.findViewById(R.id.btn_internal_rewind);
-        if (rewindButton == null) {
-             rewindButton = findViewById(R.id.btn_internal_rewind);
-        }
-        // Fallback: try to find by tag or traverse view hierarchy if needed
-        if (rewindButton == null) {
-            // Try finding by the original ID just in case layout didn't update
-            rewindButton = exoPlayerView.findViewById(R.id.exo_rew);
-        }
-        
-        Log.d(TAG, "🔍 intiViews - rewindButton final check: " + (rewindButton != null));
-        
+        rewindButton = findViewById(R.id.btn_internal_rewind);
+        Log.d(TAG, "🔍 intiViews - rewindButton found: " + (rewindButton != null));
         if (rewindButton != null) {
             Log.d(TAG, "🔍 intiViews - rewindButton initial visibility: " + rewindButton.getVisibility());
             rewindButton.setVisibility(View.VISIBLE);
             Log.d(TAG, "🔍 intiViews - rewindButton forced VISIBLE");
         }
-        
         fastForwardButton = findViewById(R.id.exo_ffwd);
-        if (fastForwardButton == null) {
-            fastForwardButton = exoPlayerView.findViewById(R.id.exo_ffwd);
-        }
         previousEpisodeButton = findViewById(R.id.btn_previous_episode);
         nextEpisodeButton = findViewById(R.id.btn_next_episode);
         liveTvTextInController = findViewById(R.id.live_tv);
+        
+        // NEW: Custom seek buttons - outside PlayerView, in main activity layout (using Button, not ImageButton)
+        Button customRewindButton = findViewById(R.id.btn_custom_rewind);
+        Button customForwardButton = findViewById(R.id.btn_custom_forward);
+        
+        Log.d("PlayerActivity", "🔍 Custom button check - rewindButton: " + (customRewindButton != null ? "FOUND ✅" : "NULL ❌"));
+        Log.d("PlayerActivity", "🔍 Custom button check - forwardButton: " + (customForwardButton != null ? "FOUND ✅" : "NULL ❌"));
+        
+        // Setup click listeners immediately (buttons are in activity layout, not PlayerView)
+        if (customRewindButton != null) {
+            customRewindButton.setOnClickListener(v -> {
+                seekBackward(10000);
+                Toast.makeText(this, "⏪ -10s", Toast.LENGTH_SHORT).show();
+            });
+        }
+        if (customForwardButton != null) {
+            customForwardButton.setOnClickListener(v -> {
+                seekForward(10000);
+                Toast.makeText(this, "⏩ +10s", Toast.LENGTH_SHORT).show();
+            });
+        }
         
         seekBarLayout = findViewById(R.id.seekbar_layout);
         if (category.equalsIgnoreCase("tv")) {
@@ -402,6 +408,10 @@ public class PlayerActivity extends Activity {
             subtitleButton.setVisibility(View.GONE);
             //seekBarLayout.setVisibility(View.GONE);
             fastForwardButton.setVisibility(View.GONE);
+            
+            // Hide custom seek buttons for live TV (using LinearLayout container)
+            View customSeekButtons = findViewById(R.id.custom_seek_buttons);
+            if (customSeekButtons != null) customSeekButtons.setVisibility(View.GONE);
             
             liveTvTextInController.setVisibility(View.VISIBLE);
             posterImageView.setVisibility(View.GONE);

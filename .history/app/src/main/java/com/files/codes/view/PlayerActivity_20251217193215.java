@@ -396,12 +396,37 @@ public class PlayerActivity extends Activity {
         nextEpisodeButton = findViewById(R.id.btn_next_episode);
         liveTvTextInController = findViewById(R.id.live_tv);
         
+        // NEW: Custom seek buttons - outside PlayerView, in main activity layout (using Button, not ImageButton)
+        Button customRewindButton = findViewById(R.id.btn_custom_rewind);
+        Button customForwardButton = findViewById(R.id.btn_custom_forward);
+        
+        Log.d("PlayerActivity", "🔍 Custom button check - rewindButton: " + (customRewindButton != null ? "FOUND ✅" : "NULL ❌"));
+        Log.d("PlayerActivity", "🔍 Custom button check - forwardButton: " + (customForwardButton != null ? "FOUND ✅" : "NULL ❌"));
+        
+        // Setup click listeners immediately (buttons are in activity layout, not PlayerView)
+        if (customRewindButton != null) {
+            customRewindButton.setOnClickListener(v -> {
+                seekBackward(10000);
+                Toast.makeText(this, "⏪ -10s", Toast.LENGTH_SHORT).show();
+            });
+        }
+        if (customForwardButton != null) {
+            customForwardButton.setOnClickListener(v -> {
+                seekForward(10000);
+                Toast.makeText(this, "⏩ +10s", Toast.LENGTH_SHORT).show();
+            });
+        }
+        
         seekBarLayout = findViewById(R.id.seekbar_layout);
         if (category.equalsIgnoreCase("tv")) {
             serverButton.setVisibility(View.GONE);
             subtitleButton.setVisibility(View.GONE);
             //seekBarLayout.setVisibility(View.GONE);
             fastForwardButton.setVisibility(View.GONE);
+            
+            // Hide custom seek buttons for live TV (using LinearLayout container)
+            View customSeekButtons = findViewById(R.id.custom_seek_buttons);
+            if (customSeekButtons != null) customSeekButtons.setVisibility(View.GONE);
             
             liveTvTextInController.setVisibility(View.VISIBLE);
             posterImageView.setVisibility(View.GONE);

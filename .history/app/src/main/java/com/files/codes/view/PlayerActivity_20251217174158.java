@@ -283,28 +283,13 @@ public class PlayerActivity extends Activity {
             return;
         }
 
-        // Initialize Watch History Sync Manager
-        watchHistorySyncManager = new WatchHistorySyncManager(this);
-        
-        // Fetch complete movie data for enhanced watch history if not already available
-        if (completeMovieData == null && model != null && model.getMovieId() != null && 
-            !model.getMovieId().equals("null") && !model.getMovieId().isEmpty()) {
-            Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
-            fetchCompleteMovieDataForWatchHistory(model.getMovieId(), model.getVideoType() != null ? model.getVideoType() : "movie");
-        } else if (model != null) {
-            Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
-        }
-
         // Check if external player is enabled (check ProfileFragment first, then MyAccountFragment)
         boolean useExternalPlayer = ProfileFragment.shouldUseExternalPlayer(this);
         if (!useExternalPlayer) {
             useExternalPlayer = MyAccountFragment.shouldUseExternalPlayer(this);
         }
         
-        Log.e(TAG, "🔍 onCreate - External Player Check: " + useExternalPlayer);
-
         if (useExternalPlayer) {
-            Log.e(TAG, "🚀 onCreate - Launching External Player sequence...");
             launchExternalPlayer();
             // finish(); // Don't finish here, wait for onActivityResult
             return;
@@ -335,6 +320,15 @@ public class PlayerActivity extends Activity {
         intiViews();
         initVideoPlayer(url, videoType);
         
+        // Fetch complete movie data for enhanced watch history if not already available
+        if (completeMovieData == null && model != null && model.getMovieId() != null && 
+            !model.getMovieId().equals("null") && !model.getMovieId().isEmpty()) {
+            Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
+            fetchCompleteMovieDataForWatchHistory(model.getMovieId(), model.getVideoType() != null ? model.getVideoType() : "movie");
+        } else if (model != null) {
+            Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
+        }
+        
         // Initialize TV Recommendation Manager for Android TV home screen (with error handling)
         try {
             tvRecommendationManager = new TvRecommendationManager(this);
@@ -342,6 +336,9 @@ public class PlayerActivity extends Activity {
         } catch (Exception e) {
             Log.e(TAG, "Error initializing TV recommendations (safe to continue)", e);
         }
+        
+        // Initialize Watch History Sync Manager
+        watchHistorySyncManager = new WatchHistorySyncManager(this);
         
         // Sync watch history from API to Android TV home screen
         try {
@@ -706,8 +703,8 @@ public class PlayerActivity extends Activity {
             }
             
             // Validate and log video URL
-            Log.e(TAG, "🔍 Video URL: " + videoUrl);
-            Log.e(TAG, "🎬 Movie Title: " + (model.getTitle() != null ? model.getTitle() : "Unknown"));
+            Log.d(TAG, "🔍 Video URL: " + videoUrl);
+            Log.d(TAG, "🎬 Movie Title: " + (model.getTitle() != null ? model.getTitle() : "Unknown"));
             
             // Check for problematic URLs that might cause issues
             if (isProblematicUrl(videoUrl)) {
@@ -723,8 +720,6 @@ public class PlayerActivity extends Activity {
             SharedPreferences prefs = getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
             String selectedPlayer = prefs.getString("selected_player", "just");
             
-            Log.e(TAG, "🎮 Selected Player: " + selectedPlayer);
-
             switch (selectedPlayer) {
                 case "p4k":
                     launchP4KPlayer(videoUrl);
@@ -771,8 +766,6 @@ public class PlayerActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.e(TAG, "📥 onActivityResult - RequestCode: " + requestCode + ", ResultCode: " + resultCode);
-
         if (resultCode == Activity.RESULT_OK && data != null) {
             long position = -1;
             long duration = -1;
@@ -781,32 +774,27 @@ public class PlayerActivity extends Activity {
             if (requestCode == 1001) {
                 position = data.getIntExtra("position", -1);
                 duration = data.getIntExtra("duration", -1);
-                Log.e(TAG, "📥 MX Player Result - Position: " + position + ", Duration: " + duration);
+                Log.d(TAG, "📥 MX Player Result - Position: " + position + ", Duration: " + duration);
             }
             // VLC Player (1002)
             else if (requestCode == 1002) {
                 position = data.getLongExtra("extra_position", -1);
                 duration = data.getLongExtra("extra_duration", -1);
-                Log.e(TAG, "📥 VLC Player Result - Position: " + position + ", Duration: " + duration);
+                Log.d(TAG, "📥 VLC Player Result - Position: " + position + ", Duration: " + duration);
             }
             // Just Player (1003)
             else if (requestCode == 1003) {
                 position = data.getLongExtra("position", -1);
                 duration = data.getLongExtra("duration", -1);
-                Log.e(TAG, "📥 Just Player Result - Position: " + position + ", Duration: " + duration);
+                Log.d(TAG, "📥 Just Player Result - Position: " + position + ", Duration: " + duration);
             }
 
             // Save watch history if valid position returned
             if (position > 0) {
-                Log.e(TAG, "💾 Saving watch history from External Player: " + position + "ms");
-                // Force save even if complete data is missing, to ensure external player progress is saved
-                saveWatchHistoryWithData(position, duration, true);
+                Log.d(TAG, "💾 Saving watch history from External Player: " + position + "ms");
+                saveWatchHistoryWithData(position, duration);
                 new ToastMsg(this).toastIconSuccess("Đã lưu lịch sử xem từ trình phát ngoài");
-            } else {
-                Log.e(TAG, "⚠️ Position is 0 or invalid, not saving history.");
             }
-        } else {
-            Log.e(TAG, "⚠️ onActivityResult - Result not OK or Data null. ResultCode: " + resultCode);
         }
         
         // Finish activity after handling result
@@ -1062,11 +1050,6 @@ public class PlayerActivity extends Activity {
             // Clear window flags before finishing
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             
-            // Remove NEW_TASK flag for startActivityForResult compatibility
-            intent.setFlags(0); // Clear all flags
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-            
             startActivityForResult(intent, 1003);
             // finishAndRemoveTask(); // Don't finish, wait for result
             
@@ -1140,16 +1123,11 @@ public class PlayerActivity extends Activity {
             // Request result from MX Player
             intent.putExtra("return_result", true);
 
-            Log.e(TAG, "🎬 Launching MX Player - URL: " + videoUrl);
-            Log.e(TAG, "📡 User-Agent: " + userAgent);
+            Log.d(TAG, "🎬 Launching MX Player - URL: " + videoUrl);
+            Log.d(TAG, "📡 User-Agent: " + userAgent);
             
             // Clear window flags before finishing
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            
-            // Remove NEW_TASK flag for startActivityForResult compatibility
-            intent.setFlags(0); // Clear all flags
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
             
             startActivityForResult(intent, 1001);
             // finishAndRemoveTask(); // Don't finish, wait for result
@@ -1253,11 +1231,6 @@ public class PlayerActivity extends Activity {
             
             // Clear window flags before finishing
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            
-            // Remove NEW_TASK flag for startActivityForResult compatibility
-            intent.setFlags(0); // Clear all flags
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
             
             startActivityForResult(intent, 1002);
             // finishAndRemoveTask(); // Don't finish, wait for result
@@ -2665,16 +2638,11 @@ public class PlayerActivity extends Activity {
         long currentPosition = player.getCurrentPosition();
         long duration = player.getDuration();
         
-        saveWatchHistoryWithData(currentPosition, duration, false);
+        saveWatchHistoryWithData(currentPosition, duration);
     }
     
     private void saveWatchHistoryWithData(long currentPosition, long duration) {
-        saveWatchHistoryWithData(currentPosition, duration, false);
-    }
-    
-    private void saveWatchHistoryWithData(long currentPosition, long duration, boolean forceSave) {
         if (model == null || watchHistorySyncManager == null) {
-            Log.e(TAG, "❌ saveWatchHistoryWithData: model or manager is null");
             return;
         }
         
@@ -2684,17 +2652,12 @@ public class PlayerActivity extends Activity {
         
         if (validDuration && validPosition && watchHistorySyncManager != null) {
             try {
-                // Check if completeMovieData has essential information
-                boolean hasCompleteInfo = false;
+                // Use enhanced watch history saving with complete movie metadata when available
                 if (completeMovieData != null) {
-                    hasCompleteInfo = completeMovieData.getTitle() != null && 
+                    // Check if completeMovieData has essential information
+                    boolean hasCompleteInfo = completeMovieData.getTitle() != null && 
                                             !completeMovieData.getTitle().isEmpty() && 
                                             !completeMovieData.getTitle().equals("Unknown Title");
-                }
-
-                // Use enhanced watch history saving with complete movie metadata when available
-                // If forceSave is true and info is incomplete, skip this block to fallback to model data
-                if (completeMovieData != null && (hasCompleteInfo || !forceSave)) {
                     
                     if (!hasCompleteInfo) {
                         Log.w(TAG, "⚠️ CompleteMovieData exists but lacks essential info, will try API fetch for: " + completeMovieData.getVideosId());
@@ -2711,7 +2674,7 @@ public class PlayerActivity extends Activity {
                         }
                     }
                     
-                    Log.e(TAG, "💾 Saving ENHANCED watch history with complete metadata - ID: " + completeMovieData.getVideosId() + 
+                    Log.d(TAG, "💾 Saving ENHANCED watch history with complete metadata - ID: " + completeMovieData.getVideosId() + 
                               ", Title: " + completeMovieData.getTitle() + 
                               ", Position: " + currentPosition + "ms");
                     
@@ -2836,7 +2799,7 @@ public class PlayerActivity extends Activity {
                     
                 } else {
                     // Use saveFullWatchHistory even without completeMovieData to get proper JSON structure
-                    Log.e(TAG, "⚠️ Using saveFullWatchHistory with PlaybackModel data (no completeMovieData available)");
+                    Log.w(TAG, "⚠️ Using saveFullWatchHistory with PlaybackModel data (no completeMovieData available)");
                     
                     String isTvSeries = model.getIsTvSeries() != null ? model.getIsTvSeries() : "0";
                     
@@ -2888,7 +2851,7 @@ public class PlayerActivity extends Activity {
                         genreList.add(genreMap);
                     }
                     
-                    Log.e(TAG, "💾 Saving ENHANCED watch history with PlaybackModel data - ID: " + saveId + 
+                    Log.d(TAG, "💾 Saving ENHANCED watch history with PlaybackModel data - ID: " + saveId + 
                               ", Title: " + title + ", Position: " + currentPosition + "ms");
                     
                     // For TV series data - try to get from model
@@ -2929,7 +2892,7 @@ public class PlayerActivity extends Activity {
                 Log.e(TAG, "Error saving watch history: " + e.getMessage(), e);
             }
         } else {
-            Log.e(TAG, "Cannot save watch history - invalid duration or position: pos=" + currentPosition + ", dur=" + duration);
+            Log.w(TAG, "Cannot save watch history - invalid duration or position");
         }
     }
 
@@ -5261,7 +5224,7 @@ public class PlayerActivity extends Activity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                saveWatchHistoryWithData(lastSavePosition, lastSaveDuration, false);
+                                saveWatchHistoryWithData(lastSavePosition, lastSaveDuration);
                             }
                         });
                     }
@@ -5282,7 +5245,7 @@ public class PlayerActivity extends Activity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                saveWatchHistoryWithData(lastSavePosition, lastSaveDuration, true);
+                                saveWatchHistoryWithData(lastSavePosition, lastSaveDuration);
                             }
                         });
                     }

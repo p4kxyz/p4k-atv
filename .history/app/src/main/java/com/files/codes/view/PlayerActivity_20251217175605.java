@@ -283,18 +283,6 @@ public class PlayerActivity extends Activity {
             return;
         }
 
-        // Initialize Watch History Sync Manager
-        watchHistorySyncManager = new WatchHistorySyncManager(this);
-        
-        // Fetch complete movie data for enhanced watch history if not already available
-        if (completeMovieData == null && model != null && model.getMovieId() != null && 
-            !model.getMovieId().equals("null") && !model.getMovieId().isEmpty()) {
-            Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
-            fetchCompleteMovieDataForWatchHistory(model.getMovieId(), model.getVideoType() != null ? model.getVideoType() : "movie");
-        } else if (model != null) {
-            Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
-        }
-
         // Check if external player is enabled (check ProfileFragment first, then MyAccountFragment)
         boolean useExternalPlayer = ProfileFragment.shouldUseExternalPlayer(this);
         if (!useExternalPlayer) {
@@ -335,6 +323,15 @@ public class PlayerActivity extends Activity {
         intiViews();
         initVideoPlayer(url, videoType);
         
+        // Fetch complete movie data for enhanced watch history if not already available
+        if (completeMovieData == null && model != null && model.getMovieId() != null && 
+            !model.getMovieId().equals("null") && !model.getMovieId().isEmpty()) {
+            Log.d(TAG, "🔍 Fetching complete movie data early for ID: " + model.getMovieId());
+            fetchCompleteMovieDataForWatchHistory(model.getMovieId(), model.getVideoType() != null ? model.getVideoType() : "movie");
+        } else if (model != null) {
+            Log.w(TAG, "⚠️ Cannot fetch complete movie data - MovieId: " + model.getMovieId() + ", CompleteData: " + (completeMovieData != null ? "exists" : "null"));
+        }
+        
         // Initialize TV Recommendation Manager for Android TV home screen (with error handling)
         try {
             tvRecommendationManager = new TvRecommendationManager(this);
@@ -342,6 +339,9 @@ public class PlayerActivity extends Activity {
         } catch (Exception e) {
             Log.e(TAG, "Error initializing TV recommendations (safe to continue)", e);
         }
+        
+        // Initialize Watch History Sync Manager
+        watchHistorySyncManager = new WatchHistorySyncManager(this);
         
         // Sync watch history from API to Android TV home screen
         try {

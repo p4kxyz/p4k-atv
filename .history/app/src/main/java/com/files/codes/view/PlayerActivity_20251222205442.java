@@ -168,7 +168,7 @@ public class PlayerActivity extends Activity {
     private int visible;
     private ImageButton serverButton, subtitleButton, subtitleSettingsButton, audioTrackButton, aspectRatioButton;
     private ImageButton previousEpisodeButton, nextEpisodeButton; // Episode navigation for TV series
-    private TextView movieTitleTV, movieDescriptionTV;
+    private TextView movieTitleTV, movieDescriptionTV, videoQualityTag;
     private ImageView posterImageView, posterImageViewForTV;
     private RelativeLayout seekBarLayout;
     private TextView liveTvTextInController;
@@ -368,6 +368,7 @@ public class PlayerActivity extends Activity {
         // setupDualSubtitleOverlay();
         movieTitleTV = findViewById(R.id.movie_title);
         movieDescriptionTV = findViewById(R.id.movie_description);
+        videoQualityTag = findViewById(R.id.video_quality_tag);
         posterImageView = findViewById(R.id.poster_image_view);
         posterImageViewForTV = findViewById(R.id.poster_image_view_for_tv);
         serverButton = findViewById(R.id.img_server);

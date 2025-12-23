@@ -500,61 +500,46 @@ public class PlayerActivity extends Activity {
 
 
         //set title, description and poster in controller layout
-        String titleText = model.getTitle();
-        String descriptionText = "";
-        boolean isTvSeries = model.getIsTvSeries() != null && model.getIsTvSeries().equals("1");
-
-        if (isTvSeries) {
-            try {
-                if (model.getAllSeasons() != null && 
-                    model.getCurrentSeasonIndex() >= 0 && 
-                    model.getCurrentSeasonIndex() < model.getAllSeasons().size()) {
-                    
-                    com.files.codes.model.movieDetails.Season currentSeason = model.getAllSeasons().get(model.getCurrentSeasonIndex());
-                    
-                    if (currentSeason.getEpisodes() != null && 
-                        model.getCurrentEpisodeIndex() >= 0 && 
-                        model.getCurrentEpisodeIndex() < currentSeason.getEpisodes().size()) {
-                        
-                        String episodeName = currentSeason.getEpisodes().get(model.getCurrentEpisodeIndex()).getEpisodesName();
-                        if (episodeName != null && !episodeName.isEmpty()) {
-                            descriptionText = episodeName;
-                            
-                            // Clean up title by removing " - EpisodeName"
-                            String suffix = " - " + episodeName;
-                            if (titleText != null && titleText.endsWith(suffix)) {
-                                titleText = titleText.substring(0, titleText.length() - suffix.length());
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            
-            if (descriptionText.isEmpty()) {
-                descriptionText = model.getTitle();
-            }
-        } else {
-            if (model.getVideo() != null) {
-                descriptionText = model.getVideo().getLabel();
-            }
-        }
-
         if (movieTitleTV != null) {
-            // Clean up title to show only "Vietnamese Name (Year)"
-            // Example: "Tên Việt (2024) Tên Gốc" -> "Tên Việt (2024)"
-            if (titleText != null) {
-                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(.*\\(\\d{4}\\))");
-                java.util.regex.Matcher matcher = pattern.matcher(titleText);
-                if (matcher.find()) {
-                    titleText = matcher.group(1);
-                }
-            }
-            movieTitleTV.setText(titleText);
+            movieTitleTV.setText(model.getTitle());
         }
         if (movieDescriptionTV != null) {
-            movieDescriptionTV.setText(descriptionText);
+            String displayText = "";
+            boolean isTvSeries = model.getIsTvSeries() != null && model.getIsTvSeries().equals("1");
+
+            if (isTvSeries) {
+                try {
+                    if (model.getAllSeasons() != null && 
+                        model.getCurrentSeasonIndex() >= 0 && 
+                        model.getCurrentSeasonIndex() < model.getAllSeasons().size()) {
+                        
+                        com.files.codes.model.movieDetails.Season currentSeason = model.getAllSeasons().get(model.getCurrentSeasonIndex());
+                        
+                        if (currentSeason.getEpisodes() != null && 
+                            model.getCurrentEpisodeIndex() >= 0 && 
+                            model.getCurrentEpisodeIndex() < currentSeason.getEpisodes().size()) {
+                            
+                            displayText = currentSeason.getEpisodes().get(model.getCurrentEpisodeIndex()).getEpisodesName();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                
+                if (displayText == null || displayText.isEmpty()) {
+                    displayText = model.getTitle();
+                }
+            } else {
+                if (model.getVideo() != null) {
+                    displayText = model.getVideo().getLabel();
+                }
+                
+                if (displayText == null || displayText.isEmpty()) {
+                    // Fallback to title if label is missing, or leave empty as per user preference
+                    // displayText = model.getTitle(); 
+                }
+            }
+            movieDescriptionTV.setText(displayText);
         }
 
         // Ensure poster images are hidden as per user request

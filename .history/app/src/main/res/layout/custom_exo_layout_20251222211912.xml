@@ -32,7 +32,6 @@
             android:textColor="@android:color/white"
             android:textSize="30sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"
             tools:text="Title" />
 
         <TextView
@@ -44,7 +43,6 @@
             android:layout_marginTop="5dp"
             android:textColor="#B3FFFFFF"
             android:textSize="16sp"
-            android:fontFamily="sans-serif-light"
             tools:text="Filename.mkv" />
     </RelativeLayout>
 

@@ -542,15 +542,6 @@ public class PlayerActivity extends Activity {
         }
 
         if (movieTitleTV != null) {
-            // Clean up title to show only "Vietnamese Name (Year)"
-            // Example: "Tên Việt (2024) Tên Gốc" -> "Tên Việt (2024)"
-            if (titleText != null) {
-                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(.*\\(\\d{4}\\))");
-                java.util.regex.Matcher matcher = pattern.matcher(titleText);
-                if (matcher.find()) {
-                    titleText = matcher.group(1);
-                }
-            }
             movieTitleTV.setText(titleText);
         }
         if (movieDescriptionTV != null) {

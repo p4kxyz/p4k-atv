@@ -32,7 +32,6 @@
             android:textColor="@android:color/white"
             android:textSize="30sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"
             tools:text="Title" />
 
         <TextView
@@ -44,7 +43,6 @@
             android:layout_marginTop="5dp"
             android:textColor="#B3FFFFFF"
             android:textSize="16sp"
-            android:fontFamily="sans-serif-light"
             tools:text="Filename.mkv" />
     </RelativeLayout>
 
@@ -52,8 +50,8 @@
         android:id="@+id/control_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/seekbar_layout"
-        android:layout_marginBottom="0dp"
+        android:layout_below="@id/info_layout"
+        android:layout_marginTop="24dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="16dp"
@@ -192,7 +190,8 @@
         android:id="@+id/seekbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/control_layout"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="24dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">

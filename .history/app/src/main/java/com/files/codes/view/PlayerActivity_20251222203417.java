@@ -500,69 +500,89 @@ public class PlayerActivity extends Activity {
 
 
         //set title, description and poster in controller layout
-        String titleText = model.getTitle();
-        String descriptionText = "";
-        boolean isTvSeries = model.getIsTvSeries() != null && model.getIsTvSeries().equals("1");
+        if (movieTitleTV != null) {
+            movieTitleTV.setText(model.getTitle());
+        }
+        if (movieDescriptionTV != null) {
+            String displayText = "";
+            boolean isTvSeries = model.getIsTvSeries() != null && model.getIsTvSeries().equals("1");
 
-        if (isTvSeries) {
-            try {
-                if (model.getAllSeasons() != null && 
-                    model.getCurrentSeasonIndex() >= 0 && 
-                    model.getCurrentSeasonIndex() < model.getAllSeasons().size()) {
-                    
-                    com.files.codes.model.movieDetails.Season currentSeason = model.getAllSeasons().get(model.getCurrentSeasonIndex());
-                    
-                    if (currentSeason.getEpisodes() != null && 
-                        model.getCurrentEpisodeIndex() >= 0 && 
-                        model.getCurrentEpisodeIndex() < currentSeason.getEpisodes().size()) {
+            if (isTvSeries) {
+                try {
+                    if (model.getAllSeasons() != null && 
+                        model.getCurrentSeasonIndex() >= 0 && 
+                        model.getCurrentSeasonIndex() < model.getAllSeasons().size()) {
                         
-                        String episodeName = currentSeason.getEpisodes().get(model.getCurrentEpisodeIndex()).getEpisodesName();
-                        if (episodeName != null && !episodeName.isEmpty()) {
-                            descriptionText = episodeName;
+                        com.files.codes.model.movieDetails.Season currentSeason = model.getAllSeasons().get(model.getCurrentSeasonIndex());
+                        
+                        if (currentSeason.getEpisodes() != null && 
+                            model.getCurrentEpisodeIndex() >= 0 && 
+                            model.getCurrentEpisodeIndex() < currentSeason.getEpisodes().size()) {
                             
-                            // Clean up title by removing " - EpisodeName"
-                            String suffix = " - " + episodeName;
-                            if (titleText != null && titleText.endsWith(suffix)) {
-                                titleText = titleText.substring(0, titleText.length() - suffix.length());
+                            displayText = currentSeason.getEpisodes().get(model.getCurrentEpisodeIndex()).getEpisodesName();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                
+                if (displayText == null || displayText.isEmpty()) {
+                    displayText = model.getTitle();
+                }
+            } else {
+                if (model.getVideo() != null) {
+                    displayText = model.getVideo().getLabel();
+                }
+                
+                if (displayText == null || displayText.isEmpty()) {
+                    String videoUrl = model.getVideoUrl();
+                    if (videoUrl != null && !videoUrl.isEmpty()) {
+                        try {
+                            displayText = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
+                            if (displayText.contains("?")) {
+                                displayText = displayText.substring(0, displayText.indexOf("?"));
                             }
+                        } catch (Exception e) {
+                            displayText = videoUrl;
                         }
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-            
-            if (descriptionText.isEmpty()) {
-                descriptionText = model.getTitle();
-            }
-        } else {
-            if (model.getVideo() != null) {
-                descriptionText = model.getVideo().getLabel();
-            }
+            movieDescriptionTV.setText(displayText);
         }
 
-        if (movieTitleTV != null) {
-            // Clean up title to show only "Vietnamese Name (Year)"
-            // Example: "Tên Việt (2024) Tên Gốc" -> "Tên Việt (2024)"
-            if (titleText != null) {
-                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(.*\\(\\d{4}\\))");
-                java.util.regex.Matcher matcher = pattern.matcher(titleText);
-                if (matcher.find()) {
-                    titleText = matcher.group(1);
+        if (category.equalsIgnoreCase("tv")) {
+            String cardImageUrl = model.getCardImageUrl();
+            if (posterImageViewForTV != null) {
+                if (cardImageUrl != null && !cardImageUrl.trim().isEmpty()) {
+                    Picasso.get()
+                            .load(cardImageUrl)
+                            .placeholder(R.drawable.poster_placeholder)
+                            .centerCrop()
+                            .resize(200, 120)
+                            .error(R.drawable.poster_placeholder)
+                            .into(posterImageViewForTV);
+                } else {
+                    // Set placeholder when no image URL
+                    posterImageViewForTV.setImageResource(R.drawable.poster_placeholder);
                 }
             }
-            movieTitleTV.setText(titleText);
-        }
-        if (movieDescriptionTV != null) {
-            movieDescriptionTV.setText(descriptionText);
-        }
-
-        // Ensure poster images are hidden as per user request
-        if (posterImageViewForTV != null) {
-            posterImageViewForTV.setVisibility(View.GONE);
-        }
-        if (posterImageView != null) {
-            posterImageView.setVisibility(View.GONE);
+        } else {
+            String cardImageUrl = model.getCardImageUrl();
+            if (posterImageView != null) {
+                if (cardImageUrl != null && !cardImageUrl.trim().isEmpty()) {
+                    Picasso.get()
+                            .load(cardImageUrl)
+                            .placeholder(R.drawable.poster_placeholder)
+                            .centerCrop()
+                            .resize(120, 200)
+                            .error(R.drawable.poster_placeholder)
+                            .into(posterImageView);
+                } else {
+                    // Set placeholder when no image URL
+                    posterImageView.setImageResource(R.drawable.poster_placeholder);
+                }
+            }
         }
     }
 

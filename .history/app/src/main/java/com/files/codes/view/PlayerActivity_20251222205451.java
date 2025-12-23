@@ -168,7 +168,7 @@ public class PlayerActivity extends Activity {
     private int visible;
     private ImageButton serverButton, subtitleButton, subtitleSettingsButton, audioTrackButton, aspectRatioButton;
     private ImageButton previousEpisodeButton, nextEpisodeButton; // Episode navigation for TV series
-    private TextView movieTitleTV, movieDescriptionTV;
+    private TextView movieTitleTV, movieDescriptionTV, videoQualityTag;
     private ImageView posterImageView, posterImageViewForTV;
     private RelativeLayout seekBarLayout;
     private TextView liveTvTextInController;
@@ -368,6 +368,7 @@ public class PlayerActivity extends Activity {
         // setupDualSubtitleOverlay();
         movieTitleTV = findViewById(R.id.movie_title);
         movieDescriptionTV = findViewById(R.id.movie_description);
+        videoQualityTag = findViewById(R.id.video_quality_tag);
         posterImageView = findViewById(R.id.poster_image_view);
         posterImageViewForTV = findViewById(R.id.poster_image_view_for_tv);
         serverButton = findViewById(R.id.img_server);
@@ -555,6 +556,31 @@ public class PlayerActivity extends Activity {
         }
         if (movieDescriptionTV != null) {
             movieDescriptionTV.setText(descriptionText);
+        }
+
+        // Set video quality tag
+        if (videoQualityTag != null) {
+            String qualityText = "";
+            if (model.getVideo() != null && model.getVideo().getLabel() != null) {
+                qualityText = model.getVideo().getLabel();
+            } else if (model.getVideoQuality() != null) {
+                qualityText = model.getVideoQuality();
+            }
+            
+            // Fallback: try to parse from URL or filename
+            if (qualityText.isEmpty() && model.getVideoUrl() != null) {
+                String lowerUrl = model.getVideoUrl().toLowerCase();
+                if (lowerUrl.contains("4k") || lowerUrl.contains("2160p")) qualityText = "4K";
+                else if (lowerUrl.contains("1080p") || lowerUrl.contains("fhd")) qualityText = "FHD";
+                else if (lowerUrl.contains("720p") || lowerUrl.contains("hd")) qualityText = "HD";
+            }
+
+            if (!qualityText.isEmpty()) {
+                videoQualityTag.setText(qualityText);
+                videoQualityTag.setVisibility(View.VISIBLE);
+            } else {
+                videoQualityTag.setVisibility(View.GONE);
+            }
         }
 
         // Ensure poster images are hidden as per user request

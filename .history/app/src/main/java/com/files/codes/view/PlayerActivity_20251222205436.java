@@ -168,7 +168,7 @@ public class PlayerActivity extends Activity {
     private int visible;
     private ImageButton serverButton, subtitleButton, subtitleSettingsButton, audioTrackButton, aspectRatioButton;
     private ImageButton previousEpisodeButton, nextEpisodeButton; // Episode navigation for TV series
-    private TextView movieTitleTV, movieDescriptionTV;
+    private TextView movieTitleTV, movieDescriptionTV, videoQualityTag;
     private ImageView posterImageView, posterImageViewForTV;
     private RelativeLayout seekBarLayout;
     private TextView liveTvTextInController;

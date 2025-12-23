@@ -32,7 +32,6 @@
             android:textColor="@android:color/white"
             android:textSize="30sp"
             android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"
             tools:text="Title" />
 
         <TextView
@@ -44,16 +43,26 @@
             android:layout_marginTop="5dp"
             android:textColor="#B3FFFFFF"
             android:textSize="16sp"
-            android:fontFamily="sans-serif-light"
             tools:text="Filename.mkv" />
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/logo_4k"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:src="@drawable/logo_4k"
+        android:contentDescription="4K Logo" />
 
     <LinearLayout
         android:id="@+id/control_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/seekbar_layout"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="16dp"

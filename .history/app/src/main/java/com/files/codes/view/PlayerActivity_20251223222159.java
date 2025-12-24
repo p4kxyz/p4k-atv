@@ -2598,7 +2598,7 @@ public class PlayerActivity extends Activity {
                     public void onFocusChange(View v, boolean hasFocus) {
                         if (hasFocus) {
                             Log.d("PlayerActivity", "🎯 Time bar focused - DPAD LEFT/RIGHT to seek");
-                            // Toast.makeText(PlayerActivity.this, "◀▶ LEFT/RIGHT để tua", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PlayerActivity.this, "◀▶ LEFT/RIGHT để tua", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -2799,7 +2799,7 @@ public class PlayerActivity extends Activity {
             new Handler().postDelayed(() -> isUserSeeking = false, 500);
             
             // Show seek feedback
-            // Toast.makeText(this, "Tua lùi -" + (seekTimeMs / 1000) + "s", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Tua lùi -" + (seekTimeMs / 1000) + "s", Toast.LENGTH_SHORT).show();
             Log.i("PlayerActivity", "🔄 Seeking backward to: " + (newPosition / 1000) + "s");
         } else if (player != null && !player.isCurrentWindowSeekable()) {
             Toast.makeText(this, "Không thể tua trong nội dung trực tiếp", Toast.LENGTH_SHORT).show();

@@ -19,20 +19,27 @@
 
         <ImageView
             android:id="@+id/poster_image_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
+            android:layout_width="120dp"
+            android:layout_height="200dp"
             android:contentDescription="@string/poster" />
+
+        <ImageView
+            android:id="@+id/poster_image_view_for_tv"
+            android:layout_width="200dp"
+            android:layout_height="120dp"
+            android:contentDescription="@string/poster"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/movie_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/poster_image_view"
             android:textColor="@android:color/white"
             android:textSize="30sp"
-            android:textStyle="bold"
             android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
             tools:text="Title" />
 
         <TextView
@@ -41,11 +48,12 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/movie_title"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="-5dp"
-            android:textColor="#B3FFFFFF"
-            android:textSize="16sp"
+            android:layout_marginTop="-10dp"
+            android:layout_toEndOf="@id/poster_image_view"
             android:fontFamily="sans-serif-light"
-            tools:text="Filename.mkv" />
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            tools:text="Description" />
     </RelativeLayout>
 
     <LinearLayout
@@ -53,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="24dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="16dp"
@@ -81,6 +89,8 @@
             android:elevation="8dp"
             android:contentDescription="Pause" />
             
+
+
         <!-- Previous Episode Button (TV Series only) -->
         <ImageButton
             android:id="@+id/btn_previous_episode"
@@ -193,15 +203,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/control_layout"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="10dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+            android:id="@id/exo_progress"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/exo_play_pause"
+            android:nextFocusDown="@id/exo_position"
+            tools:ignore="NestedWeights"
+            app:played_color="#FF1976D2"
+            app:scrubber_color="#FFFFFF"
+            app:unplayed_color="#40FFFFFF"
+            app:buffered_color="#80E3F2FD"
+            app:bar_height="6dp" />
+
         <LinearLayout
-            android:id="@+id/time_labels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_below="@id/exo_progress"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
@@ -241,22 +266,6 @@
                 tools:text="1:00:00" />
 
         </LinearLayout>
-
-        <com.google.android.exoplayer2.ui.DefaultTimeBar
-            android:id="@id/exo_progress"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:layout_below="@id/time_labels"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:nextFocusUp="@id/exo_play_pause"
-            android:nextFocusDown="@id/exo_position"
-            tools:ignore="NestedWeights"
-            app:played_color="#FF1976D2"
-            app:scrubber_color="#FFFFFF"
-            app:unplayed_color="#40FFFFFF"
-            app:buffered_color="#80E3F2FD"
-            app:bar_height="6dp" />
 
     </RelativeLayout>
 

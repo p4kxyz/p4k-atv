@@ -2598,7 +2598,7 @@ public class PlayerActivity extends Activity {
                     public void onFocusChange(View v, boolean hasFocus) {
                         if (hasFocus) {
                             Log.d("PlayerActivity", "🎯 Time bar focused - DPAD LEFT/RIGHT to seek");
-                            // Toast.makeText(PlayerActivity.this, "◀▶ LEFT/RIGHT để tua", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PlayerActivity.this, "◀▶ LEFT/RIGHT để tua", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

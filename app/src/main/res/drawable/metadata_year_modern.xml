@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    
-    <!-- Modern Gradient Background -->
-    <gradient
-        android:startColor="#80000000"
-        android:endColor="#B3000000"
-        android:angle="135"
-        android:type="linear" />
-    
-    <!-- Perfectly Rounded -->
-    <corners android:radius="20dp" />
-    
-    <!-- Glass Effect Border -->
-    <stroke 
-        android:width="0.5dp" 
-        android:color="#60FFFFFF" />
-        
+    <solid android:color="@android:color/transparent" />
+    <stroke
+        android:width="2dp"
+        android:color="#FFD700" />
+    <corners android:radius="6dp" />
 </shape>

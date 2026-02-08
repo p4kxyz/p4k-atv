@@ -24,7 +24,9 @@
         android:layout_centerInParent="true"
         android:textSize="20sp"
         android:textColor="@android:color/white"
-        android:background="@android:color/transparent" />
+        android:background="@android:color/transparent"
+        android:clickable="false"
+        android:focusable="false" />
 
     <ImageView
         android:id="@+id/logo_4k_overlay"

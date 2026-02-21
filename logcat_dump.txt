@@ -1,0 +1,142 @@
+﻿--------- beginning of main
+02-08 20:49:00.597  7170  7170 I oxootv.spagree: Late-enabling -Xcheck:jni
+02-08 20:49:00.614  7170  7170 W oxootv.spagree: Unexpected CPU variant for X86 using defaults: x86
+02-08 20:49:00.680  7170  7170 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10080; state: ENABLED
+02-08 20:49:01.039  7170  7170 V GraphicsEnvironment: ANGLE Developer option for 'com.oxootv.spagreen' set to: 'default'
+02-08 20:49:01.039  7170  7170 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+02-08 20:49:01.044  7170  7170 D NetworkSecurityConfig: No Network Security Config specified, using platform default
+02-08 20:49:01.045  7170  7170 D NetworkSecurityConfig: No Network Security Config specified, using platform default
+02-08 20:49:01.154  7170  7170 I FirebaseApp: Device unlocked: initializing all Firebase APIs for app [DEFAULT]
+02-08 20:49:01.191  7170  7170 I FirebaseInitProvider: FirebaseApp initialization successful
+02-08 20:49:01.217  7170  7189 I DynamiteModule: Considering local module com.google.android.gms.measurement.dynamite:92 and remote module com.google.android.gms.measurement.dynamite:84
+02-08 20:49:01.217  7170  7189 I DynamiteModule: Selected local version of com.google.android.gms.measurement.dynamite
+02-08 20:49:01.355  7170  7193 I FA      : App measurement initialized, version: 79000
+02-08 20:49:01.355  7170  7193 I FA      : To enable debug logging run: adb shell setprop log.tag.FA VERBOSE
+02-08 20:49:01.355  7170  7193 I FA      : To enable faster debug mode event logging run:
+02-08 20:49:01.355  7170  7193 I FA      :   adb shell setprop debug.firebase.analytics.app com.oxootv.spagreen
+02-08 20:49:01.542  7170  7205 D libEGL  : loaded /vendor/lib/egl/libEGL_emulation.so
+02-08 20:49:01.544  7170  7205 D libEGL  : loaded /vendor/lib/egl/libGLESv1_CM_emulation.so
+02-08 20:49:01.545  7170  7205 D libEGL  : loaded /vendor/lib/egl/libGLESv2_emulation.so
+02-08 20:49:01.655  7170  7170 W oxootv.spagree: Accessing hidden method Ljava/lang/invoke/MethodHandles$Lookup;-><init>(Ljava/lang/Class;I)V (unsupported, reflection, allowed)
+02-08 20:49:01.761  7170  7170 D RenderScript HIDL Adaptation: IRenderScriptDevice::getService()
+02-08 20:49:01.761  7170  7170 D RenderScript HIDL Adaptation: IRenderScriptDevice::getService() returned 0x0
+02-08 20:49:01.761  7170  7170 D RenderScript HIDL Adaptation: Using Fallback Path.
+02-08 20:49:01.770  7170  7170 D oxootv.spagree: Successfully queried cache dir: /data/user_de/0/com.oxootv.spagreen/code_cache
+02-08 20:49:01.770  7170  7170 D RenderScript: Setting cache dir: /data/user_de/0/com.oxootv.spagreen/code_cache
+02-08 20:49:01.818  7170  7193 I FA      : Tag Manager is not found and thus will not be used
+02-08 20:49:01.841  7170  7203 D HostConnection: createUnique: call
+02-08 20:49:01.843  7170  7203 D HostConnection: HostConnection::get() New Host Connection established 0xea717310, tid 7203
+02-08 20:49:01.848  7170  7203 D HostConnection: HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+02-08 20:49:01.851  7170  7203 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+02-08 20:49:01.853  7170  7203 D EGL_emulation: eglCreateContext: 0xea70e470: maj 3 min 0 rcv 3
+02-08 20:49:01.854  7170  7203 D EGL_emulation: eglMakeCurrent: 0xea70e470: ver 3 0 (tinfo 0xe8533040) (first time)
+02-08 20:49:01.874  7170  7203 I Gralloc4: mapper 4.x is not supported
+02-08 20:49:01.875  7170  7203 D HostConnection: createUnique: call
+02-08 20:49:01.875  7170  7203 D HostConnection: HostConnection::get() New Host Connection established 0xea70f2e0, tid 7203
+02-08 20:49:01.875  7170  7203 D goldfish-address-space: allocate: Ask for block of size 0x100
+02-08 20:49:01.876  7170  7203 D goldfish-address-space: allocate: ioctl allocate returned offset 0x3efffe000 size 0x2000
+02-08 20:49:01.895  7170  7203 W Gralloc4: allocator 4.x is not supported
+02-08 20:49:01.908  7170  7203 D HostConnection: HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+02-08 20:49:02.715  7170  7179 I oxootv.spagree: Background young concurrent copying GC freed 40831(2357KB) AllocSpace objects, 16(384KB) LOS objects, 87% free, 3582KB/27MB, paused 4.325ms,203us total 101.040ms
+02-08 20:49:03.204  7170  7203 D EGL_emulation: app_time_stats: avg=16.64ms min=3.31ms max=137.01ms count=43
+02-08 20:49:04.103  7170  7170 D HomeNewActivity: ≡ƒô║ Android TV detected, skipping install permission check
+02-08 20:49:04.103  7170  7170 D HomeNewActivity: Γ£à All permissions granted, starting OTA check...
+02-08 20:49:04.207  7170  7203 D EGL_emulation: app_time_stats: avg=11.89ms min=3.47ms max=24.19ms count=54
+02-08 20:49:05.921  7170  7203 D EGL_emulation: app_time_stats: avg=16.99ms min=3.18ms max=352.76ms count=55
+02-08 20:49:05.969  7170  7170 E HOME_DEBUG: ≡ƒöÑ HomeFragment.onCreate - tvRecommendationManager initialized
+02-08 20:49:05.970  7170  7170 E HOME_DEBUG: ≡ƒöÑ HomeFragment.onCreate - registering LiveData observer on activity: com.files.codes.view.fragments.testFolder.HomeNewActivity@8f260a0
+02-08 20:49:05.993  7170  7170 E HOME_DEBUG: ≡ƒöÑ onChanged FIRED! homeContentList=NOT NULL, list size=7
+02-08 20:49:05.994  7170  7170 E HOME_DEBUG: ≡ƒöÑ loadRows called! list=size=7
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒÜÇ Loading initial content batch: 9 items
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒöì loadFixedHeroBanner called with video: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒÄ¼ Category 0: Phim Hay Nha N├¡
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒîì Country ID found: korea_content - Title: Drama xß╗⌐ Kim Chi
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒîì Country ID found: china_content - Title: Tr╞░ß╗¥ng thi├¬n Drama T├áu
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒîì Country ID found: vietnam_content - Title: X╞░ß╗ƒng phim xß╗⌐ ─É├┤ng L├áo
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒÄ¡ Genre ID found: animation_content - Title: Xi n├¬ Tuß╗òi th╞í
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒôé Phim Bß╗Ö: Phim Bß╗Ö Mß╗¢i Nhß║Ñt
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒôé Phim4k Free1: Nguß╗ôn Phim Free 1
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒôé KKPhim4k Free2: Nguß╗ôn Free 2
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒöº Created Korea category (ID 13)
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒöº Created China category (ID 15)
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒöº Created Vietnam category (ID 5)
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒöº Created Animation category (Genre ID 13)
+02-08 20:49:06.000  7170  7170 D HomeActivity: ≡ƒöº Created Phim Le category (ID 2)
+02-08 20:49:06.000  7170  7170 D HomeActivity: Γ£à Category 2: Drama Xß╗⌐ Kim Chi
+02-08 20:49:06.001  7170  7170 D HomeActivity: Γ£à Category 3: Tr╞░ß╗¥ng Thi├¬n Drama "T├áu"
+02-08 20:49:06.001  7170  7170 D HomeActivity: Γ£à Category 4: X╞░ß╗ƒng phim Xß╗⌐ ─É├┤ng L├áo
+02-08 20:49:06.001  7170  7170 D HomeActivity: Γ£à Category 5: Xi N├¬ Tuß╗òi Th╞í
+02-08 20:49:06.001  7170  7170 D HomeActivity: Γ£à Category 6: Phim Lß║╗ Mß╗¢i Nhß║Ñt
+02-08 20:49:06.001  7170  7170 D HomeActivity: Γ£à Category 7: Phim Bß╗Ö Mß╗¢i Nhß║Ñt
+02-08 20:49:06.001  7170  7170 D HomeActivity: Γ£à Total categories loaded: 7
+02-08 20:49:06.001  7170  7170 D HomeActivity: ≡ƒÄ» Current category index: 0
+02-08 20:49:06.001  7170  7170 D HomeActivity: Γ£à No padding - Hero Banner only mode
+02-08 20:49:06.006  7170  7170 D HomeActivity: Γ£à Hero banner container found in Fragment
+02-08 20:49:06.051  7170  7170 E ThemeUtils: View class androidx.appcompat.widget.AppCompatButton is an AppCompat widget that can only be used with a Theme.AppCompat theme (or descendant).
+02-08 20:49:06.071  7170  7170 E ThemeUtils: View class androidx.appcompat.widget.AppCompatButton is an AppCompat widget that can only be used with a Theme.AppCompat theme (or descendant).
+02-08 20:49:06.078  7170  7170 D HomeActivity: Γ£à Hero banner view inflated
+02-08 20:49:06.081  7170  7170 D HomeActivity: Γ£à Hero banner view added to container
+02-08 20:49:06.081  7170  7170 D HomeActivity: ≡ƒôÉ Screen dimensions: 1920x1080 px
+02-08 20:49:06.081  7170  7170 D HomeActivity: ≡ƒôÉ Target 16:9 size: 1920x1080 px
+02-08 20:49:06.081  7170  7170 D HomeActivity: ≡ƒîÉ ========== CLOUDFLARE URL ==========
+02-08 20:49:06.081  7170  7170 D HomeActivity: ≡ƒîÉ Original: https://api.phim4k.lol/uploads/poster_image/16169.jpg
+02-08 20:49:06.081  7170  7170 D HomeActivity: ≡ƒîÉ Cloudflare: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:49:06.081  7170  7170 D HomeActivity: ≡ƒîÉ Size: 1920x1080 px (fit=cover)
+02-08 20:49:06.081  7170  7170 D HomeActivity: ≡ƒîÉ =====================================
+02-08 20:49:06.091  7170  7170 D HomeActivity: Γ£à Fixed Hero Banner loaded successfully with title: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:49:06.100  7170  7170 D HomeActivity: ≡ƒÄ¼ Lazy loading: Initial 10 of 24 thumbnails
+02-08 20:49:06.102  7170  7170 D HomeActivity: Γ£à Thumbnails grid setup with 24 items and focus listener
+02-08 20:49:06.104  7170  7170 D HomeNewActivity: ≡ƒÜÇ Starting OTA update check...
+02-08 20:49:06.104  7170  7170 D HomeNewActivity: ≡ƒô▒ Getting OTAUpdateManager instance...
+02-08 20:49:06.108  7170  7170 E OTAUpdateManager: ≡ƒöº Creating OTAUpdateService...
+02-08 20:49:06.110  7170  7170 D OTAUpdateService: OTA Update Service created with context
+02-08 20:49:06.110  7170  7170 E OTAUpdateService: ≡ƒöÑ Initializing Firebase Database...
+02-08 20:49:06.284  7170  7170 E OTAUpdateService: Γ£à Firebase initialized successfully!
+02-08 20:49:06.284  7170  7170 E OTAUpdateService: Firebase URL: https://website-19a7d-default-rtdb.asia-southeast1.firebasedatabase.app
+02-08 20:49:06.284  7170  7170 E OTAUpdateService: Firebase path: app_updates/phim4k
+02-08 20:49:06.284  7170  7170 E OTAUpdateManager: Γ£à OTAUpdateService created and Firebase initialized
+02-08 20:49:06.284  7170  7170 E OTAUpdateManager: ≡ƒöº Creating OTADownloadManager...
+02-08 20:49:06.285  7170  7170 E OTADownloadManager: ≡ƒôí Registering download receiver...
+02-08 20:49:06.286  7170  7170 E OTADownloadManager: ≡ƒôí Γ£à Download receiver registered successfully!
+02-08 20:49:06.286  7170  7170 E OTAUpdateManager: Γ£à OTADownloadManager created
+02-08 20:49:06.287  7170  7170 D HomeNewActivity: Γ£à OTAUpdateManager instance created: SUCCESS
+02-08 20:49:06.287  7170  7170 D HomeNewActivity: ≡ƒöì Calling checkForUpdates...
+02-08 20:49:06.287  7170  7170 E OTAUpdateManager: Starting OTA update check...
+02-08 20:49:06.287  7170  7170 E OTAUpdateService: ≡ƒöä Checking for updates with fresh data...
+02-08 20:49:06.291  7170  7170 D HomeNewActivity: Γ£à checkForUpdates called successfully
+02-08 20:49:06.414  7170  7170 D HomeActivity: ≡ƒÄ¿ ========== BITMAP LOADED (CURRENT APP) ==========
+02-08 20:49:06.414  7170  7170 D HomeActivity: ≡ƒÄ¿ URL: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:49:06.414  7170  7170 D HomeActivity: ≡ƒÄ¿ Bitmap size: 1920x1080 px
+02-08 20:49:06.414  7170  7170 D HomeActivity: ≡ƒÄ¿ ImageView scaleType: CENTER_CROP
+02-08 20:49:06.414  7170  7170 D HomeActivity: ≡ƒÄ¿ ImageView size: 0x0 px
+02-08 20:49:06.414  7170  7170 D HomeActivity: ≡ƒÄ¿ AdjustViewBounds: false
+02-08 20:49:06.414  7170  7170 D HomeActivity: ≡ƒÄ¿ ===================================================
+02-08 20:49:06.438  7170  7170 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒôì Thumbnail grid focus changed - Position: 0
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ» Thumbnail focused: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒôÉ Screen dimensions: 1920x1080 px
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒôÉ Target 16:9 size: 1920x1080 px
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒîÉ ========== CLOUDFLARE URL ==========
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒîÉ Original: https://api.phim4k.lol/uploads/poster_image/16169.jpg
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒîÉ Cloudflare: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒîÉ Size: 1920x1080 px (fit=cover)
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒîÉ =====================================
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ¿ ========== BITMAP LOADED (CURRENT APP) ==========
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ¿ URL: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ¿ Bitmap size: 1920x1080 px
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ¿ ImageView scaleType: CENTER_CROP
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ¿ ImageView size: 1920x1080 px
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ¿ AdjustViewBounds: false
+02-08 20:49:06.440  7170  7170 D HomeActivity: ≡ƒÄ¿ ===================================================
+02-08 20:49:06.443  7170  7170 D HomeActivity: Γ£à Hero Banner content updated: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:49:06.445  7170  7170 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:49:06.455  7170  7170 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:49:06.458  7170  7170 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:49:06.462  7170  7170 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:49:06.495  7170  7170 W View    : requestLayout() improperly called by android.widget.TextView{e202b32 V.ED..... ......ID 80,10-118,43 #7f0b0207 app:id/hero_imdb_rating} during layout: running second layout pass
+02-08 20:49:06.495  7170  7170 W View    : requestLayout() improperly called by android.widget.TextView{b87d083 V.ED..... ......ID 24,12-81,42 #7f0b0214 app:id/hero_year} during layout: running second layout pass
+02-08 20:49:06.495  7170  7170 W View    : requestLayout() improperly called by android.widget.TextView{2ade200 V.ED..... ......ID 24,12-111,42 #7f0b020d app:id/hero_quality} during layout: running second layout pass
+02-08 20:49:06.564  7170  7178 I oxootv.spagree: JIT allocated 75KB for compiled code of void android.view.View.<init>(android.content.Context, android.util.AttributeSet, int, int)
+02-08 20:49:06.614  7170  7170 D HomeActivity: ≡ƒÄ» Auto-focused on thumbnail grid - Success: true
+02-08 20:49:06.753  7170  7253 W PersistentConnection: pc_0 - Firebase Database connection was forcefully killed by the server. Will not attempt reconnect. Reason: The Firebase database 'website-19a7d-default-rtdb' has reached its peak connections limit. If you are the Firebase owner, consider upgrading.
+02-08 20:49:06.937  7170  7203 D EGL_emulation: app_time_stats: avg=37.71ms min=4.83ms max=227.35ms count=23

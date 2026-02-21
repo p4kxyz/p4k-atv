@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:padding="4dp"
+    android:gravity="center_horizontal"
+    android:background="@drawable/thumbnail_focus_selector">
+
+    <!-- Thumbnail Image - 16:9 Landscape ratio (Reduced by 30%: 134x76dp) -->
+    <ImageView
+        android:id="@+id/thumbnail_image"
+        android:layout_width="134dp"
+        android:layout_height="76dp"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="false" />
+
+    <!-- Movie Title -->
+    <TextView
+        android:id="@+id/thumbnail_title"
+        android:layout_width="134dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:textSize="11sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:shadowColor="#000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2" />
+
+</LinearLayout>

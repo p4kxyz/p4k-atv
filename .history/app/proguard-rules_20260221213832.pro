@@ -38,10 +38,8 @@
 
 # ---- App Activities & Fragments (registered in Manifest) ----
 -keep class com.files.codes.view.** extends android.app.Activity { *; }
--keep class com.files.codes.view.** extends androidx.fragment.app.FragmentActivity { *; }
 -keep class com.files.codes.view.** extends androidx.fragment.app.Fragment { *; }
 -keep class com.files.codes.view.fragments.** extends androidx.fragment.app.Fragment { *; }
--keep class com.files.codes.view.fragments.testFolder.** { *; }
 -keep class com.files.codes.DetailsActivity { *; }
 -keep class com.files.codes.PlaybackActivity { *; }
 -keep class com.files.codes.BrowseErrorActivity { *; }

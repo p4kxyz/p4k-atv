@@ -24,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Phim4kClient {
     private static final String TAG = "Phim4kClient";
-    private static final String BASE_URL = "https://free2.phim4k.lol/api/";
+    private static final String BASE_URL = "https://free1.phim4k.lol/api/";
     private static Phim4kClient instance;
     private Phim4kApiService apiService;
     

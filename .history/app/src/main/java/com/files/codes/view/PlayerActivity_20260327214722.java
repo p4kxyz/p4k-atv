@@ -140,7 +140,6 @@ import java.util.Map;
 
 public class PlayerActivity extends Activity {
     private static final String TAG = "PlayerActivity";
-    private static final String PLAYER_LOGO_URL = "https://raw.githubusercontent.com/p4kxyz/p4k/main/lg_player.png";
     private boolean useSoftwareAudioDecoder = false; // Flag to force software decoding
     private int audioMode = 1; // 0: HW, 1: SW, 2: Passthrough
     private static final String CLASS_NAME = "com.oxoo.spagreen.ui.activity.PlayerActivity";
@@ -174,7 +173,6 @@ public class PlayerActivity extends Activity {
     private ImageButton btnRewind, btnForward; // Custom seek buttons
     private TextView movieTitleTV, movieDescriptionTV;
     private ImageView posterImageView, posterImageViewForTV;
-    private ImageView logo4kOverlay;
     private RelativeLayout seekBarLayout;
     private TextView liveTvTextInController;
     private ProgressBar progressBar;
@@ -215,26 +213,6 @@ public class PlayerActivity extends Activity {
         }
     };
     private final Handler timeBarFocusLockHandler = new Handler();
-    private final Handler logoBurnInHandler = new Handler();
-    private final Runnable logoBurnInRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (logo4kOverlay == null || !logo4kOverlay.isShown() || isFinishing()) {
-                return;
-            }
-
-            float dx = (float) ((Math.random() * 50.0) - 25.0);
-            float dy = (float) ((Math.random() * 24.0) - 12.0);
-
-            logo4kOverlay.animate()
-                    .translationX(dx)
-                    .translationY(dy)
-                    .setDuration(1500)
-                    .start();
-
-            logoBurnInHandler.postDelayed(this, 30000);
-        }
-    };
     private final Runnable timeBarFocusLockRunnable = new Runnable() {
         @Override
         public void run() {
@@ -470,7 +448,6 @@ public class PlayerActivity extends Activity {
         movieDescriptionTV = findViewById(R.id.movie_description);
         posterImageView = findViewById(R.id.poster_image_view);
         posterImageViewForTV = findViewById(R.id.poster_image_view_for_tv);
-        logo4kOverlay = findViewById(R.id.logo_4k_overlay);
         serverButton = findViewById(R.id.img_server);
         subtitleButton = findViewById(R.id.img_subtitle);
         subtitleSettingsButton = findViewById(R.id.img_subtitle_settings);
@@ -614,8 +591,6 @@ public class PlayerActivity extends Activity {
                 }
             });
         }
-
-        setupPlayerLogoOverlay();
 
 
         //set title, description and poster in controller layout
@@ -2012,10 +1987,7 @@ public class PlayerActivity extends Activity {
                 }
             }
 
-            android.app.Dialog dialog = new android.app.Dialog(PlayerActivity.this);
-            dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
-            dialog.setCancelable(true);
-
+            AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
             View view = LayoutInflater.from(PlayerActivity.this).inflate(R.layout.layout_server_tv, null);
             RecyclerView serverRv = view.findViewById(R.id.serverRv);
             ServerAdapter serverAdapter = new ServerAdapter(PlayerActivity.this, videoList, "movie");
@@ -2025,17 +1997,10 @@ public class PlayerActivity extends Activity {
 
             Button closeBt = view.findViewById(R.id.close_bt);
 
-            dialog.setContentView(view);
-            dialog.show();
+            builder.setView(view);
 
-            if (dialog.getWindow() != null) {
-                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-                bg.setColor(0xFF1E1E2E);
-                bg.setCornerRadius(dp(16));
-                dialog.getWindow().setBackgroundDrawable(bg);
-                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.55f);
-                dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
-            }
+            final AlertDialog dialog = builder.create();
+            dialog.show();
 
             closeBt.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -3892,7 +3857,6 @@ public class PlayerActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         stopTimeBarFocusLock();
-        stopLogoBurnInMotion();
         // Save watch history before destroying
         saveWatchHistory();
         releasePlayer();
@@ -4714,7 +4678,7 @@ public class PlayerActivity extends Activity {
         
         positionUpBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset += 1; // Move up (increase offset from bottom - higher value = further from bottom)
+            offset += 5; // Move up (increase offset from bottom - higher value = further from bottom)
             offset = Math.min(offset, 80); // Max 80% from bottom
             String newPositionText = offset == 0 ? "Giữa" : "Lên +" + offset + "%";
             positionTV.setText(newPositionText);
@@ -4723,7 +4687,7 @@ public class PlayerActivity extends Activity {
         
         positionDownBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset -= 1; // Move down (decrease offset - negative values = closer to bottom edge)
+            offset -= 5; // Move down (decrease offset - negative values = closer to bottom edge)
             offset = Math.max(offset, -10); // Min -10% (very close to bottom edge)
             String newPositionText = offset == 0 ? "Giữa" : "Xuống " + offset + "%";
             positionTV.setText(newPositionText);
@@ -5018,7 +4982,6 @@ public class PlayerActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        stopLogoBurnInMotion();
         // Update Continue Watching with current position when stopping
         if (player != null && model != null && tvRecommendationManager != null) {
             try {
@@ -5063,65 +5026,6 @@ public class PlayerActivity extends Activity {
             } catch (Exception e) {
                 Log.e(TAG, "Error starting watch history sync", e);
             }
-        }
-    }
-
-    private void setupPlayerLogoOverlay() {
-        if (logo4kOverlay == null) {
-            return;
-        }
-
-        logo4kOverlay.setVisibility(View.VISIBLE);
-        loadPlayerLogoFromRemote();
-
-        SharedPreferences playerPref = getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
-        boolean logoFixed = playerPref.getBoolean("logo_fixed", false);
-        if (logoFixed) {
-            stopLogoBurnInMotion();
-        } else {
-            startLogoBurnInMotion();
-        }
-    }
-
-    private void loadPlayerLogoFromRemote() {
-        if (logo4kOverlay == null) {
-            return;
-        }
-
-        Picasso.get()
-                .load(PLAYER_LOGO_URL)
-            .into(logo4kOverlay, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(TAG, "Loaded player logo from remote URL");
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        Log.e(TAG, "Failed to load remote player logo", e);
-                        // Keep overlay alive even if remote image is temporarily unavailable.
-                        logo4kOverlay.setImageDrawable(null);
-                    }
-                });
-    }
-
-    private void startLogoBurnInMotion() {
-        if (logo4kOverlay == null) {
-            return;
-        }
-
-        stopLogoBurnInMotion();
-        logo4kOverlay.setTranslationX(0f);
-        logo4kOverlay.setTranslationY(0f);
-        logoBurnInHandler.postDelayed(logoBurnInRunnable, 6000);
-    }
-
-    private void stopLogoBurnInMotion() {
-        logoBurnInHandler.removeCallbacks(logoBurnInRunnable);
-        if (logo4kOverlay != null) {
-            logo4kOverlay.animate().cancel();
-            logo4kOverlay.setTranslationX(0f);
-            logo4kOverlay.setTranslationY(0f);
         }
     }
     

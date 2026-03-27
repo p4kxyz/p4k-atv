@@ -223,16 +223,16 @@ public class PlayerActivity extends Activity {
                 return;
             }
 
-            float dx = (float) ((Math.random() * 50.0) - 25.0);
-            float dy = (float) ((Math.random() * 24.0) - 12.0);
+            float dx = (float) ((Math.random() * 32.0) - 16.0);
+            float dy = (float) ((Math.random() * 18.0) - 9.0);
 
             logo4kOverlay.animate()
                     .translationX(dx)
                     .translationY(dy)
-                    .setDuration(1500)
+                    .setDuration(900)
                     .start();
 
-            logoBurnInHandler.postDelayed(this, 30000);
+            logoBurnInHandler.postDelayed(this, 12000);
         }
     };
     private final Runnable timeBarFocusLockRunnable = new Runnable() {
@@ -4714,7 +4714,7 @@ public class PlayerActivity extends Activity {
         
         positionUpBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset += 1; // Move up (increase offset from bottom - higher value = further from bottom)
+            offset += 5; // Move up (increase offset from bottom - higher value = further from bottom)
             offset = Math.min(offset, 80); // Max 80% from bottom
             String newPositionText = offset == 0 ? "Giữa" : "Lên +" + offset + "%";
             positionTV.setText(newPositionText);
@@ -4723,7 +4723,7 @@ public class PlayerActivity extends Activity {
         
         positionDownBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset -= 1; // Move down (decrease offset - negative values = closer to bottom edge)
+            offset -= 5; // Move down (decrease offset - negative values = closer to bottom edge)
             offset = Math.max(offset, -10); // Min -10% (very close to bottom edge)
             String newPositionText = offset == 0 ? "Giữa" : "Xuống " + offset + "%";
             positionTV.setText(newPositionText);

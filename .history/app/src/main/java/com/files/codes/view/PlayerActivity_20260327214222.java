@@ -140,7 +140,6 @@ import java.util.Map;
 
 public class PlayerActivity extends Activity {
     private static final String TAG = "PlayerActivity";
-    private static final String PLAYER_LOGO_URL = "https://raw.githubusercontent.com/p4kxyz/p4k/main/lg_player.png";
     private boolean useSoftwareAudioDecoder = false; // Flag to force software decoding
     private int audioMode = 1; // 0: HW, 1: SW, 2: Passthrough
     private static final String CLASS_NAME = "com.oxoo.spagreen.ui.activity.PlayerActivity";
@@ -174,7 +173,6 @@ public class PlayerActivity extends Activity {
     private ImageButton btnRewind, btnForward; // Custom seek buttons
     private TextView movieTitleTV, movieDescriptionTV;
     private ImageView posterImageView, posterImageViewForTV;
-    private ImageView logo4kOverlay;
     private RelativeLayout seekBarLayout;
     private TextView liveTvTextInController;
     private ProgressBar progressBar;
@@ -215,26 +213,6 @@ public class PlayerActivity extends Activity {
         }
     };
     private final Handler timeBarFocusLockHandler = new Handler();
-    private final Handler logoBurnInHandler = new Handler();
-    private final Runnable logoBurnInRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (logo4kOverlay == null || !logo4kOverlay.isShown() || isFinishing()) {
-                return;
-            }
-
-            float dx = (float) ((Math.random() * 50.0) - 25.0);
-            float dy = (float) ((Math.random() * 24.0) - 12.0);
-
-            logo4kOverlay.animate()
-                    .translationX(dx)
-                    .translationY(dy)
-                    .setDuration(1500)
-                    .start();
-
-            logoBurnInHandler.postDelayed(this, 30000);
-        }
-    };
     private final Runnable timeBarFocusLockRunnable = new Runnable() {
         @Override
         public void run() {
@@ -470,7 +448,6 @@ public class PlayerActivity extends Activity {
         movieDescriptionTV = findViewById(R.id.movie_description);
         posterImageView = findViewById(R.id.poster_image_view);
         posterImageViewForTV = findViewById(R.id.poster_image_view_for_tv);
-        logo4kOverlay = findViewById(R.id.logo_4k_overlay);
         serverButton = findViewById(R.id.img_server);
         subtitleButton = findViewById(R.id.img_subtitle);
         subtitleSettingsButton = findViewById(R.id.img_subtitle_settings);
@@ -614,8 +591,6 @@ public class PlayerActivity extends Activity {
                 }
             });
         }
-
-        setupPlayerLogoOverlay();
 
 
         //set title, description and poster in controller layout
@@ -2012,10 +1987,7 @@ public class PlayerActivity extends Activity {
                 }
             }
 
-            android.app.Dialog dialog = new android.app.Dialog(PlayerActivity.this);
-            dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
-            dialog.setCancelable(true);
-
+            AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
             View view = LayoutInflater.from(PlayerActivity.this).inflate(R.layout.layout_server_tv, null);
             RecyclerView serverRv = view.findViewById(R.id.serverRv);
             ServerAdapter serverAdapter = new ServerAdapter(PlayerActivity.this, videoList, "movie");
@@ -2025,17 +1997,10 @@ public class PlayerActivity extends Activity {
 
             Button closeBt = view.findViewById(R.id.close_bt);
 
-            dialog.setContentView(view);
-            dialog.show();
+            builder.setView(view);
 
-            if (dialog.getWindow() != null) {
-                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-                bg.setColor(0xFF1E1E2E);
-                bg.setCornerRadius(dp(16));
-                dialog.getWindow().setBackgroundDrawable(bg);
-                int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.55f);
-                dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
-            }
+            final AlertDialog dialog = builder.create();
+            dialog.show();
 
             closeBt.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -3892,7 +3857,6 @@ public class PlayerActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         stopTimeBarFocusLock();
-        stopLogoBurnInMotion();
         // Save watch history before destroying
         saveWatchHistory();
         releasePlayer();
@@ -4588,44 +4552,37 @@ public class PlayerActivity extends Activity {
         speed05.setText("0.5x");
         speed05.setTextSize(12);
         speed05.setTextColor(0xFFFFFFFF);
-        speed05.setBackground(createDialogButtonBackground(0xFF3A3A4C));
+        if (currentSpeed == 0.5f) speed05.setBackgroundColor(Color.GREEN);
         
         Button speed075 = new Button(this);
         speed075.setText("0.75x");
         speed075.setTextSize(12);
         speed075.setTextColor(0xFFFFFFFF);
-        speed075.setBackground(createDialogButtonBackground(0xFF3A3A4C));
+        if (currentSpeed == 0.75f) speed075.setBackgroundColor(Color.GREEN);
         
         Button speed10 = new Button(this);
         speed10.setText("1.0x");
         speed10.setTextSize(12);
         speed10.setTextColor(0xFFFFFFFF);
-        speed10.setBackground(createDialogButtonBackground(0xFF3A3A4C));
+        if (currentSpeed == 1.0f) speed10.setBackgroundColor(Color.GREEN);
         
         Button speed15 = new Button(this);
         speed15.setText("1.5x");
         speed15.setTextSize(12);
         speed15.setTextColor(0xFFFFFFFF);
-        speed15.setBackground(createDialogButtonBackground(0xFF3A3A4C));
+        if (currentSpeed == 1.5f) speed15.setBackgroundColor(Color.GREEN);
         
         Button speed20 = new Button(this);
         speed20.setText("2.0x");
         speed20.setTextSize(12);
         speed20.setTextColor(0xFFFFFFFF);
-        speed20.setBackground(createDialogButtonBackground(0xFF3A3A4C));
+        if (currentSpeed == 2.0f) speed20.setBackgroundColor(Color.GREEN);
         
         Button speed30 = new Button(this);
         speed30.setText("3.0x");
         speed30.setTextSize(12);
         speed30.setTextColor(0xFFFFFFFF);
-        speed30.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        setDialogButtonSelected(speed05, currentSpeed == 0.5f);
-        setDialogButtonSelected(speed075, currentSpeed == 0.75f);
-        setDialogButtonSelected(speed10, currentSpeed == 1.0f);
-        setDialogButtonSelected(speed15, currentSpeed == 1.5f);
-        setDialogButtonSelected(speed20, currentSpeed == 2.0f);
-        setDialogButtonSelected(speed30, currentSpeed == 3.0f);
+        if (currentSpeed == 3.0f) speed30.setBackgroundColor(Color.GREEN);
         
         playbackSpeedLayout.addView(speed05);
         playbackSpeedLayout.addView(speed075);
@@ -4655,12 +4612,6 @@ public class PlayerActivity extends Activity {
         applyWhiteFocusBorder(textColorNextBtn);
         applyWhiteFocusBorder(outlineColorPrevBtn);
         applyWhiteFocusBorder(outlineColorNextBtn);
-        applyWhiteFocusBorder(speed05);
-        applyWhiteFocusBorder(speed075);
-        applyWhiteFocusBorder(speed10);
-        applyWhiteFocusBorder(speed15);
-        applyWhiteFocusBorder(speed20);
-        applyWhiteFocusBorder(speed30);
         applyWhiteFocusBorder(resetBtn);
         
         // Add all views to layout
@@ -4714,7 +4665,7 @@ public class PlayerActivity extends Activity {
         
         positionUpBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset += 1; // Move up (increase offset from bottom - higher value = further from bottom)
+            offset += 5; // Move up (increase offset from bottom - higher value = further from bottom)
             offset = Math.min(offset, 80); // Max 80% from bottom
             String newPositionText = offset == 0 ? "Giữa" : "Lên +" + offset + "%";
             positionTV.setText(newPositionText);
@@ -4723,7 +4674,7 @@ public class PlayerActivity extends Activity {
         
         positionDownBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset -= 1; // Move down (decrease offset - negative values = closer to bottom edge)
+            offset -= 5; // Move down (decrease offset - negative values = closer to bottom edge)
             offset = Math.max(offset, -10); // Min -10% (very close to bottom edge)
             String newPositionText = offset == 0 ? "Giữa" : "Xuống " + offset + "%";
             positionTV.setText(newPositionText);
@@ -4788,13 +4739,16 @@ public class PlayerActivity extends Activity {
             else if (v == speed20) speed = 2.0f;
             else if (v == speed30) speed = 3.0f;
             
-            // Keep rounded style and white focus ring while toggling selection.
-            setDialogButtonSelected(speed05, v == speed05);
-            setDialogButtonSelected(speed075, v == speed075);
-            setDialogButtonSelected(speed10, v == speed10);
-            setDialogButtonSelected(speed15, v == speed15);
-            setDialogButtonSelected(speed20, v == speed20);
-            setDialogButtonSelected(speed30, v == speed30);
+            // Reset all button backgrounds
+            speed05.setBackgroundColor(Color.TRANSPARENT);
+            speed075.setBackgroundColor(Color.TRANSPARENT);
+            speed10.setBackgroundColor(Color.TRANSPARENT);
+            speed15.setBackgroundColor(Color.TRANSPARENT);
+            speed20.setBackgroundColor(Color.TRANSPARENT);
+            speed30.setBackgroundColor(Color.TRANSPARENT);
+            
+            // Highlight selected button
+            ((Button)v).setBackgroundColor(Color.GREEN);
             
             // Save and apply speed
             prefs.edit().putFloat("playback_speed", speed).apply();
@@ -4903,26 +4857,6 @@ public class PlayerActivity extends Activity {
         });
     }
 
-    private android.graphics.drawable.GradientDrawable createDialogButtonBackground(int fillColor) {
-        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setCornerRadius(dp(8));
-        bg.setColor(fillColor);
-        bg.setStroke(dp(1), 0x00FFFFFF);
-        return bg;
-    }
-
-    private void setDialogButtonSelected(android.widget.Button button, boolean selected) {
-        if (button == null) {
-            return;
-        }
-
-        android.graphics.drawable.Drawable bg = button.getBackground();
-        if (bg instanceof android.graphics.drawable.GradientDrawable) {
-            ((android.graphics.drawable.GradientDrawable) bg)
-                    .setColor(selected ? 0xFF2E7D32 : 0xFF3A3A4C);
-        }
-    }
-
     private void saveAndApplySubtitleSetting(String key, boolean value) {
         SharedPreferences.Editor editor = getSharedPreferences("subtitle_settings", MODE_PRIVATE).edit();
         editor.putBoolean(key, value);
@@ -5018,7 +4952,6 @@ public class PlayerActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        stopLogoBurnInMotion();
         // Update Continue Watching with current position when stopping
         if (player != null && model != null && tvRecommendationManager != null) {
             try {
@@ -5063,65 +4996,6 @@ public class PlayerActivity extends Activity {
             } catch (Exception e) {
                 Log.e(TAG, "Error starting watch history sync", e);
             }
-        }
-    }
-
-    private void setupPlayerLogoOverlay() {
-        if (logo4kOverlay == null) {
-            return;
-        }
-
-        logo4kOverlay.setVisibility(View.VISIBLE);
-        loadPlayerLogoFromRemote();
-
-        SharedPreferences playerPref = getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
-        boolean logoFixed = playerPref.getBoolean("logo_fixed", false);
-        if (logoFixed) {
-            stopLogoBurnInMotion();
-        } else {
-            startLogoBurnInMotion();
-        }
-    }
-
-    private void loadPlayerLogoFromRemote() {
-        if (logo4kOverlay == null) {
-            return;
-        }
-
-        Picasso.get()
-                .load(PLAYER_LOGO_URL)
-            .into(logo4kOverlay, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(TAG, "Loaded player logo from remote URL");
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        Log.e(TAG, "Failed to load remote player logo", e);
-                        // Keep overlay alive even if remote image is temporarily unavailable.
-                        logo4kOverlay.setImageDrawable(null);
-                    }
-                });
-    }
-
-    private void startLogoBurnInMotion() {
-        if (logo4kOverlay == null) {
-            return;
-        }
-
-        stopLogoBurnInMotion();
-        logo4kOverlay.setTranslationX(0f);
-        logo4kOverlay.setTranslationY(0f);
-        logoBurnInHandler.postDelayed(logoBurnInRunnable, 6000);
-    }
-
-    private void stopLogoBurnInMotion() {
-        logoBurnInHandler.removeCallbacks(logoBurnInRunnable);
-        if (logo4kOverlay != null) {
-            logo4kOverlay.animate().cancel();
-            logo4kOverlay.setTranslationX(0f);
-            logo4kOverlay.setTranslationY(0f);
         }
     }
     

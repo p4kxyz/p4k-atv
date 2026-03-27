@@ -131,6 +131,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import com.files.codes.AppConfig;
 import com.files.codes.view.fragments.testFolder.ProfileFragment;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -223,16 +224,16 @@ public class PlayerActivity extends Activity {
                 return;
             }
 
-            float dx = (float) ((Math.random() * 50.0) - 25.0);
-            float dy = (float) ((Math.random() * 24.0) - 12.0);
+            float dx = (float) ((Math.random() * 32.0) - 16.0);
+            float dy = (float) ((Math.random() * 18.0) - 9.0);
 
             logo4kOverlay.animate()
                     .translationX(dx)
                     .translationY(dy)
-                    .setDuration(1500)
+                    .setDuration(900)
                     .start();
 
-            logoBurnInHandler.postDelayed(this, 30000);
+            logoBurnInHandler.postDelayed(this, 12000);
         }
     };
     private final Runnable timeBarFocusLockRunnable = new Runnable() {
@@ -4714,7 +4715,7 @@ public class PlayerActivity extends Activity {
         
         positionUpBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset += 1; // Move up (increase offset from bottom - higher value = further from bottom)
+            offset += 5; // Move up (increase offset from bottom - higher value = further from bottom)
             offset = Math.min(offset, 80); // Max 80% from bottom
             String newPositionText = offset == 0 ? "Giữa" : "Lên +" + offset + "%";
             positionTV.setText(newPositionText);
@@ -4723,7 +4724,7 @@ public class PlayerActivity extends Activity {
         
         positionDownBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset -= 1; // Move down (decrease offset - negative values = closer to bottom edge)
+            offset -= 5; // Move down (decrease offset - negative values = closer to bottom edge)
             offset = Math.max(offset, -10); // Min -10% (very close to bottom edge)
             String newPositionText = offset == 0 ? "Giữa" : "Xuống " + offset + "%";
             positionTV.setText(newPositionText);
@@ -5090,7 +5091,7 @@ public class PlayerActivity extends Activity {
 
         Picasso.get()
                 .load(PLAYER_LOGO_URL)
-            .into(logo4kOverlay, new com.squareup.picasso.Callback() {
+                .into(logo4kOverlay, new Callback() {
                     @Override
                     public void onSuccess() {
                         Log.d(TAG, "Loaded player logo from remote URL");

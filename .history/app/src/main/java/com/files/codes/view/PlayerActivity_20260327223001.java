@@ -4714,7 +4714,7 @@ public class PlayerActivity extends Activity {
         
         positionUpBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset += 1; // Move up (increase offset from bottom - higher value = further from bottom)
+            offset += 5; // Move up (increase offset from bottom - higher value = further from bottom)
             offset = Math.min(offset, 80); // Max 80% from bottom
             String newPositionText = offset == 0 ? "Giữa" : "Lên +" + offset + "%";
             positionTV.setText(newPositionText);
@@ -4723,7 +4723,7 @@ public class PlayerActivity extends Activity {
         
         positionDownBtn.setOnClickListener(v -> {
             int offset = prefs.getInt("vertical_offset", 0);
-            offset -= 1; // Move down (decrease offset - negative values = closer to bottom edge)
+            offset -= 5; // Move down (decrease offset - negative values = closer to bottom edge)
             offset = Math.max(offset, -10); // Min -10% (very close to bottom edge)
             String newPositionText = offset == 0 ? "Giữa" : "Xuống " + offset + "%";
             positionTV.setText(newPositionText);

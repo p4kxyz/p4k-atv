@@ -134,7 +134,8 @@ public class HomeFragment extends RowsSupportFragment {
     private int currentCategoryIndex = 0; // Current category being displayed
     private int currentCategoryPage = 1; // Current page for API-based categories
     private boolean isLoadingMoreForCategory = false; // Track if currently loading more for category
-    
+    private boolean isScrollingDown = true; // Track navigation direction mapping scrolling direction
+
     // Section-specific pagination tracking
     private java.util.HashMap<String, Integer> sectionPageMap = new java.util.HashMap<>();
     private java.util.HashMap<String, Boolean> sectionLoadingMap = new java.util.HashMap<>();
@@ -212,7 +213,6 @@ public class HomeFragment extends RowsSupportFragment {
         
         // If there's pending hero banner data, load it now that view is ready
         if (pendingHeroBannerVideo != null && pendingHeroBannerContent != null) {
-            Log.d(TAG, "✅ View is now ready - loading pending hero banner");
             loadFixedHeroBanner(pendingHeroBannerVideo, pendingHeroBannerContent);
         }
     }
@@ -227,7 +227,6 @@ public class HomeFragment extends RowsSupportFragment {
         String className = view.getClass().getName();
         if (className.contains("TitleView") || className.contains("BrowseTitle")) {
             view.setVisibility(View.GONE);
-            Log.d(TAG, "Hidden TitleView: " + className);
             return;
         }
         
@@ -248,7 +247,6 @@ public class HomeFragment extends RowsSupportFragment {
      * LAZY LOADING: Load home content from API with pagination support
      */
     private void loadHomeContentFromAPI(int page) {
-        Log.d(TAG, "🌐 Loading home content from API - Page: " + page);
         
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService api = retrofit.create(ApiService.class);
@@ -290,7 +288,6 @@ public class HomeFragment extends RowsSupportFragment {
                                                 addHomeContentRow(content, allHomeContent.size());
                                             }
                                             isLoadingMore = false;
-                                            Log.d(TAG, "✅ Appended " + homeContents.size() + " more content sections");
                                         }
                                     });
                                 }
@@ -303,7 +300,6 @@ public class HomeFragment extends RowsSupportFragment {
                         if (page == 1) {
                             Toast.makeText(getContext(), getResources().getString(R.string.no_data_found), Toast.LENGTH_SHORT).show();
                         } else {
-                            Log.d(TAG, "📝 No more home content available from API");
                         }
                     }
                 } else {
@@ -378,9 +374,7 @@ public class HomeFragment extends RowsSupportFragment {
             watchHistoryContent.setTitle("📺 Tiếp tục xem");
             watchHistoryContent.setContent(new ArrayList<>()); // Will be loaded dynamically from sync manager
             homeContents.add(watchHistoryContent);
-            Log.d("HomeFragment", "✅ Added watch history section (logged in user)");
         } else {
-            Log.d("HomeFragment", "❌ User not logged in, skipping watch history section");
         }
         
         // 3. Add Drama xứ Kim Chi (Hàn Quốc - ID: 13)
@@ -599,7 +593,6 @@ public class HomeFragment extends RowsSupportFragment {
 
             // Load initial batch of content (lazy loading)
             int itemsToLoad = Math.min(ITEMS_PER_PAGE, list.size());
-            Log.d(TAG, "🚀 Loading initial content batch: " + itemsToLoad + " items");
             
             // 🎯 NEW APPROACH: Collect specific categories in order
             allCategories.clear();
@@ -640,66 +633,54 @@ public class HomeFragment extends RowsSupportFragment {
                         allCategories.add(homeContent);
                         
                         loadFixedHeroBanner(firstVideo, allHeroBannerContent);
-                        Log.d(TAG, "🎬 Category 0: " + homeContent.getTitle());
                     }
                     continue;
                 } else if (homeContent.getType().equalsIgnoreCase("watch_history")) {
                     // Category 1: Watch History
                     homeContent.setTitle("📺 Tiếp Tục Xem");
                     watchHistoryCategory = homeContent;
-                    Log.d(TAG, "📂 Watch History: " + homeContent.getTitle());
                 } else if (homeContent.getType().equalsIgnoreCase("country")) {
                     // Check Country ID directly
                     String id = homeContent.getId();
-                    Log.d(TAG, "🌍 Country ID found: " + id + " - Title: " + homeContent.getTitle());
                     
                     if ("13".equals(id)) {
                         // Hàn Quốc
                         homeContent.setTitle("Drama Xứ Kim Chi");
                         koreaCategory = homeContent;
-                        Log.d(TAG, "📂 Korea (ID 13): " + homeContent.getTitle());
                     } else if ("15".equals(id)) {
                         // Trung Quốc
                         homeContent.setTitle("Trường Thiên Drama \"Tàu\"");
                         chinaCategory = homeContent;
-                        Log.d(TAG, "📂 China (ID 15): " + homeContent.getTitle());
                     } else if ("5".equals(id)) {
                         // Việt Nam - Updated to "Xưởng phim Xứ Đông Lào"
                         homeContent.setTitle("Xưởng phim Xứ Đông Lào");
                         vietnamCategory = homeContent;
-                        Log.d(TAG, "📂 Vietnam (ID 5): " + homeContent.getTitle());
                     }
                 } else if (homeContent.getType().equalsIgnoreCase("genre")) {
                     // Check Genre ID for Animation
                     String id = homeContent.getId();
-                    Log.d(TAG, "🎭 Genre ID found: " + id + " - Title: " + homeContent.getTitle());
                     
                     if ("13".equals(id)) {
                         // Animation
                         homeContent.setTitle("Xi Nê Tuổi Thơ");
                         animationCategory = homeContent;
-                        Log.d(TAG, "📂 Animation (Genre ID 13): " + homeContent.getTitle());
                     }
                 } else if (homeContent.getId().equalsIgnoreCase("2")) {
                     // Phim Lẻ (Movie)
                     homeContent.setTitle("Phim Lẻ Mới Nhất");
                     phimLeCategory = homeContent;
-                    Log.d(TAG, "📂 Phim Lẻ: " + homeContent.getTitle());
                 } else if (homeContent.getType().equalsIgnoreCase("tvseries")) {
                     // Phim Bộ
                     homeContent.setTitle("Phim Bộ Mới Nhất");
                     phimBoCategory = homeContent;
-                    Log.d(TAG, "📂 Phim Bộ: " + homeContent.getTitle());
                 } else if (homeContent.getType().equalsIgnoreCase("phim4k") || homeContent.getId().equalsIgnoreCase("phim4k_free1")) {
                     // Nguồn Phim Free 1
                     homeContent.setTitle("Nguồn Phim Free 1");
                     phim4kCategory = homeContent;
-                    Log.d(TAG, "📂 Phim4k Free1: " + homeContent.getTitle());
                 } else if (homeContent.getType().equalsIgnoreCase("kkphim4k") || homeContent.getId().equalsIgnoreCase("phim4k_free2")) {
                     // Nguồn Phim Free 2
                     homeContent.setTitle("Nguồn Free 2");
                     kkPhim4kCategory = homeContent;
-                    Log.d(TAG, "📂 KKPhim4k Free2: " + homeContent.getTitle());
                 }
             }
             
@@ -713,7 +694,6 @@ public class HomeFragment extends RowsSupportFragment {
                 watchHistoryCategory.setType("watch_history");
                 watchHistoryCategory.setTitle("📺 Tiếp Tục Xem");
                 watchHistoryCategory.setContent(new ArrayList<>());
-                Log.d(TAG, "🔧 Created Watch History category");
             }
             
             // Create Korea category if missing
@@ -723,7 +703,6 @@ public class HomeFragment extends RowsSupportFragment {
                 koreaCategory.setType("country");
                 koreaCategory.setTitle("Drama Xứ Kim Chi");
                 koreaCategory.setContent(new ArrayList<>());
-                Log.d(TAG, "🔧 Created Korea category (ID 13)");
             }
             
             // Create China category if missing
@@ -733,7 +712,6 @@ public class HomeFragment extends RowsSupportFragment {
                 chinaCategory.setType("country");
                 chinaCategory.setTitle("Trường Thiên Drama \"Tàu\"");
                 chinaCategory.setContent(new ArrayList<>());
-                Log.d(TAG, "🔧 Created China category (ID 15)");
             }
             
             // Create Vietnam category if missing
@@ -743,7 +721,6 @@ public class HomeFragment extends RowsSupportFragment {
                 vietnamCategory.setType("country");
                 vietnamCategory.setTitle("Xưởng phim Xứ Đông Lào");
                 vietnamCategory.setContent(new ArrayList<>());
-                Log.d(TAG, "🔧 Created Vietnam category (ID 5)");
             }
             
             // Create Animation category if missing
@@ -753,7 +730,6 @@ public class HomeFragment extends RowsSupportFragment {
                 animationCategory.setType("genre");
                 animationCategory.setTitle("Xi Nê Tuổi Thơ");
                 animationCategory.setContent(new ArrayList<>());
-                Log.d(TAG, "🔧 Created Animation category (Genre ID 13)");
             }
             
             // Create Phim Le category if missing
@@ -763,7 +739,6 @@ public class HomeFragment extends RowsSupportFragment {
                 phimLeCategory.setType("movie");
                 phimLeCategory.setTitle("Phim Lẻ Mới Nhất");
                 phimLeCategory.setContent(new ArrayList<>());
-                Log.d(TAG, "🔧 Created Phim Le category (ID 2)");
             }
 
             // Create KKPhim4k category if missing
@@ -773,7 +748,6 @@ public class HomeFragment extends RowsSupportFragment {
                 kkPhim4kCategory.setType("kkphim4k");
                 kkPhim4kCategory.setTitle("Nguồn Free 2");
                 kkPhim4kCategory.setContent(new ArrayList<>());
-                Log.d(TAG, "🔧 Created KKPhim4k category (ID phim4k_free2)");
             }
             
             // Phim Bo and Phim4k are already handled above, but ensure they exist
@@ -784,51 +758,40 @@ public class HomeFragment extends RowsSupportFragment {
             // 2. Tiếp Tục Xem (only if logged in)
             if (watchHistoryCategory != null && userLoggedIn) {
                 allCategories.add(watchHistoryCategory);
-                Log.d(TAG, "✅ Category 1: Tiếp Tục Xem");
             }
             
             // 3. Drama Xứ Kim Chi
             allCategories.add(koreaCategory);
-            Log.d(TAG, "✅ Category 2: Drama Xứ Kim Chi");
             
             // 4. Trường Thiên Drama "Tàu"
             allCategories.add(chinaCategory);
-            Log.d(TAG, "✅ Category 3: Trường Thiên Drama \"Tàu\"");
             
             // 5. Xưởng phim Xứ Đông Lào
             allCategories.add(vietnamCategory);
-            Log.d(TAG, "✅ Category 4: Xưởng phim Xứ Đông Lào");
             
             // 6. Xi Nê Tuổi Thơ
             allCategories.add(animationCategory);
-            Log.d(TAG, "✅ Category 5: Xi Nê Tuổi Thơ");
             
             // 7. Phim Lẻ Mới Nhất
             allCategories.add(phimLeCategory);
-            Log.d(TAG, "✅ Category 6: Phim Lẻ Mới Nhất");
             
             // 8. Phim Bộ Mới Nhất
             if (phimBoCategory != null) {
                 allCategories.add(phimBoCategory);
-                Log.d(TAG, "✅ Category 7: Phim Bộ Mới Nhất");
             }
             
             /* REMOVED AS REQUESTED
             // 9. Nguồn Phim Free 1
             if (phim4kCategory != null) {
                 allCategories.add(phim4kCategory);
-                Log.d(TAG, "✅ Category 8: Nguồn Phim Free 1");
             }
 
             // 10. Nguồn Free 2
             if (kkPhim4kCategory != null) {
                 allCategories.add(kkPhim4kCategory);
-                Log.d(TAG, "✅ Category 9: Nguồn Free 2");
             }
             */
             
-            Log.d(TAG, "✅ Total categories loaded: " + allCategories.size());
-            Log.d(TAG, "🎯 Current category index: " + currentCategoryIndex);
             
             // DON'T add any rows - homepage only shows Hero Banner
             // User navigates categories using UP/DOWN in thumbnail list
@@ -852,7 +815,6 @@ public class HomeFragment extends RowsSupportFragment {
         androidx.leanback.widget.VerticalGridView verticalGridView = getVerticalGridView();
         if (verticalGridView != null) {
             verticalGridView.setPadding(0, 0, 0, 0);
-            Log.d(TAG, "✅ No padding - Hero Banner only mode");
         }
     }
 
@@ -877,7 +839,6 @@ public class HomeFragment extends RowsSupportFragment {
                 if ("clear_button".equals(videoContent.getType()) || 
                     (videoContent.getDescription() != null && "CLEAR_HISTORY_BUTTON".equals(videoContent.getDescription()))) {
                     showClearHistoryConfirmDialog();
-                    Log.d(TAG, "🗑️ Clear history button clicked from thumbnail list");
                     return;
                 }
                 
@@ -889,59 +850,8 @@ public class HomeFragment extends RowsSupportFragment {
                 // Check if this is a watch history item
                 String description = videoContent.getDescription();
                 if (description != null && description.startsWith("WATCH_HISTORY:")) {
-                    try {
-                        // Extract current position from description
-                        String positionStr = description.substring("WATCH_HISTORY:".length());
-                        long currentPosition = 0;
-                        try {
-                            currentPosition = Long.parseLong(positionStr);
-                        } catch (NumberFormatException e) {
-                            // Failed to parse current position
-                        }
-                        
-                        // Determine correct type for watch history item
-                        String contentType = "movie"; // default
-                        if (videoContent.getIsTvseries() != null && videoContent.getIsTvseries().equals("1")) {
-                            contentType = "tvseries";
-                        } else if (videoContent.getType() != null) {
-                            contentType = videoContent.getType();
-                        }
-                        
-                        Log.d("HomeFragment", "📺 Watch History Type - isTvseries: " + videoContent.getIsTvseries() + ", type: " + videoContent.getType() + " → " + contentType);
-                        
-                        // Check if video has valid URL before going to player
-                        String videoUrl = videoContent.getVideoUrl();
-                        if (videoUrl == null || videoUrl.trim().isEmpty()) {
-                            Toast.makeText(getActivity(), "Video chưa có link phát, đang chuyển đến trang chi tiết...", Toast.LENGTH_SHORT).show();
-                            
-                            // Go to details page instead of player
-                            Intent intent = new Intent(getActivity(), HeroStyleVideoDetailsActivity.class);
-                            intent.putExtra("id", videoContent.getId());
-                            intent.putExtra("type", contentType);
-                            intent.putExtra("thumbImage", videoContent.getThumbnailUrl() != null ? videoContent.getThumbnailUrl() : "");
-                            startActivity(intent);
-                            return;
-                        }
-                        
-                        // Go directly to player for watch history items with valid URL
-                        Intent intent = new Intent(getActivity(), com.files.codes.view.PlayerActivity.class);
-                        intent.putExtra("id", videoContent.getId());
-                        intent.putExtra("type", contentType);
-                        intent.putExtra("title", videoContent.getTitle());
-                        intent.putExtra("poster", videoContent.getPosterUrl());
-                        intent.putExtra("thumbnail", videoContent.getThumbnailUrl());
-                        intent.putExtra("video_url", videoUrl); // Thêm video URL
-                        intent.putExtra("position", currentPosition); // Resume from last position
-                        intent.putExtra("from_watch_history", true); // Flag để biết đến từ watch history
-                        
-                        Log.d("HomeFragment", "🎬 Opening player from watch history - ID: " + videoContent.getId() + ", Position: " + currentPosition);
-                        
-                        startActivity(intent);
-                        return;
-                    } catch (Exception e) {
-                        Toast.makeText(getActivity(), "Lỗi khi mở video từ lịch sử xem", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                    showWatchHistoryOptionsDialog(videoContent);
+                    return;
                 }
                 
                 // Check if it's a TV series based on isTvseries field
@@ -956,7 +866,12 @@ public class HomeFragment extends RowsSupportFragment {
                     intent.putExtra("thumbImage", videoContent.getThumbnailUrl() != null ? videoContent.getThumbnailUrl() : "");
 
                     //poster transition
-                    ImageView imageView = ((ImageCardView) viewHolder.view).getMainImageView();
+                    ImageView imageView = null;
+                if (viewHolder.view instanceof androidx.leanback.widget.ImageCardView) {
+                    imageView = ((androidx.leanback.widget.ImageCardView) viewHolder.view).getMainImageView();
+                } else {
+                    imageView = viewHolder.view.findViewById(R.id.main_image);
+                }
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
                             imageView, VideoDetailsFragment.TRANSITION_NAME).toBundle();
 
@@ -978,7 +893,12 @@ public class HomeFragment extends RowsSupportFragment {
                                 intent.putExtra("thumbImage", videoContent.getThumbnailUrl() != null ? videoContent.getThumbnailUrl() : "");
 
                                 //poster transition
-                                ImageView imageView = ((ImageCardView) viewHolder.view).getMainImageView();
+                                ImageView imageView = null;
+                if (viewHolder.view instanceof androidx.leanback.widget.ImageCardView) {
+                    imageView = ((androidx.leanback.widget.ImageCardView) viewHolder.view).getMainImageView();
+                } else {
+                    imageView = viewHolder.view.findViewById(R.id.main_image);
+                }
                                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
                                         imageView, VideoDetailsFragment.TRANSITION_NAME).toBundle();
 
@@ -1007,7 +927,12 @@ public class HomeFragment extends RowsSupportFragment {
                         intent.putExtra("thumbImage", videoContent.getThumbnailUrl() != null ? videoContent.getThumbnailUrl() : "");
 
                         //poster transition
-                        ImageView imageView = ((ImageCardView) viewHolder.view).getMainImageView();
+                        ImageView imageView = null;
+                if (viewHolder.view instanceof androidx.leanback.widget.ImageCardView) {
+                    imageView = ((androidx.leanback.widget.ImageCardView) viewHolder.view).getMainImageView();
+                } else {
+                    imageView = viewHolder.view.findViewById(R.id.main_image);
+                }
                         Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
                                 imageView, VideoDetailsFragment.TRANSITION_NAME).toBundle();
 
@@ -1045,7 +970,6 @@ public class HomeFragment extends RowsSupportFragment {
                             // Update thumbnail list if we have videos
                             if (rowVideos.size() > 0) {
                                 updateHeroThumbnailList(rowVideos);
-                                Log.d(TAG, "🔄 Updated Hero Banner thumbnail list with " + rowVideos.size() + " videos from row: " + listRow.getHeaderItem().getName());
                             }
                         }
                     }
@@ -1117,11 +1041,9 @@ public class HomeFragment extends RowsSupportFragment {
                 if (heroBannerContainer != null && heroBannerContainer.getChildCount() > 0) {
                     View heroBannerView = heroBannerContainer.getChildAt(0);
                     updateFixedHeroBanner(heroBannerView, video, allHeroBannerContent);
-                    Log.d(TAG, "🎯 Fixed Hero Banner updated to: " + video.getTitle());
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating Fixed Hero Banner", e);
         }
     }
     
@@ -1169,7 +1091,6 @@ public class HomeFragment extends RowsSupportFragment {
         String sectionTitle = listRow.getHeaderItem().getName();
         ArrayObjectAdapter sectionAdapter = (ArrayObjectAdapter) listRow.getAdapter();
         
-        Log.d(TAG, "🔍 checkAndLoadMoreForSection: " + sectionTitle + " - Adapter size: " + sectionAdapter.size());
         
         // Find current item position in this section
         int currentPosition = -1;
@@ -1182,16 +1103,13 @@ public class HomeFragment extends RowsSupportFragment {
             }
         }
         
-        Log.d(TAG, "👆 Selected position: " + currentPosition + "/" + sectionAdapter.size());
         
         // Load more when user is at the LAST item (same logic as MoviesFragment/TvSeriesFragment)
         if (currentPosition == sectionAdapter.size() - 1) {
             String sectionId = getSectionIdFromTitle(sectionTitle);
             if (sectionId != null && !isPlaceholder(sectionAdapter.get(sectionAdapter.size() - 1))) {
-                Log.d(TAG, "🔄 Triggering section lazy load - Position: " + currentPosition + "/" + sectionAdapter.size() + " for " + sectionTitle);
                 loadMoreForSpecificSection(sectionId, sectionTitle, sectionAdapter);
             } else {
-                Log.d(TAG, "❌ Cannot load more: sectionId=" + sectionId + ", isPlaceholder=" + isPlaceholder(sectionAdapter.get(sectionAdapter.size() - 1)));
             }
         }
     }
@@ -1203,15 +1121,12 @@ public class HomeFragment extends RowsSupportFragment {
         // Check if already loading
         Boolean isLoading = sectionLoadingMap.get(sectionId);
         if (isLoading != null && isLoading) {
-            Log.d(TAG, "⏳ Already loading for section: " + sectionTitle);
             return;
         }
         
         // Check if has more data
         Boolean hasMore = sectionHasMoreMap.get(sectionId);
-        Log.d(TAG, "🎯 Section " + sectionTitle + " (ID: " + sectionId + ") - HasMore: " + hasMore);
         if (hasMore != null && !hasMore) {
-            Log.d(TAG, "🚫 No more data for section: " + sectionTitle);
             return;
         }
         
@@ -1225,7 +1140,6 @@ public class HomeFragment extends RowsSupportFragment {
         // Mark as loading
         sectionLoadingMap.put(sectionId, true);
         
-        Log.d(TAG, "🔄 Loading more for section: " + sectionTitle + " - Page: " + nextPage);
         
         // Add loading indicator
         adapter.add(createPlaceholderContent("Đang tải thêm " + sectionTitle + "..."));
@@ -1242,7 +1156,6 @@ public class HomeFragment extends RowsSupportFragment {
         } else if (sectionId.equals("3") || sectionTitle.contains("Latest Tv Series") || sectionTitle.contains("Latest TV Series") || sectionTitle.contains("Phim Bộ Mới nhất")) {
             loadMoreLatestTVSeries(sectionId, sectionTitle, adapter, nextPage);
         } else {
-            Log.d(TAG, "❌ Unknown section type for: " + sectionTitle + " (ID: " + sectionId + ")");
             sectionLoadingMap.put(sectionId, false);
         }
     }
@@ -1286,11 +1199,9 @@ public class HomeFragment extends RowsSupportFragment {
                                 sectionPageMap.put(sectionId, page);
                                 sectionHasMoreMap.put(sectionId, response.body().size() >= 20); // Assume page size is 20
                                 
-                                Log.d(TAG, "✅ Loaded " + response.body().size() + " more items for " + sectionTitle);
                             } else {
                                 // No more data
                                 sectionHasMoreMap.put(sectionId, false);
-                                Log.d(TAG, "📝 No more data for " + sectionTitle);
                             }
                             
                             sectionLoadingMap.put(sectionId, false);
@@ -1357,10 +1268,8 @@ public class HomeFragment extends RowsSupportFragment {
                                 sectionPageMap.put(sectionId, page);
                                 sectionHasMoreMap.put(sectionId, response.body().size() >= 20);
                                 
-                                Log.d(TAG, "✅ Loaded " + response.body().size() + " more items for " + sectionTitle);
                             } else {
                                 sectionHasMoreMap.put(sectionId, false);
-                                Log.d(TAG, "📝 No more data for " + sectionTitle);
                             }
                             
                             sectionLoadingMap.put(sectionId, false);
@@ -1392,7 +1301,6 @@ public class HomeFragment extends RowsSupportFragment {
      * Load more Phim4k content
      */
     private void loadMorePhim4kContent(String sectionId, String sectionTitle, ArrayObjectAdapter adapter, int page) {
-        Log.d(TAG, "🎬 loadMorePhim4kContent - Page: " + page + " for section: " + sectionTitle);
         Phim4kClient.getInstance().getLatestMovies(page, new Phim4kClient.Phim4kCallback() {
             @Override
             public void onSuccess(List<VideoContent> videoContents) {
@@ -1423,10 +1331,8 @@ public class HomeFragment extends RowsSupportFragment {
                                 sectionPageMap.put(sectionId, page);
                                 sectionHasMoreMap.put(sectionId, videoContents.size() >= 20);
                                 
-                                Log.d(TAG, "✅ Loaded " + videoContents.size() + " more Phim4k items - HasMore: " + (videoContents.size() >= 20));
                             } else {
                                 sectionHasMoreMap.put(sectionId, false);
-                                Log.d(TAG, "📝 No more Phim4k data");
                             }
                             
                             sectionLoadingMap.put(sectionId, false);
@@ -1487,7 +1393,6 @@ public class HomeFragment extends RowsSupportFragment {
                                 sectionPageMap.put(sectionId, page);
                                 sectionHasMoreMap.put(sectionId, response.body().size() >= 20);
                                 
-                                Log.d(TAG, "✅ Loaded " + response.body().size() + " more latest movies");
                             } else {
                                 sectionHasMoreMap.put(sectionId, false);
                             }
@@ -1549,7 +1454,6 @@ public class HomeFragment extends RowsSupportFragment {
                                 sectionPageMap.put(sectionId, page);
                                 sectionHasMoreMap.put(sectionId, response.body().size() >= 20);
                                 
-                                Log.d(TAG, "✅ Loaded " + response.body().size() + " more latest TV series");
                             } else {
                                 sectionHasMoreMap.put(sectionId, false);
                             }
@@ -1582,22 +1486,18 @@ public class HomeFragment extends RowsSupportFragment {
      * Helper method to get section ID from title
      */
     private String getSectionIdFromTitle(String title) {
-        Log.d(TAG, "🔍 getSectionIdFromTitle: " + title);
         if (title.contains("Drama xứ Kim Chi")) return "13";  // Cùng ID với genre mapping
         if (title.contains("Trường thiên Drama Tàu")) return "15";  // Cùng ID với genre mapping
         if (title.contains("Xưởng phim xứ Đông Lào")) return "5";   // Cùng ID với genre mapping
         if (title.contains("Xi nê Tuổi thơ")) return "13";          // Genre ID
         if (title.contains("Latest Movies") || title.contains("Phim Mới nhất")) {
-            Log.d(TAG, "📱 Matched Latest Movies section");
             return "2";
         }
         // Fix TV Series matching - cần match cả "Latest Tv Series" và "Latest TV Series"
         if (title.contains("Latest Tv Series") || title.contains("Latest TV Series") || title.contains("Phim Bộ Mới nhất")) {
-            Log.d(TAG, "📺 Matched Latest TV Series section");
             return "3";
         }
         if (title.contains("Nguồn free1")) return "phim4k_free1";
-        Log.d(TAG, "❌ No match found for title: " + title);
         return null;
     }
     
@@ -1855,7 +1755,6 @@ public class HomeFragment extends RowsSupportFragment {
                                 // Update pagination info - for Phim4k, always assume more data initially
                                 // since their API might return less than 20 items per page
                                 sectionHasMoreMap.put(homeContent.getId(), true);
-                                Log.d(TAG, "🎬 Phim4k initial data - Size: " + videoContents.size() + ", HasMore: true (forced for pagination)");
                                 
                                 // Notify adapter of changes
                                 adapter.notifyArrayItemRangeChanged(0, adapter.size());
@@ -1930,7 +1829,6 @@ public class HomeFragment extends RowsSupportFragment {
                                 
                                 // Update pagination info - for KKPhim4k, always assume more data initially
                                 sectionHasMoreMap.put(homeContent.getId(), true);
-                                Log.d(TAG, "🎬 KKPhim4k initial data - Size: " + videoContents.size() + ", HasMore: true (forced for pagination)");
                                 
                                 // Notify adapter of changes
                                 adapter.notifyArrayItemRangeChanged(0, adapter.size());
@@ -2030,30 +1928,32 @@ public class HomeFragment extends RowsSupportFragment {
                             String thumbnailUrl = historyItem.getThumbnailUrl();
                             String posterUrl = historyItem.getPosterUrl();
                             
-                            // Replace video_thumb with bg for better quality thumbnails
-                            if (thumbnailUrl != null) {
-                                thumbnailUrl = thumbnailUrl.replace("/uploads/video_thumb/", "/uploads/bg/");
-                            }
-                            
-                            if (posterUrl != null && !posterUrl.isEmpty()) {
-                                // Use posterUrl for background/poster (large image)
+                            // Keep video_thumb for small card thumbnail
+                            // Use poster_image for background (large image behind card)
+                            String videoId = historyItem.getVideoId();
+                            String bgUrl = (videoId != null && !videoId.isEmpty())
+                                ? "https://api.phim4k.lol/uploads/poster_image/" + videoId + ".jpg"
+                                : null;
+
+                            if (bgUrl != null && !bgUrl.isEmpty()) {
+                                videoContent.setPosterUrl(bgUrl);
+                            } else if (posterUrl != null && !posterUrl.isEmpty()) {
                                 videoContent.setPosterUrl(posterUrl);
                             } else if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
-                                // Fallback to thumbnail if no poster
                                 videoContent.setPosterUrl(thumbnailUrl);
                             } else {
-                                // No poster available
                                 videoContent.setPosterUrl("");
                             }
                             
-                            if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
-                                // Use thumbnailUrl for small card display
+                            // Use bg endpoint for small card thumbnail
+                            String bgThumbUrl = (videoId != null && !videoId.isEmpty())
+                                ? "https://api.phim4k.lol/uploads/bg/" + videoId + ".jpg"
+                                : null;
+                            if (bgThumbUrl != null) {
+                                videoContent.setThumbnailUrl(bgThumbUrl);
+                            } else if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
                                 videoContent.setThumbnailUrl(thumbnailUrl);
-                            } else if (posterUrl != null && !posterUrl.isEmpty()) {
-                                // Fallback to poster if no thumbnail
-                                videoContent.setThumbnailUrl(posterUrl);
                             } else {
-                                // No thumbnail available
                                 videoContent.setThumbnailUrl("");
                             }
                             
@@ -2105,9 +2005,7 @@ public class HomeFragment extends RowsSupportFragment {
                                     
                                     // Add history items after clear button
                                     if (!historyVideoContent.isEmpty()) {
-                                        Log.d("HomeFragment", "📺 Adding " + historyVideoContent.size() + " history items");
                                     } else {
-                                        Log.d("HomeFragment", "📺 No history items to display");
                                     }
                                     
                                     for (VideoContent content : historyVideoContent) {
@@ -2175,7 +2073,6 @@ public class HomeFragment extends RowsSupportFragment {
                     if (syncManager != null) {
                         // Try to get local watch history data
                         List<WatchHistorySyncItem.WatchHistoryItem> historyItems = syncManager.getWatchHistoryForDisplay();
-                        Log.e("HomeFragment", "Retrieved " + (historyItems != null ? historyItems.size() : "null") + " local history items");
                         
                         if (historyItems != null && !historyItems.isEmpty()) {
                             // Convert watch history items to VideoContent
@@ -2183,13 +2080,16 @@ public class HomeFragment extends RowsSupportFragment {
                             
                             for (WatchHistorySyncItem.WatchHistoryItem historyItem : historyItems) {
                                 VideoContent videoContent = new VideoContent();
-                                videoContent.setId(historyItem.getVideoId());
+                                String vid = historyItem.getVideoId();
+                                videoContent.setId(vid);
                                 videoContent.setTitle(historyItem.getTitle());
-                                videoContent.setPosterUrl(historyItem.getPosterUrl());
-                                // Use thumbnailUrl if available, otherwise fallback to posterUrl
-                                String thumbnailUrl = historyItem.getThumbnailUrl() != null ? 
-                                        historyItem.getThumbnailUrl() : historyItem.getPosterUrl();
-                                videoContent.setThumbnailUrl(thumbnailUrl);
+                                // Ảnh nền: poster_image, ảnh nhỏ: bg
+                                videoContent.setPosterUrl(vid != null && !vid.isEmpty()
+                                        ? "https://api.phim4k.lol/uploads/poster_image/" + vid + ".jpg"
+                                        : historyItem.getPosterUrl());
+                                videoContent.setThumbnailUrl(vid != null && !vid.isEmpty()
+                                        ? "https://api.phim4k.lol/uploads/bg/" + vid + ".jpg"
+                                        : historyItem.getThumbnailUrl());
                                 videoContent.setType("movie"); // Default type
                                 
                                 // Mark as watch history item and store current position
@@ -2214,13 +2114,11 @@ public class HomeFragment extends RowsSupportFragment {
                                             adapter.add(createPlaceholderContent("Chưa có lịch sử xem (Offline)"));
                                         }
                                         
-                                        Log.e("HomeFragment", "Updated UI with " + historyVideoContent.size() + " local history items");
                                     }
                                 });
                             }
                         } else {
                             // No local history found either
-                            Log.e("HomeFragment", "No local watch history found");
                             if (getActivity() != null) {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
@@ -2232,7 +2130,6 @@ public class HomeFragment extends RowsSupportFragment {
                             }
                         }
                     } else {
-                        Log.e("HomeFragment", "SyncManager is null, cannot load local history");
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
@@ -2244,7 +2141,6 @@ public class HomeFragment extends RowsSupportFragment {
                         }
                     }
                 } catch (Exception e) {
-                    Log.e("HomeFragment", "Error loading local watch history", e);
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -2370,7 +2266,6 @@ public class HomeFragment extends RowsSupportFragment {
         
         // For now, simulate loading more content with a delay
         // In a real scenario, you would call API with pagination
-        Log.d(TAG, "🔄 Loading more home content - Page: " + currentPage);
         
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
@@ -2388,7 +2283,6 @@ public class HomeFragment extends RowsSupportFragment {
                             // No more data to load
                             hasMoreData = false;
                             isLoadingMore = false;
-                            Log.d(TAG, "📝 No more home content to load");
                             return;
                         }
                         
@@ -2405,11 +2299,9 @@ public class HomeFragment extends RowsSupportFragment {
                                     // Check if we've loaded all content
                                     if (endIndex >= allHomeContent.size()) {
                                         hasMoreData = false;
-                                        Log.d(TAG, "✅ All home content loaded");
                                     }
                                     
                                     isLoadingMore = false;
-                                    Log.d(TAG, "✅ Loaded batch " + currentPage + " - Items: " + (endIndex - startIndex));
                                 }
                             });
                         }
@@ -2418,7 +2310,6 @@ public class HomeFragment extends RowsSupportFragment {
                     }
                     
                 } catch (Exception e) {
-                    Log.e(TAG, "❌ Error loading more home content", e);
                     isLoadingMore = false;
                 }
             }
@@ -2484,12 +2375,10 @@ public class HomeFragment extends RowsSupportFragment {
                 if (homeContent.getContent() != null && homeContent.getContent().size() > 0) {
                     // Initialize pagination for sections with existing content
                     if (homeContent.getType().equalsIgnoreCase("movie")) {
-                        Log.d(TAG, "🎬 Initializing pagination for Latest Movies section (ID: " + homeContent.getId() + ")");
                         sectionPageMap.put(homeContent.getId(), 1);
                         sectionLoadingMap.put(homeContent.getId(), false);
                         sectionHasMoreMap.put(homeContent.getId(), true);
                     } else if (homeContent.getType().equalsIgnoreCase("tvseries")) {
-                        Log.d(TAG, "📺 Initializing pagination for Latest TV Series section (ID: " + homeContent.getId() + ")");
                         sectionPageMap.put(homeContent.getId(), 1);
                         sectionLoadingMap.put(homeContent.getId(), false);
                         sectionHasMoreMap.put(homeContent.getId(), true);
@@ -2514,7 +2403,6 @@ public class HomeFragment extends RowsSupportFragment {
             }
             
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error adding home content row: " + homeContent.getTitle(), e);
         }
     }
     
@@ -2524,14 +2412,12 @@ public class HomeFragment extends RowsSupportFragment {
     private void loadFixedHeroBanner(VideoContent initialVideo, List<VideoContent> featuredContent) {
         // Store data for later if view is not ready yet
         if (getView() == null) {
-            Log.w(TAG, "⚠️ Fragment view is null - will retry when view is ready");
             // Store data to retry later
             pendingHeroBannerVideo = initialVideo;
             pendingHeroBannerContent = featuredContent;
             return;
         }
         
-        Log.d(TAG, "🔍 loadFixedHeroBanner called with video: " + (initialVideo != null ? initialVideo.getTitle() : "null"));
         
         // Clear pending data since we're loading now
         pendingHeroBannerVideo = null;
@@ -2544,11 +2430,9 @@ public class HomeFragment extends RowsSupportFragment {
                 android.view.ViewGroup heroBannerContainer = getView().findViewById(R.id.hero_banner_fixed_container);
                 
                 if (heroBannerContainer == null) {
-                    Log.e(TAG, "❌ Hero banner fixed container not found in Fragment!");
                     return;
                 }
                 
-                Log.d(TAG, "✅ Hero banner container found in Fragment");
                 
                 // Make sure container is visible
                 heroBannerContainer.setVisibility(View.VISIBLE);
@@ -2557,7 +2441,6 @@ public class HomeFragment extends RowsSupportFragment {
                 android.view.LayoutInflater inflater = android.view.LayoutInflater.from(getActivity());
                 View heroBannerView = inflater.inflate(R.layout.item_hero_banner, heroBannerContainer, false);
                 
-                Log.d(TAG, "✅ Hero banner view inflated");
                 
                 // Category switcher disabled - using standard FrameLayout like backup
                 // if (heroBannerView instanceof com.files.codes.view.widget.CategorySwitcherFrameLayout) {
@@ -2581,14 +2464,11 @@ public class HomeFragment extends RowsSupportFragment {
                 heroBannerContainer.removeAllViews();
                 heroBannerContainer.addView(heroBannerView);
                 
-                Log.d(TAG, "✅ Hero banner view added to container");
                 
                 // Initialize hero banner with first video
                 updateFixedHeroBanner(heroBannerView, initialVideo, featuredContent);
                 
-                Log.d(TAG, "✅ Fixed Hero Banner loaded successfully with title: " + initialVideo.getTitle());
             } catch (Exception e) {
-                Log.e(TAG, "❌ Error loading fixed hero banner", e);
                 e.printStackTrace();
             }
         });
@@ -2720,7 +2600,6 @@ public class HomeFragment extends RowsSupportFragment {
                 if (allCategories != null && currentCategoryIndex >= 0 && currentCategoryIndex < allCategories.size()) {
                     HomeContent currentCategory = allCategories.get(currentCategoryIndex);
                     isFromWatchHistory = "watch_history".equalsIgnoreCase(currentCategory.getType());
-                    Log.d(TAG, "🎬 Play button - Current category: " + currentCategory.getTitle() + ", isWatchHistory: " + isFromWatchHistory);
                 }
                 
                 // Use the same logic as thumbnail click with current hero video
@@ -2778,7 +2657,6 @@ public class HomeFragment extends RowsSupportFragment {
                                 if (allCategories != null && currentCategoryIndex >= 0 && currentCategoryIndex < allCategories.size()) {
                                     HomeContent currentCategory = allCategories.get(currentCategoryIndex);
                                     actuallyFromWatchHistory = "watch_history".equalsIgnoreCase(currentCategory.getType());
-                                    Log.d(TAG, "🎬 Thumbnail clicked - Current category: " + currentCategory.getTitle() + ", isWatchHistory: " + actuallyFromWatchHistory);
                                 }
                                 handleThumbnailClick(video, actuallyFromWatchHistory);
                             }
@@ -2798,7 +2676,6 @@ public class HomeFragment extends RowsSupportFragment {
                         for (int i = 0; i < initialLoadCount; i++) {
                             currentThumbnailAdapter.add(currentFeaturedContent.get(i));
                         }
-                        Log.d(TAG, "🎬 Lazy loading: Initial " + initialLoadCount + " of " + currentFeaturedContent.size() + " thumbnails");
                         
                         androidx.leanback.widget.ItemBridgeAdapter bridgeAdapter = 
                             new androidx.leanback.widget.ItemBridgeAdapter(currentThumbnailAdapter);
@@ -2810,11 +2687,9 @@ public class HomeFragment extends RowsSupportFragment {
                             public void onChildViewHolderSelected(androidx.recyclerview.widget.RecyclerView parent, 
                                                                  androidx.recyclerview.widget.RecyclerView.ViewHolder child, 
                                                                  int position, int subposition) {
-                                Log.d(TAG, "📍 Thumbnail grid focus changed - Position: " + position);
                                 
                                 if (currentFeaturedContent != null && position >= 0 && position < currentFeaturedContent.size()) {
                                     VideoContent selectedVideo = currentFeaturedContent.get(position);
-                                    Log.d(TAG, "🎯 Thumbnail focused: " + selectedVideo.getTitle());
                                     
                                     // Update Hero Banner directly using stored reference
                                     if (heroBannerViewReference != null) {
@@ -2829,7 +2704,6 @@ public class HomeFragment extends RowsSupportFragment {
                                     int currentAdapterSize = currentThumbnailAdapter.size();
                                     if (position >= currentAdapterSize - 3 && currentAdapterSize < currentFeaturedContent.size()) {
                                         int loadMoreCount = Math.min(5, currentFeaturedContent.size() - currentAdapterSize);
-                                        Log.d(TAG, "📦 Loading " + loadMoreCount + " more thumbnails from memory (total will be: " + (currentAdapterSize + loadMoreCount) + ")");
                                         
                                         // Post to avoid "Cannot call this method while RecyclerView is computing a layout or scrolling"
                                         final int startIndex = currentAdapterSize;
@@ -2848,10 +2722,8 @@ public class HomeFragment extends RowsSupportFragment {
                                             String categoryType = currentCategory.getType().toLowerCase();
                                             
                                             if ("country".equals(categoryType)) {
-                                                Log.d(TAG, "🌍 Loading next page for country category (page " + (currentCategoryPage + 1) + ")");
                                                 loadCountryContentForHeroBanner(currentCategory, currentCategoryPage + 1, true);
                                             } else if ("genre".equals(categoryType)) {
-                                                Log.d(TAG, "🎭 Loading next page for genre category (page " + (currentCategoryPage + 1) + ")");
                                                 loadGenreContentForHeroBanner(currentCategory, currentCategoryPage + 1, true);
                                             }
                                         }
@@ -2864,14 +2736,12 @@ public class HomeFragment extends RowsSupportFragment {
                         thumbnailsGrid.setCategorySwitchListener(new com.files.codes.view.widget.CategorySwitchingHorizontalGridView.OnCategorySwitchListener() {
                             @Override
                             public boolean onSwitchNext() {
-                                Log.d(TAG, "⬇️ DOWN key intercepted - switching to next category");
                                 switchToNextCategory();
                                 return true; // Always consume DOWN key
                             }
                             
                             @Override
                             public boolean onSwitchPrevious() {
-                                Log.d(TAG, "⬆️ UP key intercepted - checking if can switch to previous category");
                                 return switchToPreviousCategory(); // Return false if at first category to allow focus escape
                             }
                         });
@@ -2886,26 +2756,21 @@ public class HomeFragment extends RowsSupportFragment {
                         thumbnailsGrid.postDelayed(() -> {
                             boolean focused = thumbnailsGrid.requestFocus();
                             thumbnailsGrid.setSelectedPosition(0);
-                            Log.d(TAG, "🎯 Auto-focused on thumbnail grid - Success: " + focused);
                             
                             // Force focus if first attempt failed
                             if (!focused) {
                                 thumbnailsGrid.postDelayed(() -> {
                                     thumbnailsGrid.requestFocus();
-                                    Log.d(TAG, "🔄 Retry focus on thumbnail grid");
                                 }, 200);
                             }
                         }, 500);
                         
-                        Log.d(TAG, "✅ Thumbnails grid setup with " + currentFeaturedContent.size() + " items and focus listener");
                     } catch (Exception e) {
-                        Log.e(TAG, "❌ Error setting up thumbnails grid", e);
                     }
                 });
             }
             
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating fixed hero banner", e);
         }
     }
     
@@ -2987,7 +2852,6 @@ public class HomeFragment extends RowsSupportFragment {
         if ("CLEAR_BUTTON_THUMBNAIL".equals(url)) {
             heroBackground.setImageResource(R.drawable.clear_history_background);
             heroBackground.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
-            Log.d(TAG, "🗑️ Set clear history background");
             return;
         }
         
@@ -3006,8 +2870,6 @@ public class HomeFragment extends RowsSupportFragment {
         int targetWidth = screenWidth;
         int targetHeight = (int) (screenWidth / 16.0 * 9.0); // 16:9 ratio
         
-        Log.d(TAG, "📐 Screen dimensions: " + screenWidth + "x" + displayMetrics.heightPixels + " px");
-        Log.d(TAG, "📐 Target 16:9 size: " + targetWidth + "x" + targetHeight + " px");
         
         // Use Cloudflare Image Resizing with fit=cover to fill the banner
         String optimizedUrl = url;
@@ -3022,14 +2884,8 @@ public class HomeFragment extends RowsSupportFragment {
                          + ",height=" + targetHeight
                          + ",fit=cover,quality=90,format=auto" + path;
             
-            Log.d(TAG, "🌐 ========== CLOUDFLARE URL ==========");
-            Log.d(TAG, "🌐 Original: " + url);
-            Log.d(TAG, "🌐 Cloudflare: " + optimizedUrl);
-            Log.d(TAG, "🌐 Size: " + targetWidth + "x" + targetHeight + " px (fit=cover)");
-            Log.d(TAG, "🌐 =====================================");
         } catch (Exception e) {
             optimizedUrl = url;
-            Log.d(TAG, "⚠️ Using original URL: " + url);
         }
         
         // � Create Target and keep strong reference to prevent GC
@@ -3037,30 +2893,34 @@ public class HomeFragment extends RowsSupportFragment {
         currentHeroTarget = new com.squareup.picasso.Target() {
             @Override
             public void onBitmapLoaded(android.graphics.Bitmap bitmap, com.squareup.picasso.Picasso.LoadedFrom from) {
-                Log.d(TAG, "🎨 ========== BITMAP LOADED (CURRENT APP) ==========");
-                Log.d(TAG, "🎨 URL: " + finalOptimizedUrl);
-                Log.d(TAG, "🎨 Bitmap size: " + bitmap.getWidth() + "x" + bitmap.getHeight() + " px");
-                Log.d(TAG, "🎨 ImageView scaleType: " + heroBackground.getScaleType());
-                Log.d(TAG, "🎨 ImageView size: " + heroBackground.getWidth() + "x" + heroBackground.getHeight() + " px");
-                Log.d(TAG, "🎨 AdjustViewBounds: " + heroBackground.getAdjustViewBounds());
-                Log.d(TAG, "🎨 ===================================================");
                 
-                // Set image directly (no animation)
-                heroBackground.setImageBitmap(bitmap);
+                // Set image with crossfade
+                android.graphics.drawable.Drawable currentDrawable = heroBackground.getDrawable();
+                android.graphics.drawable.BitmapDrawable newDrawable = new android.graphics.drawable.BitmapDrawable(getResources(), bitmap);
+                
+                // Allow crossfade between previous image and new image
+                if (currentDrawable != null && currentDrawable.getIntrinsicWidth() > 0) {
+                    android.graphics.drawable.TransitionDrawable td = new android.graphics.drawable.TransitionDrawable(new android.graphics.drawable.Drawable[]{ currentDrawable, newDrawable });
+                    td.setCrossFadeEnabled(true);
+                    heroBackground.setImageDrawable(td);
+                    td.startTransition(400); // 400ms crossfade
+                } else {
+                    // No previous image (or placeholder), set directly
+                    heroBackground.setImageDrawable(newDrawable);
+                }
             }
-            
+
             @Override
             public void onBitmapFailed(Exception e, android.graphics.drawable.Drawable errorDrawable) {
-                Log.e(TAG, "❌ Bitmap load failed: " + e.getMessage());
                 heroBackground.setImageDrawable(errorDrawable);
             }
-            
+
             @Override
             public void onPrepareLoad(android.graphics.drawable.Drawable placeHolderDrawable) {
                 // Keep current image while loading new one - don't replace with placeholder
             }
         };
-        
+
         // Load image into Target (strong reference prevents GC)
         com.squareup.picasso.Picasso.get()
             .load(optimizedUrl)
@@ -3089,7 +2949,6 @@ public class HomeFragment extends RowsSupportFragment {
         }
         
         lastPreloadedPosition = currentPosition;
-        Log.d(TAG, "🚀 Predictive preload triggered at position: " + currentPosition);
         
         // Calculate preload range
         // Current row: preload 5 items ahead
@@ -3111,7 +2970,6 @@ public class HomeFragment extends RowsSupportFragment {
                     }
                 }
             }
-            Log.d(TAG, "📥 Preloaded current row backgrounds: " + currentPosition + " to " + (currentRowEnd - 1));
         });
         
         // Preload next row images after a short delay
@@ -3125,7 +2983,6 @@ public class HomeFragment extends RowsSupportFragment {
                     }
                 }
             }
-            Log.d(TAG, "📥 Preloaded next row backgrounds: " + nextRowStart + " to " + (nextRowEnd - 1));
         }, 200); // 200ms delay for next row
     }
     
@@ -3199,10 +3056,8 @@ public class HomeFragment extends RowsSupportFragment {
             updateTextContent(heroTitle, heroTitleLine2, heroDescription, heroImdbRating, 
                             heroYear, heroQuality, heroImdbContainer, heroQualityContainer, video);
             
-            Log.d(TAG, "✅ Hero Banner content updated: " + video.getTitle());
             
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating hero banner content", e);
         }
     }
     
@@ -3324,7 +3179,6 @@ public class HomeFragment extends RowsSupportFragment {
      */
     private void updateHeroThumbnailList(List<VideoContent> newContent) {
         if (heroBannerViewReference == null || newContent == null || newContent.isEmpty()) {
-            Log.w(TAG, "⚠️ Cannot update thumbnail list - missing view reference or content");
             return;
         }
         
@@ -3333,7 +3187,6 @@ public class HomeFragment extends RowsSupportFragment {
                 heroBannerViewReference.findViewById(R.id.hero_thumbnails_grid);
             
             if (thumbnailsGrid == null) {
-                Log.e(TAG, "❌ Thumbnails grid not found");
                 return;
             }
             
@@ -3343,30 +3196,44 @@ public class HomeFragment extends RowsSupportFragment {
             // 🚀 Reset predictive preload position when switching content
             lastPreloadedPosition = -1;
             
-            // Add fade out animation before updating
-            android.view.animation.Animation fadeOut = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
-            fadeOut.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+// Add fade out and slide up animation before updating
+            android.view.animation.AnimationSet fadeOutSet = new android.view.animation.AnimationSet(true);
+            fadeOutSet.setInterpolator(new android.view.animation.AccelerateInterpolator());
+
+            android.view.animation.AlphaAnimation fadeOut = new android.view.animation.AlphaAnimation(1.0f, 0.0f);
+            fadeOut.setDuration(150);
+
+            float toYDelta = isScrollingDown ? -0.2f : 0.2f;
+
+            // Slide out of view
+            android.view.animation.TranslateAnimation slideOut = new android.view.animation.TranslateAnimation(
+                    android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                    android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                    android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                    android.view.animation.Animation.RELATIVE_TO_SELF, toYDelta);
+            slideOut.setDuration(150);
+            
+            fadeOutSet.addAnimation(fadeOut);
+            fadeOutSet.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(android.view.animation.Animation animation) {
                 }
-                
+
                 @Override
                 public void onAnimationEnd(android.view.animation.Animation animation) {
                     // After fade out, update content and fade in
                     updateThumbnailsContent(thumbnailsGrid, newContent);
                 }
-                
+
                 @Override
                 public void onAnimationRepeat(android.view.animation.Animation animation) {
                 }
             });
+
+            thumbnailsGrid.startAnimation(fadeOutSet);
             
-            thumbnailsGrid.startAnimation(fadeOut);
-            
-            Log.d(TAG, "✅ Thumbnail list updating with animation - " + newContent.size() + " items");
             
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating thumbnail list", e);
         }
     }
     
@@ -3407,7 +3274,6 @@ public class HomeFragment extends RowsSupportFragment {
             for (int i = 0; i < initialLoadCount; i++) {
                 currentThumbnailAdapter.add(newContent.get(i));
             }
-            Log.d(TAG, "🎬 Lazy loading on category switch: Initial " + initialLoadCount + " of " + newContent.size() + " thumbnails");
             
             // Update grid adapter
             androidx.leanback.widget.ItemBridgeAdapter bridgeAdapter = 
@@ -3417,26 +3283,42 @@ public class HomeFragment extends RowsSupportFragment {
             // Ensure grid remains focusable after adapter update
             thumbnailsGrid.setFocusable(true);
             thumbnailsGrid.setFocusableInTouchMode(true);
-            
-            // Apply fade in animation
-            android.view.animation.Animation fadeIn = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
-            thumbnailsGrid.startAnimation(fadeIn);
-            
-            // Request focus on first item to trigger selection listener
+
+            // Apply fade in and slide up from bottom animation
+            android.view.animation.AnimationSet fadeInSet = new android.view.animation.AnimationSet(true);
+            fadeInSet.setInterpolator(new android.view.animation.DecelerateInterpolator());
+
+            android.view.animation.AlphaAnimation fadeIn = new android.view.animation.AlphaAnimation(0.0f, 1.0f);
+            fadeIn.setDuration(250);
+
+            float fromYDelta = isScrollingDown ? 0.2f : -0.2f;
+
+            // Slide into view
+            android.view.animation.TranslateAnimation slideIn = new android.view.animation.TranslateAnimation(
+                    android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                    android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                    android.view.animation.Animation.RELATIVE_TO_SELF, fromYDelta,
+                    android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f);
+            slideIn.setDuration(250);
+
+            fadeInSet.addAnimation(fadeIn);
+            fadeInSet.addAnimation(slideIn);
+
+            // Wait for layout parameters to resolve before animating to prevent dropping frames
             thumbnailsGrid.post(() -> {
+                thumbnailsGrid.startAnimation(fadeInSet);
                 thumbnailsGrid.requestFocus();
                 thumbnailsGrid.setSelectedPosition(0);
+                
+                // Update Hero Banner with first item from new list
+                if (newContent.size() > 0) {
+                    VideoContent firstVideo = newContent.get(0);
+                    currentHeroVideo = firstVideo;
+                    updateHeroBannerContent(heroBannerViewReference, firstVideo);
+                }
             });
-            
-            // Update Hero Banner with first item from new list
-            if (newContent.size() > 0) {
-                VideoContent firstVideo = newContent.get(0);
-                currentHeroVideo = firstVideo;
-                updateHeroBannerContent(heroBannerViewReference, firstVideo);
-            }
-            
+
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating thumbnail list", e);
         }
     }
     
@@ -3444,25 +3326,24 @@ public class HomeFragment extends RowsSupportFragment {
      * 🔄 Switch to next category when user presses DOWN
      */
     private void switchToNextCategory() {
-        Log.d(TAG, "🔽 switchToNextCategory called - Current categories: " + (allCategories != null ? allCategories.size() : "null"));
-        
+
         if (allCategories == null || allCategories.isEmpty()) {
-            Log.w(TAG, "⚠️ No categories available to switch");
             return;
         }
-        
+
+        isScrollingDown = true;
+
         int oldIndex = currentCategoryIndex;
-        
+
         // Find the next valid category that has content
         int targetIndex = (currentCategoryIndex + 1) % allCategories.size();
         int attemptsLeft = allCategories.size(); // Prevent infinite loop
-        
+
         while (attemptsLeft > 0) {
             HomeContent targetCategory = allCategories.get(targetIndex);
             
             // Check if this category should be skipped
             if (shouldSkipCategory(targetCategory)) {
-                Log.d(TAG, "⏭️ Skipping empty category: " + targetCategory.getTitle() + " at index " + targetIndex);
                 targetIndex = (targetIndex + 1) % allCategories.size();
                 attemptsLeft--;
                 continue;
@@ -3474,7 +3355,6 @@ public class HomeFragment extends RowsSupportFragment {
         
         // Move to the found category
         currentCategoryIndex = targetIndex;
-        Log.d(TAG, "📊 Category index: " + oldIndex + " → " + currentCategoryIndex + " (skipped empty categories)");
         
         // Reset pagination for new category
         currentCategoryPage = 1;
@@ -3488,16 +3368,15 @@ public class HomeFragment extends RowsSupportFragment {
      * 🔄 Switch to previous category when user presses UP
      */
     private boolean switchToPreviousCategory() {
-        Log.d(TAG, "🔼 switchToPreviousCategory called - Current categories: " + (allCategories != null ? allCategories.size() : "null"));
-        
+
         if (allCategories == null || allCategories.isEmpty()) {
-            Log.w(TAG, "⚠️ No categories available to switch");
             return false;
         }
-        
+
+        isScrollingDown = false;
+
         // 🎯 Don't cycle to end - allow focus to escape to search bar
         if (currentCategoryIndex <= 0) {
-            Log.d(TAG, "🚫 Already at first category - allow focus to escape UP");
             return false; // Don't consume the UP key, let it go to search
         }
         
@@ -3510,7 +3389,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             // Check if this category should be skipped
             if (shouldSkipCategory(targetCategory)) {
-                Log.d(TAG, "⏭️ Skipping empty category: " + targetCategory.getTitle() + " at index " + targetIndex);
                 targetIndex--;
                 continue;
             }
@@ -3521,13 +3399,11 @@ public class HomeFragment extends RowsSupportFragment {
         
         // If no valid previous category found, allow focus to escape UP
         if (targetIndex < 0) {
-            Log.d(TAG, "🚫 No valid previous category found - allow focus to escape UP");
             return false; // Don't consume the UP key, let it go to search
         }
         
         // Move to the found category
         currentCategoryIndex = targetIndex;
-        Log.d(TAG, "📊 Category index: " + oldIndex + " → " + currentCategoryIndex + " (skipped empty categories)");
         
         // Reset pagination for new category
         currentCategoryPage = 1;
@@ -3542,69 +3418,16 @@ public class HomeFragment extends RowsSupportFragment {
      * 🎬 Handle thumbnail click - either play video (watch history) or show details
      */
     private void handleThumbnailClick(VideoContent video, boolean isFromWatchHistory) {
-        Log.d(TAG, "🖱️ Thumbnail clicked: " + video.getTitle() + " (from watch history: " + isFromWatchHistory + ")");
-        Log.d(TAG, "   Video ID: " + video.getId());
-        Log.d(TAG, "   Video Type: " + video.getType());
-        Log.d(TAG, "   Video URL: " + video.getVideoUrl());
-        Log.d(TAG, "   Description: " + video.getDescription());
         
         // Check if this is clear history button
         if ("clear_button".equals(video.getType()) || 
             (video.getDescription() != null && "CLEAR_HISTORY_BUTTON".equals(video.getDescription()))) {
-            Log.d(TAG, "🗑️ Clear history button clicked in hero thumbnails");
             showClearHistoryConfirmDialog();
             return;
         }
         
         if (isFromWatchHistory) {
-            // Parse watch position from description field
-            long watchPosition = 0;
-            if (video.getDescription() != null && video.getDescription().startsWith("WATCH_HISTORY:")) {
-                try {
-                    String positionStr = video.getDescription().substring("WATCH_HISTORY:".length());
-                    watchPosition = Long.parseLong(positionStr);
-                    Log.d(TAG, "📍 Resume position: " + watchPosition + "ms");
-                } catch (NumberFormatException e) {
-                    Log.e(TAG, "❌ Failed to parse watch position: " + video.getDescription(), e);
-                }
-            }
-            
-            // Check if video has URL
-            String videoUrl = video.getVideoUrl();
-            Log.d(TAG, "🔍 Checking video URL: " + (videoUrl != null ? videoUrl : "NULL"));
-            
-            if (videoUrl == null || videoUrl.isEmpty()) {
-                // No video URL, try to fetch from server using video ID
-                Log.w(TAG, "⚠️ No video URL stored, will open details page to fetch");
-                if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "Đang tải thông tin phim...", Toast.LENGTH_SHORT).show();
-                }
-                openVideoDetailsPage(video);
-                return;
-            }
-            
-            // Open PlayerActivity directly with resume position
-            Intent intent = new Intent(getActivity(), com.files.codes.view.PlayerActivity.class);
-            intent.putExtra("id", video.getId());
-            
-            // Determine content type
-            String contentType = "movie";
-            if (video.getIsTvseries() != null && video.getIsTvseries().equals("1")) {
-                contentType = "tvseries";
-            } else if (video.getType() != null && !video.getType().isEmpty()) {
-                contentType = video.getType();
-            }
-            
-            intent.putExtra("type", contentType);
-            intent.putExtra("title", video.getTitle() != null ? video.getTitle() : "");
-            intent.putExtra("poster", video.getPosterUrl() != null ? video.getPosterUrl() : "");
-            intent.putExtra("thumbnail", video.getThumbnailUrl() != null ? video.getThumbnailUrl() : "");
-            intent.putExtra("video_url", videoUrl);
-            intent.putExtra("position", watchPosition);
-            intent.putExtra("from_watch_history", true);
-            
-            Log.d(TAG, "▶️ Opening PlayerActivity - ID: " + video.getId() + ", Type: " + contentType + ", Position: " + watchPosition + "ms");
-            startActivity(intent);
+            showWatchHistoryOptionsDialog(video);
         } else {
             // Regular content - open details page
             openVideoDetailsPage(video);
@@ -3629,7 +3452,6 @@ public class HomeFragment extends RowsSupportFragment {
         intent.putExtra("type", contentType);
         intent.putExtra("thumbImage", video.getThumbnailUrl() != null ? video.getThumbnailUrl() : "");
         
-        Log.d(TAG, "🎬 Opening VideoDetailsActivity - ID: " + video.getId() + ", Type: " + contentType);
         startActivity(intent);
     }
     
@@ -3647,13 +3469,11 @@ public class HomeFragment extends RowsSupportFragment {
         if ("watch_history".equals(categoryType)) {
             // Check login status
             if (!PreferenceUtils.isLoggedIn(getContext())) {
-                Log.d(TAG, "🚫 Skipping watch history - user not logged in");
                 return true;
             }
             
             // Check if sync manager is available and can sync
             if (syncManager == null || !syncManager.canAutoSync()) {
-                Log.d(TAG, "🚫 Skipping watch history - sync not available");
                 return true;
             }
             
@@ -3661,11 +3481,9 @@ public class HomeFragment extends RowsSupportFragment {
             try {
                 List<WatchHistorySyncItem.WatchHistoryItem> historyItems = syncManager.getWatchHistoryForDisplay();
                 if (historyItems == null || historyItems.isEmpty()) {
-                    Log.d(TAG, "🚫 Skipping watch history - no history items");
                     return true;
                 }
             } catch (Exception e) {
-                Log.e(TAG, "❌ Error checking watch history", e);
                 return true;
             }
         }
@@ -3680,12 +3498,10 @@ public class HomeFragment extends RowsSupportFragment {
      */
     private void loadCategoryContent() {
         if (allCategories == null || allCategories.isEmpty() || currentCategoryIndex < 0 || currentCategoryIndex >= allCategories.size()) {
-            Log.e(TAG, "❌ Invalid category index: " + currentCategoryIndex);
             return;
         }
         
         HomeContent category = allCategories.get(currentCategoryIndex);
-        Log.d(TAG, "🔄 Switching to category: " + category.getTitle() + " (type: " + category.getType() + ", id: " + category.getId() + ")");
         
         String categoryType = category.getType().toLowerCase();
         String categoryId = category.getId();
@@ -3722,7 +3538,6 @@ public class HomeFragment extends RowsSupportFragment {
                 // Update category title in Hero Banner
                 updateCategoryTitle(category.getTitle());
             } else {
-                Log.w(TAG, "⚠️ No videos in category: " + category.getTitle());
                 // Show placeholder
                 List<VideoContent> placeholder = new ArrayList<>();
                 VideoContent placeholderContent = new VideoContent();
@@ -3738,9 +3553,7 @@ public class HomeFragment extends RowsSupportFragment {
      * 🏷️ Update category title in Hero Banner
      */
     private void updateCategoryTitle(String categoryTitle) {
-        Log.d(TAG, "🔍 updateCategoryTitle called with: " + categoryTitle);
         if (heroBannerViewReference == null) {
-            Log.w(TAG, "❌ heroBannerViewReference is null");
             return;
         }
         
@@ -3748,18 +3561,30 @@ public class HomeFragment extends RowsSupportFragment {
             android.widget.TextView titleView = heroBannerViewReference.findViewById(R.id.hero_thumbnails_title);
             android.widget.Button clearButton = heroBannerViewReference.findViewById(R.id.hero_clear_history_button);
             com.files.codes.view.widget.CategorySwitchingHorizontalGridView thumbnailsGrid = heroBannerViewReference.findViewById(R.id.hero_thumbnails_grid);
-            Log.d(TAG, "🔍 titleView found: " + (titleView != null));
-            Log.d(TAG, "🔍 clearButton found: " + (clearButton != null));
-            Log.d(TAG, "🔍 thumbnailsGrid found: " + (thumbnailsGrid != null));
             if (titleView != null && clearButton != null && thumbnailsGrid != null) {
-                // Fade out old title
-                android.view.animation.Animation fadeOut = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
-                fadeOut.setDuration(200);
-                fadeOut.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+                // Fade out and slide up old title
+                android.view.animation.AnimationSet fadeOutSet = new android.view.animation.AnimationSet(true);
+                fadeOutSet.setInterpolator(new android.view.animation.AccelerateInterpolator());
+                
+                android.view.animation.AlphaAnimation fadeOutAlpha = new android.view.animation.AlphaAnimation(1.0f, 0.0f);
+                fadeOutAlpha.setDuration(150);
+
+                float toYDelta = isScrollingDown ? -0.4f : 0.4f;
+
+                android.view.animation.TranslateAnimation slideOut = new android.view.animation.TranslateAnimation(
+                        android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                        android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                        android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                        android.view.animation.Animation.RELATIVE_TO_SELF, toYDelta);
+                slideOut.setDuration(150);
+                fadeOutSet.addAnimation(fadeOutAlpha);
+                fadeOutSet.addAnimation(slideOut);
+
+                fadeOutSet.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(android.view.animation.Animation animation) {
                     }
-                    
+
                     @Override
                     public void onAnimationEnd(android.view.animation.Animation animation) {
                         // Always set normal title and hide clear button (clear button now in thumbnail list)
@@ -3767,30 +3592,43 @@ public class HomeFragment extends RowsSupportFragment {
                         titleView.setOnClickListener(null);
                         titleView.setFocusable(false);
                         titleView.setClickable(false);
-                        
+
                         // Always hide the separate clear button
                         clearButton.setVisibility(android.view.View.GONE);
                         clearButton.setOnClickListener(null);
-                        
+
                         // Reset navigation to normal
                         thumbnailsGrid.setNextFocusUpId(R.id.hero_favorite_button);
+
+                        // Fade in and slide up new title
+                        android.view.animation.AnimationSet fadeInSet = new android.view.animation.AnimationSet(true);
+                        fadeInSet.setInterpolator(new android.view.animation.DecelerateInterpolator());
                         
-                        // Fade in new title
-                        android.view.animation.Animation fadeIn = android.view.animation.AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
-                        fadeIn.setDuration(300);
-                        titleView.startAnimation(fadeIn);
+                        android.view.animation.AlphaAnimation fadeInAlpha = new android.view.animation.AlphaAnimation(0.0f, 1.0f);
+                        fadeInAlpha.setDuration(250);
+
+                        float fromYDelta = isScrollingDown ? 0.4f : -0.4f;
+
+                        android.view.animation.TranslateAnimation slideIn = new android.view.animation.TranslateAnimation(
+                                android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                                android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f,
+                                android.view.animation.Animation.RELATIVE_TO_SELF, fromYDelta,
+                                android.view.animation.Animation.RELATIVE_TO_SELF, 0.0f);
+                        slideIn.setDuration(250);
+                        fadeInSet.addAnimation(fadeInAlpha);
+                        fadeInSet.addAnimation(slideIn);
+
+                        titleView.startAnimation(fadeInSet);
                     }
-                    
+
                     @Override
                     public void onAnimationRepeat(android.view.animation.Animation animation) {
                     }
                 });
-                
-                titleView.startAnimation(fadeOut);
-                Log.d(TAG, "✅ Category title updated with separate clear button: " + categoryTitle);
+
+                titleView.startAnimation(fadeOutSet);
             }
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating category title", e);
         }
     }
     
@@ -3820,7 +3658,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             nextCategoryLabel.setVisibility(View.GONE);
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error updating next category label", e);
         }
     }
     
@@ -3828,11 +3665,9 @@ public class HomeFragment extends RowsSupportFragment {
      * 📺 Load Watch History content for Hero Banner
      */
     private void loadWatchHistoryForHeroBanner(HomeContent category) {
-        Log.d(TAG, "📺 Loading Watch History for Hero Banner");
         
         // Check login status
         if (!PreferenceUtils.isLoggedIn(getContext())) {
-            Log.w(TAG, "⚠️ User not logged in");
             updateCategoryTitle(category.getTitle());
             updateHeroThumbnailList(new ArrayList<>());
             return;
@@ -3840,7 +3675,6 @@ public class HomeFragment extends RowsSupportFragment {
         
         // Check if sync manager is available
         if (syncManager == null) {
-            Log.e(TAG, "❌ WatchHistorySyncManager not initialized");
             updateCategoryTitle(category.getTitle());
             updateHeroThumbnailList(new ArrayList<>());
             return;
@@ -3848,7 +3682,6 @@ public class HomeFragment extends RowsSupportFragment {
         
         // Check if sync manager can auto sync
         if (!syncManager.canAutoSync()) {
-            Log.w(TAG, "⚠️ Email không hợp lệ để sync lịch sử");
             updateCategoryTitle(category.getTitle());
             updateHeroThumbnailList(new ArrayList<>());
             return;
@@ -3861,13 +3694,11 @@ public class HomeFragment extends RowsSupportFragment {
             syncManager.createSyncLink(userEmail, new WatchHistorySyncManager.SyncCallback() {
                 @Override
                 public void onSuccess(String message) {
-                    Log.d(TAG, "✅ Sync link created, now syncing from server");
                     syncWatchHistoryAndLoad(category);
                 }
                 
                 @Override
                 public void onError(String error) {
-                    Log.e(TAG, "❌ Error creating sync link: " + error);
                     loadLocalWatchHistory(category);
                 }
             });
@@ -3884,13 +3715,11 @@ public class HomeFragment extends RowsSupportFragment {
         syncManager.syncWatchHistoryFromServer(new WatchHistorySyncManager.SyncCallback() {
             @Override
             public void onSuccess(String message) {
-                Log.d(TAG, "✅ Watch history synced from server");
                 loadLocalWatchHistory(category);
             }
             
             @Override
             public void onError(String error) {
-                Log.e(TAG, "❌ Error syncing watch history: " + error);
                 loadLocalWatchHistory(category);
             }
         });
@@ -3906,7 +3735,6 @@ public class HomeFragment extends RowsSupportFragment {
                 try {
                     // Get watch history data
                     List<WatchHistorySyncItem.WatchHistoryItem> historyItems = syncManager.getWatchHistoryForDisplay();
-                    Log.d(TAG, "📂 Retrieved " + (historyItems != null ? historyItems.size() : "null") + " history items");
                     
                     if (historyItems != null && !historyItems.isEmpty()) {
                         // Convert to VideoContent
@@ -3917,17 +3745,21 @@ public class HomeFragment extends RowsSupportFragment {
                             videoContent.setId(historyItem.getVideoId());
                             videoContent.setTitle(historyItem.getTitle());
                             
-                            // Prioritize thumbnailUrl over posterUrl
+                            // posterUrl → poster_image (ảnh nền to), thumbnailUrl → video_thumb (ảnh nhỏ card)
                             String thumbnailUrl = historyItem.getThumbnailUrl();
                             String posterUrl = historyItem.getPosterUrl();
+                            String vid = historyItem.getVideoId();
                             
-                            if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
-                                videoContent.setPosterUrl(thumbnailUrl);
-                                videoContent.setThumbnailUrl(thumbnailUrl);
-                            } else if (posterUrl != null && !posterUrl.isEmpty()) {
-                                videoContent.setPosterUrl(posterUrl);
-                                videoContent.setThumbnailUrl(posterUrl);
-                            }
+                            videoContent.setPosterUrl(posterUrl != null && !posterUrl.isEmpty()
+                                ? posterUrl
+                                : (vid != null && !vid.isEmpty()
+                                    ? "https://api.phim4k.lol/uploads/poster_image/" + vid + ".jpg"
+                                    : ""));
+                            videoContent.setThumbnailUrl(thumbnailUrl != null && !thumbnailUrl.isEmpty()
+                                ? thumbnailUrl
+                                : (vid != null && !vid.isEmpty()
+                                    ? "https://api.phim4k.lol/uploads/video_thumb/" + vid + ".jpg"
+                                    : ""));
                             
                             // Set correct type and isTvseries
                             String isTvSeries = historyItem.getIsTvSeries();
@@ -3955,7 +3787,6 @@ public class HomeFragment extends RowsSupportFragment {
                             // ✅ CRITICAL: Store watch position in description with WATCH_HISTORY prefix
                             long currentPos = historyItem.getCurrentPosition();
                             videoContent.setDescription("WATCH_HISTORY:" + currentPos);
-                            Log.d(TAG, "📍 Set watch position for " + videoContent.getTitle() + ": " + currentPos + "ms");
                             
                             historyVideoContent.add(videoContent);
                         }
@@ -3983,13 +3814,11 @@ public class HomeFragment extends RowsSupportFragment {
                                     
                                     updateHeroThumbnailList(heroHistoryList);
                                     updateCategoryTitle(category.getTitle());
-                                    Log.d(TAG, "✅ Watch history loaded: " + historyVideoContent.size() + " items + clear button");
                                 }
                             });
                         }
                     } else {
                         // No history - skip this category entirely
-                        Log.w(TAG, "⚠️ No watch history items - skipping watch history category");
                         if (getActivity() != null) {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
@@ -4001,7 +3830,6 @@ public class HomeFragment extends RowsSupportFragment {
                         }
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "❌ Error loading watch history", e);
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -4025,10 +3853,8 @@ public class HomeFragment extends RowsSupportFragment {
     
     private void loadCountryContentForHeroBanner(HomeContent category, int page, boolean appendMode) {
         String countryId = category.getId();
-        Log.d(TAG, "🌍 Loading Country content: " + category.getTitle() + " (ID: " + countryId + ", Page: " + page + ", Append: " + appendMode + ")");
         
         if (appendMode && isLoadingMoreForCategory) {
-            Log.d(TAG, "⚠️ Already loading more, skipping...");
             return;
         }
         
@@ -4057,7 +3883,6 @@ public class HomeFragment extends RowsSupportFragment {
                                 if (appendMode && currentFeaturedContent != null) {
                                     // Append to existing list
                                     currentFeaturedContent.addAll(countryVideos);
-                                    Log.d(TAG, "📦 Appended " + countryVideos.size() + " items, total now: " + currentFeaturedContent.size());
                                     
                                     // Add to adapter
                                     if (currentThumbnailAdapter != null) {
@@ -4079,7 +3904,6 @@ public class HomeFragment extends RowsSupportFragment {
                         });
                     }
                 } else {
-                    Log.w(TAG, "⚠️ No data for country: " + countryId + " page " + page);
                     isLoadingMoreForCategory = false;
                     if (!appendMode && getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
@@ -4095,7 +3919,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             @Override
             public void onFailure(Call<List<Movie>> call, Throwable t) {
-                Log.e(TAG, "❌ Error loading country content: " + t.getMessage());
                 isLoadingMoreForCategory = false;
             }
         });
@@ -4110,10 +3933,8 @@ public class HomeFragment extends RowsSupportFragment {
     
     private void loadGenreContentForHeroBanner(HomeContent category, int page, boolean appendMode) {
         String genreId = category.getId();
-        Log.d(TAG, "🎭 Loading Genre content: " + category.getTitle() + " (ID: " + genreId + ", Page: " + page + ", Append: " + appendMode + ")");
         
         if (appendMode && isLoadingMoreForCategory) {
-            Log.d(TAG, "⚠️ Already loading more, skipping...");
             return;
         }
         
@@ -4142,7 +3963,6 @@ public class HomeFragment extends RowsSupportFragment {
                                 if (appendMode && currentFeaturedContent != null) {
                                     // Append to existing list
                                     currentFeaturedContent.addAll(genreVideos);
-                                    Log.d(TAG, "📦 Appended " + genreVideos.size() + " items, total now: " + currentFeaturedContent.size());
                                     
                                     // Add to adapter
                                     if (currentThumbnailAdapter != null) {
@@ -4164,7 +3984,6 @@ public class HomeFragment extends RowsSupportFragment {
                         });
                     }
                 } else {
-                    Log.w(TAG, "⚠️ No data for genre: " + genreId + " page " + page);
                     isLoadingMoreForCategory = false;
                     if (!appendMode && getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
@@ -4180,7 +3999,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             @Override
             public void onFailure(Call<List<Movie>> call, Throwable t) {
-                Log.e(TAG, "❌ Error loading genre content: " + t.getMessage());
                 isLoadingMoreForCategory = false;
             }
         });
@@ -4190,7 +4008,6 @@ public class HomeFragment extends RowsSupportFragment {
      * 🎬 Load Phim4k content for Hero Banner
      */
     private void loadPhim4kContentForHeroBanner(HomeContent category) {
-        Log.d(TAG, "🎬 Loading Phim4k content: " + category.getTitle());
         
         // Use Phim4kClient with callback
         Phim4kClient.getInstance().getLatestMovies(1, new Phim4kClient.Phim4kCallback() {
@@ -4214,12 +4031,10 @@ public class HomeFragment extends RowsSupportFragment {
                                 
                                 updateHeroThumbnailList(videoContents);
                                 updateCategoryTitle(category.getTitle());
-                                Log.d(TAG, "✅ Phim4k content loaded: " + videoContents.size() + " videos");
                             }
                         });
                     }
                 } else {
-                    Log.w(TAG, "⚠️ No Phim4k content available");
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -4234,7 +4049,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             @Override
             public void onError(String error) {
-                Log.e(TAG, "❌ Error loading Phim4k content: " + error);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -4249,7 +4063,6 @@ public class HomeFragment extends RowsSupportFragment {
     }
 
     private void loadKKPhim4kContentForHeroBanner(HomeContent category) {
-        Log.d(TAG, "🎬 Loading KKPhim4k content: " + category.getTitle());
         
         // Use KKPhim4kClient with callback
         KKPhim4kClient.getInstance().getLatestMovies(1, new KKPhim4kClient.KKPhim4kCallback() {
@@ -4273,12 +4086,10 @@ public class HomeFragment extends RowsSupportFragment {
                                 
                                 updateHeroThumbnailList(videoContents);
                                 updateCategoryTitle(category.getTitle());
-                                Log.d(TAG, "✅ KKPhim4k content loaded: " + videoContents.size() + " videos");
                             }
                         });
                     }
                 } else {
-                    Log.w(TAG, "⚠️ No KKPhim4k content available");
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -4293,7 +4104,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             @Override
             public void onError(String error) {
-                Log.e(TAG, "❌ Error loading KKPhim4k content: " + error);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -4311,7 +4121,6 @@ public class HomeFragment extends RowsSupportFragment {
      * 🎬 Load Movie content for Hero Banner (Phim Lẻ Mới Nhất)
      */
     private void loadMovieContentForHeroBanner(HomeContent category) {
-        Log.d(TAG, "🎬 Loading Movie content: " + category.getTitle());
         
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
@@ -4334,12 +4143,10 @@ public class HomeFragment extends RowsSupportFragment {
                                 }
                                 updateHeroThumbnailList(movieVideos);
                                 updateCategoryTitle(category.getTitle());
-                                Log.d(TAG, "✅ Movie content loaded: " + movieVideos.size() + " movies");
                             }
                         });
                     }
                 } else {
-                    Log.w(TAG, "⚠️ No Movie content available");
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -4354,7 +4161,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             @Override
             public void onFailure(Call<List<Movie>> call, Throwable t) {
-                Log.e(TAG, "❌ Error loading Movie content: " + t.getMessage());
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -4372,7 +4178,6 @@ public class HomeFragment extends RowsSupportFragment {
      * 📺 Load TvSeries content for Hero Banner (Phim Bộ Mới Nhất)
      */
     private void loadTvSeriesContentForHeroBanner(HomeContent category) {
-        Log.d(TAG, "📺 Loading TvSeries content: " + category.getTitle());
         
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
@@ -4395,12 +4200,10 @@ public class HomeFragment extends RowsSupportFragment {
                                 }
                                 updateHeroThumbnailList(tvSeriesVideos);
                                 updateCategoryTitle(category.getTitle());
-                                Log.d(TAG, "✅ TvSeries content loaded: " + tvSeriesVideos.size() + " series");
                             }
                         });
                     }
                 } else {
-                    Log.w(TAG, "⚠️ No TvSeries content available");
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -4415,7 +4218,6 @@ public class HomeFragment extends RowsSupportFragment {
             
             @Override
             public void onFailure(Call<List<Movie>> call, Throwable t) {
-                Log.e(TAG, "❌ Error loading TvSeries content: " + t.getMessage());
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -4430,5 +4232,187 @@ public class HomeFragment extends RowsSupportFragment {
     }
 
     // REMOVED loadMovieLogo as requested
-}
 
+
+    // --- Bổ sung phương thức hiển thị dialog cho Lịch sử xem ---
+    private int dp(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    private void showWatchHistoryOptionsDialog(VideoContent videoContent) {
+        String[] options = {"Tiếp tục xem", "Xóa khỏi lịch sử"};
+        Runnable[] actions = new Runnable[] {
+            () -> playWatchHistoryVideo(videoContent),
+            () -> deleteWatchHistoryItemLocally(videoContent)
+        };
+
+        android.app.Dialog dialog = buildCustomListDialog(
+            videoContent.getTitle() != null ? videoContent.getTitle() : "Tùy chọn", options, -1, actions, null
+        );
+        dialog.show();
+    }
+
+    private void playWatchHistoryVideo(VideoContent videoContent) {
+        String description = videoContent.getDescription();
+        long currentPosition = 0;
+        if (description != null && description.startsWith("WATCH_HISTORY:")) {
+            try {
+                currentPosition = Long.parseLong(description.substring("WATCH_HISTORY:".length()));
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        String contentType = "movie";
+        if (videoContent.getIsTvseries() != null && videoContent.getIsTvseries().equals("1")) {
+            contentType = "tvseries";
+        } else if (videoContent.getType() != null) {
+            contentType = videoContent.getType();
+        }
+
+        String videoUrl = videoContent.getVideoUrl();
+        if (videoUrl == null || videoUrl.trim().isEmpty()) {
+            android.widget.Toast.makeText(getActivity(), "Video chưa có link phát, đang chuyển đến trang chi tiết...", android.widget.Toast.LENGTH_SHORT).show();
+            android.content.Intent intent = new android.content.Intent(getActivity(), HeroStyleVideoDetailsActivity.class);
+            intent.putExtra("id", videoContent.getId());
+            intent.putExtra("type", contentType);
+            intent.putExtra("thumbImage", videoContent.getThumbnailUrl() != null ? videoContent.getThumbnailUrl() : "");
+            startActivity(intent);
+            return;
+        }
+
+        android.content.Intent intent = new android.content.Intent(getActivity(), com.files.codes.view.PlayerActivity.class);
+        intent.putExtra("id", videoContent.getId());
+        intent.putExtra("type", contentType);
+        intent.putExtra("title", videoContent.getTitle());
+        intent.putExtra("poster", videoContent.getPosterUrl());
+        intent.putExtra("thumbnail", videoContent.getThumbnailUrl());
+        intent.putExtra("video_url", videoUrl);
+        intent.putExtra("position", currentPosition);
+        intent.putExtra("from_watch_history", true);
+        startActivity(intent);
+    }
+
+    private void deleteWatchHistoryItemLocally(VideoContent videoContent) {
+        if (syncManager != null) {
+            syncManager.deleteWatchHistoryItem(videoContent.getId(), new com.files.codes.utils.sync.WatchHistorySyncManager.SyncCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            android.widget.Toast.makeText(getContext(), "Đã xóa khỏi lịch sử", android.widget.Toast.LENGTH_SHORT).show();
+                            refreshWatchHistorySection();
+                        });
+                    }
+                }
+                @Override
+                public void onError(String error) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            android.widget.Toast.makeText(getContext(), "Lỗi xóa: " + error, android.widget.Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        } else {
+            android.widget.Toast.makeText(getContext(), "Không thể kết nối đồng bộ", android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private android.app.Dialog buildCustomListDialog(
+            String title, String[] items, int checkedIndex,
+            Runnable[] actions, Runnable onCancel) {
+
+        android.app.Dialog dialog = new android.app.Dialog(getActivity());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        if (onCancel != null) {
+            dialog.setOnCancelListener(d -> onCancel.run());
+        }
+
+        android.widget.LinearLayout root = new android.widget.LinearLayout(getActivity());
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFF1E1E2E);
+        root.setPadding(dp(20), dp(20), dp(20), dp(12));
+
+        if (title != null && !title.isEmpty()) {
+            android.widget.TextView titleView = new android.widget.TextView(getActivity());
+            titleView.setText(title);
+            titleView.setTextColor(0xFFFFFFFF);
+            titleView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
+            titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            titleView.setPadding(dp(4), 0, dp(4), dp(10));
+            root.addView(titleView);
+
+            android.view.View divider = new android.view.View(getActivity());
+            divider.setBackgroundColor(0x55FFFFFF);
+            android.widget.LinearLayout.LayoutParams divLp =
+                    new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+            divLp.bottomMargin = dp(6);
+            root.addView(divider, divLp);
+        }
+
+        android.widget.ScrollView sv = new android.widget.ScrollView(getActivity());
+        sv.setVerticalScrollBarEnabled(false);
+        android.widget.LinearLayout ll = new android.widget.LinearLayout(getActivity());
+        ll.setOrientation(android.widget.LinearLayout.VERTICAL);
+
+        for (int i = 0; i < items.length; i++) {
+            final int idx = i;
+            boolean isSelected = (checkedIndex >= 0 && i == checkedIndex);
+
+            android.widget.TextView tv = new android.widget.TextView(getActivity());
+            tv.setText(isSelected ? "í  " + items[i] : items[i]);
+            tv.setTextColor(isSelected ? 0xFF64B5F6 : 0xFFDDDDDD);
+            tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            tv.setPadding(dp(10), dp(13), dp(10), dp(13));
+            tv.setFocusable(true);
+            tv.setFocusableInTouchMode(false);
+            tv.setClickable(true);
+            tv.setBackground(null);
+
+            tv.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    v.setBackgroundColor(0x664FC3F7);
+                    ((android.widget.TextView) v).setTextColor(0xFFFFFFFF);
+                } else {
+                    v.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    boolean sel = (checkedIndex >= 0 && idx == checkedIndex);
+                    ((android.widget.TextView) v).setTextColor(sel ? 0xFF64B5F6 : 0xFFDDDDDD);
+                }
+            });
+
+            tv.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (actions != null && idx < actions.length && actions[idx] != null) {
+                    actions[idx].run();
+                }
+            });
+
+            ll.addView(tv);
+
+            if (i < items.length - 1) {
+                android.view.View sep = new android.view.View(getActivity());
+                sep.setBackgroundColor(0x22FFFFFF);
+                ll.addView(sep, new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1));
+            }
+        }
+        sv.addView(ll);
+
+        android.widget.LinearLayout.LayoutParams svLp =
+                new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                        android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        root.addView(sv, svLp);
+
+        dialog.setContentView(root);
+        android.view.Window w = dialog.getWindow();
+        if (w != null) {
+            w.setLayout(dp(480), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            w.setGravity(android.view.Gravity.CENTER);
+            w.setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        return dialog;
+    }
+}

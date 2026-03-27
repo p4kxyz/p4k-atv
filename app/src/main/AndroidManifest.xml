@@ -126,6 +126,11 @@
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
+            android:name="com.files.codes.view.LoginTvCodeActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity
             android:name="com.files.codes.view.HomeActivity"
             android:configChanges="keyboard|keyboardHidden|navigation"
             android:exported="false"

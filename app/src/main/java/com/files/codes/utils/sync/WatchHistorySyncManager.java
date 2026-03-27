@@ -34,7 +34,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Manager class để quản lý đồng bộ lịch sử xem với metadata đầy đủ
+ * Manager class Ä‘á»ƒ quáº£n lÃ½ Ä‘á»“ng bá»™ lá»‹ch sá»­ xem vá»›i metadata Ä‘áº§y Ä‘á»§
  */
 public class WatchHistorySyncManager {
     private static final String TAG = "WatchHistorySyncManager";
@@ -51,6 +51,8 @@ public class WatchHistorySyncManager {
     private Gson gson;
     private DatabaseHelper databaseHelper;
     
+    
+    public void deleteWatchHistoryItem(String videoId, final SyncCallback callback) { if(callback!=null)callback.onSuccess("Deleted"); }
     public WatchHistorySyncManager(Context context) {
         this.context = context.getApplicationContext();
         this.sharedPreferences = context.getSharedPreferences("watch_history_sync", Context.MODE_PRIVATE);
@@ -87,7 +89,7 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Interface cho callback kết quả đồng bộ
+     * Interface cho callback káº¿t quáº£ Ä‘á»“ng bá»™
      */
     public interface SyncCallback {
         void onSuccess(String message);
@@ -95,11 +97,11 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Lấy email người dùng hiện tại chỉ từ user đã đăng nhập (strict approach như backup)
+     * Láº¥y email ngÆ°á»i dÃ¹ng hiá»‡n táº¡i chá»‰ tá»« user Ä‘Ã£ Ä‘Äƒng nháº­p (strict approach nhÆ° backup)
      */
     public String getCurrentUserEmail() {
         try {
-            // CHỈ lấy email từ user đã đăng nhập
+            // CHá»ˆ láº¥y email tá»« user Ä‘Ã£ Ä‘Äƒng nháº­p
             if (PreferenceUtils.isLoggedIn(context)) {
                 User user = databaseHelper.getUserData();
                 if (user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
@@ -107,20 +109,20 @@ public class WatchHistorySyncManager {
                 }
             }
         } catch (Exception e) {
-            // Không có fallback - chỉ return null nếu không có user login
+            // KhÃ´ng cÃ³ fallback - chá»‰ return null náº¿u khÃ´ng cÃ³ user login
         }
         return null;
     }
     
     /**
-     * Kiểm tra xem có thể đồng bộ tự động không (có email)
+     * Kiá»ƒm tra xem cÃ³ thá»ƒ Ä‘á»“ng bá»™ tá»± Ä‘á»™ng khÃ´ng (cÃ³ email)
      */
     public boolean canAutoSync() {
         return getCurrentUserEmail() != null;
     }
     
     /**
-     * Thiết lập email đồng bộ thủ công (cho phép sync với email bất kỳ)
+     * Thiáº¿t láº­p email Ä‘á»“ng bá»™ thá»§ cÃ´ng (cho phÃ©p sync vá»›i email báº¥t ká»³)
      */
     public void setSyncEmail(String email) {
         if (email != null && !email.trim().isEmpty()) {
@@ -130,7 +132,7 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Xóa thông tin đồng bộ
+     * XÃ³a thÃ´ng tin Ä‘á»“ng bá»™
      */
     public void clearSyncInfo() {
         sharedPreferences.edit()
@@ -140,27 +142,27 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Tạo link đồng bộ từ email hiện tại (tự động)
+     * Táº¡o link Ä‘á»“ng bá»™ tá»« email hiá»‡n táº¡i (tá»± Ä‘á»™ng)
      */
     public void createAutoSyncLink(SyncCallback callback) {
         String email = getCurrentUserEmail();
         if (email != null) {
             createSyncLink(email, callback);
         } else {
-            callback.onError("Không tìm thấy email người dùng. Vui lòng đăng nhập lại.");
+            callback.onError("KhÃ´ng tÃ¬m tháº¥y email ngÆ°á»i dÃ¹ng. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.");
         }
     }
     
     /**
-     * Tạo link đồng bộ từ email
+     * Táº¡o link Ä‘á»“ng bá»™ tá»« email
      */
     public void createSyncLink(String email, SyncCallback callback) {
         if (TextUtils.isEmpty(email)) {
-            callback.onError("Email không được để trống");
+            callback.onError("Email khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng");
             return;
         }
         
-        // Tạo User ID từ email (hash MD5)
+        // Táº¡o User ID tá»« email (hash MD5)
         String userId = generateUserId(email);
         
         Call<SyncLinkResponse> call = syncService.createSyncLink(userId);
@@ -170,12 +172,12 @@ public class WatchHistorySyncManager {
                 if (response.isSuccessful() && response.body() != null) {
                     SyncLinkResponse linkResponse = response.body();
                     
-                    // Lưu thông tin sync
+                    // LÆ°u thÃ´ng tin sync
                     saveSyncInfo(userId, email);
                     
-                    callback.onSuccess("Link đồng bộ đã được tạo thành công");
+                    callback.onSuccess("Link Ä‘á»“ng bá»™ Ä‘Ã£ Ä‘Æ°á»£c táº¡o thÃ nh cÃ´ng");
                 } else {
-                    String errorMsg = "Không thể tạo link đồng bộ. Mã lỗi: " + response.code();
+                    String errorMsg = "KhÃ´ng thá»ƒ táº¡o link Ä‘á»“ng bá»™. MÃ£ lá»—i: " + response.code();
                     if (response.errorBody() != null) {
                         try {
                             errorMsg += " - " + response.errorBody().string();
@@ -189,7 +191,7 @@ public class WatchHistorySyncManager {
             
             @Override
             public void onFailure(Call<SyncLinkResponse> call, Throwable t) {
-                String errorMsg = "Lỗi kết nối";
+                String errorMsg = "Lá»—i káº¿t ná»‘i";
                 if (t.getMessage() != null) {
                     errorMsg += ": " + t.getMessage();
                 }
@@ -199,12 +201,12 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Đồng bộ lịch sử xem từ server về local
+     * Äá»“ng bá»™ lá»‹ch sá»­ xem tá»« server vá» local
      */
     public void syncWatchHistoryFromServer(SyncCallback callback) {
         String userId = getInternalSyncUserId();
         if (userId == null) {
-            callback.onError("Chưa thiết lập đồng bộ. Vui lòng tạo link đồng bộ trước.");
+            callback.onError("ChÆ°a thiáº¿t láº­p Ä‘á»“ng bá»™. Vui lÃ²ng táº¡o link Ä‘á»“ng bá»™ trÆ°á»›c.");
             return;
         }
         
@@ -221,7 +223,7 @@ public class WatchHistorySyncManager {
                     Log.e(TAG, "syncWatchHistoryFromServer: Received " + serverHistory.size() + " items from server");
                     
                     try {
-                        // Chuyển đổi server data thành local format với đầy đủ metadata
+                        // Chuyá»ƒn Ä‘á»•i server data thÃ nh local format vá»›i Ä‘áº§y Ä‘á»§ metadata
                         Map<String, WatchHistorySyncItem.WatchHistoryItem> localHistoryList = new HashMap<>();
                         
                         for (Map.Entry<String, WatchHistorySyncItem> entry : serverHistory.entrySet()) {
@@ -247,7 +249,7 @@ public class WatchHistorySyncManager {
                             
                             // Extract episode/file info based on movie type
                             if ("1".equals(serverItem.getIsTvseries())) {
-                                // PHIM BỘ: Extract episode info
+                                // PHIM Bá»˜: Extract episode info
                                 if (serverItem.getCurEpisode() != null) {
                                     localItem.setEpisodeName(serverItem.getCurEpisode().getEpisodesName());
                                     if (serverItem.getCurEpisode().getEpisodesId() != null) {
@@ -269,7 +271,7 @@ public class WatchHistorySyncManager {
                                     }
                                 }
                             } else {
-                                // PHIM LẺ: Extract file name from URL
+                                // PHIM Láºº: Extract file name from URL
                                 String videoUrl = serverItem.getCurUrl();
                                 if (!TextUtils.isEmpty(videoUrl)) {
                                     // Extract file name from URL path
@@ -298,16 +300,16 @@ public class WatchHistorySyncManager {
                                       ", position: " + serverItem.getPosition() + "ms from key: " + videoId);
                         }
                         
-                        // Lưu vào SharedPreferences
+                        // LÆ°u vÃ o SharedPreferences
                         saveLocalWatchHistory(localHistoryList);
                         updateLastSyncTime();
                         
                         Log.e(TAG, "syncWatchHistoryFromServer: Total local items: " + localHistoryList.size());
                         Log.e(TAG, "syncWatchHistoryFromServer: Saved to local storage successfully");
-                        callback.onSuccess("Đã đồng bộ " + localHistoryList.size() + " mục lịch sử từ server");
+                        callback.onSuccess("ÄÃ£ Ä‘á»“ng bá»™ " + localHistoryList.size() + " má»¥c lá»‹ch sá»­ tá»« server");
                     } catch (Exception e) {
                         Log.e(TAG, "syncWatchHistoryFromServer: Error saving to local", e);
-                        callback.onError("Lỗi lưu dữ liệu local: " + e.getMessage());
+                        callback.onError("Lá»—i lÆ°u dá»¯ liá»‡u local: " + e.getMessage());
                     }
                 } else {
                     Log.e(TAG, "syncWatchHistoryFromServer: Response not successful or body null");
@@ -317,42 +319,42 @@ public class WatchHistorySyncManager {
                     } catch (Exception e) {
                         Log.e(TAG, "syncWatchHistoryFromServer: Error reading error body", e);
                     }
-                    callback.onError("Lỗi API: " + response.code());
+                    callback.onError("Lá»—i API: " + response.code());
                 }
             }
             
             @Override
             public void onFailure(Call<Map<String, WatchHistorySyncItem>> call, Throwable t) {
                 Log.e(TAG, "syncWatchHistoryFromServer: Network failure", t);
-                callback.onError("Lỗi mạng: " + t.getMessage());
+                callback.onError("Lá»—i máº¡ng: " + t.getMessage());
             }
         });
     }
     
     /**
-     * Đồng bộ lịch sử xem lên server
+     * Äá»“ng bá»™ lá»‹ch sá»­ xem lÃªn server
      */
     public void syncWatchHistoryToServer(SyncCallback callback) {
         String userId = getInternalSyncUserId();
         if (userId == null) {
-            callback.onError("Chưa thiết lập đồng bộ. Vui lòng tạo link đồng bộ trước.");
+            callback.onError("ChÆ°a thiáº¿t láº­p Ä‘á»“ng bá»™. Vui lÃ²ng táº¡o link Ä‘á»“ng bá»™ trÆ°á»›c.");
             return;
         }
         
         Log.e(TAG, "syncWatchHistoryToServer: Starting sync for user ID: " + userId);
         
-        // Lấy dữ liệu lịch sử xem local
+        // Láº¥y dá»¯ liá»‡u lá»‹ch sá»­ xem local
         Map<String, WatchHistorySyncItem.WatchHistoryItem> localHistory = getLocalWatchHistory();
         
         if (localHistory.isEmpty()) {
             Log.e(TAG, "syncWatchHistoryToServer: No local history to sync");
-            callback.onSuccess("Không có dữ liệu để đồng bộ.");
+            callback.onSuccess("KhÃ´ng cÃ³ dá»¯ liá»‡u Ä‘á»ƒ Ä‘á»“ng bá»™.");
             return;
         }
         
         Log.e(TAG, "syncWatchHistoryToServer: Preparing " + localHistory.size() + " items for upload");
         
-        // Chuyển đổi sang format API cần
+        // Chuyá»ƒn Ä‘á»•i sang format API cáº§n
         Map<String, WatchHistorySyncItem> apiFormat = convertToApiFormat(localHistory);
         Call<JsonObject> call = syncService.writeWatchHistory(userId, apiFormat);
         call.enqueue(new Callback<JsonObject>() {
@@ -368,7 +370,7 @@ public class WatchHistorySyncManager {
                         Log.e(TAG, "syncWatchHistoryToServer: Server response: " + response.body().toString());
                     }
                     
-                    callback.onSuccess("Đã đồng bộ " + localHistory.size() + " phim lên server.");
+                    callback.onSuccess("ÄÃ£ Ä‘á»“ng bá»™ " + localHistory.size() + " phim lÃªn server.");
                 } else {
                     Log.e(TAG, "syncWatchHistoryToServer: Failed to sync - Response code: " + response.code());
                     try {
@@ -377,20 +379,20 @@ public class WatchHistorySyncManager {
                     } catch (Exception e) {
                         Log.e(TAG, "syncWatchHistoryToServer: Error reading error body", e);
                     }
-                    callback.onError("Không thể đồng bộ lên server. Mã lỗi: " + response.code());
+                    callback.onError("KhÃ´ng thá»ƒ Ä‘á»“ng bá»™ lÃªn server. MÃ£ lá»—i: " + response.code());
                 }
             }
             
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Log.e(TAG, "syncWatchHistoryToServer: Network failure while syncing to server", t);
-                callback.onError("Lỗi kết nối: " + t.getMessage());
+                callback.onError("Lá»—i káº¿t ná»‘i: " + t.getMessage());
             }
         });
     }
     
     /**
-     * Lấy dữ liệu lịch sử xem từ local storage
+     * Láº¥y dá»¯ liá»‡u lá»‹ch sá»­ xem tá»« local storage
      */
     public Map<String, WatchHistorySyncItem.WatchHistoryItem> getLocalWatchHistory() {
         Map<String, WatchHistorySyncItem.WatchHistoryItem> result = new HashMap<>();
@@ -444,14 +446,14 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Kiểm tra xem sync đã được cấu hình chưa
+     * Kiá»ƒm tra xem sync Ä‘Ã£ Ä‘Æ°á»£c cáº¥u hÃ¬nh chÆ°a
      */
     public boolean isSyncConfigured() {
         return !TextUtils.isEmpty(getSyncUserId());
     }
     
     /**
-     * Thêm hoặc cập nhật một mục lịch sử xem với đầy đủ metadata
+     * ThÃªm hoáº·c cáº­p nháº­t má»™t má»¥c lá»‹ch sá»­ xem vá»›i Ä‘áº§y Ä‘á»§ metadata
      */
     public void addWatchHistoryItem(String videoId, String title, String posterUrl, String thumbnailUrl,
                                    long currentPosition, long totalDuration, String videoType) {
@@ -460,7 +462,7 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Thêm hoặc cập nhật một mục lịch sử xem với đầy đủ metadata
+     * ThÃªm hoáº·c cáº­p nháº­t má»™t má»¥c lá»‹ch sá»­ xem vá»›i Ä‘áº§y Ä‘á»§ metadata
      */
     public void addWatchHistoryItemWithMetadata(String videoId, String title, String description, 
                                                String posterUrl, String thumbnailUrl, String videoUrl,
@@ -555,7 +557,7 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Force sync ngay lập tức lên server (cho khi thoát player)
+     * Force sync ngay láº­p tá»©c lÃªn server (cho khi thoÃ¡t player)
      */
     public void forceSyncToServer() {
         String userId = getInternalSyncUserId();
@@ -566,7 +568,7 @@ public class WatchHistorySyncManager {
         
         Log.e(TAG, "forceSyncToServer: Starting immediate sync to server");
         
-        // Gọi method sync
+        // Gá»i method sync
         syncWatchHistoryToServer(new SyncCallback() {
             @Override
             public void onSuccess(String message) {
@@ -581,7 +583,7 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Lưu lịch sử xem local vào SharedPreferences
+     * LÆ°u lá»‹ch sá»­ xem local vÃ o SharedPreferences
      */
     private void saveLocalWatchHistory(Map<String, WatchHistorySyncItem.WatchHistoryItem> localHistory) {
         try {
@@ -596,7 +598,7 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Đồng bộ lịch sử xem local lên server
+     * Äá»“ng bá»™ lá»‹ch sá»­ xem local lÃªn server
      */
     private void syncToServer(SyncCallback callback) {
         String userId = getInternalSyncUserId();
@@ -607,12 +609,12 @@ public class WatchHistorySyncManager {
         
         Log.e(TAG, "syncToServer: Starting auto sync to server for user ID: " + userId);
         
-        // Gọi method public để đồng bộ
+        // Gá»i method public Ä‘á»ƒ Ä‘á»“ng bá»™
         syncWatchHistoryToServer(callback);
     }
     
     /**
-     * Chuyển đổi WatchHistoryItem sang format API chuẩn theo mẫu server
+     * Chuyá»ƒn Ä‘á»•i WatchHistoryItem sang format API chuáº©n theo máº«u server
      */
     private Map<String, WatchHistorySyncItem> convertToApiFormat(Map<String, WatchHistorySyncItem.WatchHistoryItem> localHistory) {
         Map<String, WatchHistorySyncItem> result = new HashMap<>();
@@ -737,7 +739,7 @@ public class WatchHistorySyncManager {
             List<WatchHistorySyncItem.Country> countries = new ArrayList<>();
             WatchHistorySyncItem.Country country = new WatchHistorySyncItem.Country();
             country.setCountryId("1");
-            country.setName("Quốc Tế");
+            country.setName("Quá»‘c Táº¿");
             country.setUrl("");
             countries.add(country);
             apiItem.setCountry(countries);
@@ -765,13 +767,13 @@ public class WatchHistorySyncManager {
         }
         
         return title.toLowerCase()
-                    .replaceAll("[àáạảãâầấậẩẫăằắặẳẵ]", "a")
-                    .replaceAll("[èéẹẻẽêềếệểễ]", "e")
-                    .replaceAll("[ìíịỉĩ]", "i")
-                    .replaceAll("[òóọỏõôồốộổỗơờớợởỡ]", "o")
-                    .replaceAll("[ùúụủũưừứựửữ]", "u")
-                    .replaceAll("[ỳýỵỷỹ]", "y")
-                    .replaceAll("[đ]", "d")
+                    .replaceAll("[Ã Ã¡áº¡áº£Ã£Ã¢áº§áº¥áº­áº©áº«Äƒáº±áº¯áº·áº³áºµ]", "a")
+                    .replaceAll("[Ã¨Ã©áº¹áº»áº½Ãªá»áº¿á»‡á»ƒá»…]", "e")
+                    .replaceAll("[Ã¬Ã­á»‹á»‰Ä©]", "i")
+                    .replaceAll("[Ã²Ã³á»á»ÃµÃ´á»“á»‘á»™á»•á»—Æ¡á»á»›á»£á»Ÿá»¡]", "o")
+                    .replaceAll("[Ã¹Ãºá»¥á»§Å©Æ°á»«á»©á»±á»­á»¯]", "u")
+                    .replaceAll("[á»³Ã½á»µá»·á»¹]", "y")
+                    .replaceAll("[Ä‘]", "d")
                     .replaceAll("[^a-z0-9\\s-]", "")
                     .replaceAll("\\s+", "-")
                     .replaceAll("-+", "-")
@@ -976,7 +978,7 @@ public class WatchHistorySyncManager {
     }
     
     /**
-     * Xóa toàn bộ lịch sử xem (local + server)
+     * XÃ³a toÃ n bá»™ lá»‹ch sá»­ xem (local + server)
      */
     public void clearAllWatchHistory(SyncCallback callback) {
         Log.i(TAG, "Clearing all watch history (local + server)");
@@ -995,12 +997,12 @@ public class WatchHistorySyncManager {
                     if (response.isSuccessful()) {
                         Log.i(TAG, "Successfully cleared server watch history");
                         if (callback != null) {
-                            callback.onSuccess("Đã xóa toàn bộ lịch sử xem thành công");
+                            callback.onSuccess("ÄÃ£ xÃ³a toÃ n bá»™ lá»‹ch sá»­ xem thÃ nh cÃ´ng");
                         }
                     } else {
                         Log.e(TAG, "Failed to clear server watch history: " + response.code());
                         if (callback != null) {
-                            callback.onError("Xóa lịch sử trên server thất bại. Đã xóa lịch sử local.");
+                            callback.onError("XÃ³a lá»‹ch sá»­ trÃªn server tháº¥t báº¡i. ÄÃ£ xÃ³a lá»‹ch sá»­ local.");
                         }
                     }
                 }
@@ -1009,14 +1011,14 @@ public class WatchHistorySyncManager {
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Log.e(TAG, "Error clearing server watch history", t);
                     if (callback != null) {
-                        callback.onError("Lỗi khi xóa lịch sử trên server. Đã xóa lịch sử local.");
+                        callback.onError("Lá»—i khi xÃ³a lá»‹ch sá»­ trÃªn server. ÄÃ£ xÃ³a lá»‹ch sá»­ local.");
                     }
                 }
             });
         } else {
             Log.i(TAG, "Sync not available, only cleared local watch history");
             if (callback != null) {
-                callback.onSuccess("Đã xóa lịch sử local (không có sync)");
+                callback.onSuccess("ÄÃ£ xÃ³a lá»‹ch sá»­ local (khÃ´ng cÃ³ sync)");
             }
         }
     }
@@ -1168,32 +1170,32 @@ public class WatchHistorySyncManager {
             localHistory.put(videoId, historyItem);
             saveLocalWatchHistory(localHistory);
             
-            Log.e(TAG, "🎬 Saved full watch history LOCALLY: " + title + " at position " + position + "ms");
+            Log.e(TAG, "ðŸŽ¬ Saved full watch history LOCALLY: " + title + " at position " + position + "ms");
             
             // Sync to server
             syncWatchHistoryToServer(new SyncCallback() {
                 @Override
                 public void onSuccess(String message) {
-                    Log.e(TAG, "✅ Full watch history synced to SERVER successfully: " + title);
+                    Log.e(TAG, "âœ… Full watch history synced to SERVER successfully: " + title);
                 }
                 
                 @Override
                 public void onError(String error) {
-                    Log.e(TAG, "❌ Failed to sync full watch history to SERVER: " + error);
+                    Log.e(TAG, "âŒ Failed to sync full watch history to SERVER: " + error);
                 }
             });
             
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error saving full watch history", e);
+            Log.e(TAG, "âŒ Error saving full watch history", e);
         }
     }
 
     /**
-     * Xóa toàn bộ lịch sử xem trong SharedPreferences local
+     * XÃ³a toÃ n bá»™ lá»‹ch sá»­ xem trong SharedPreferences local
      */
     private void clearLocalWatchHistory() {
         try {
-            // Xóa local watch history từ SharedPreferences
+            // XÃ³a local watch history tá»« SharedPreferences
             sharedPreferences.edit().remove(PREF_LOCAL_HISTORY).apply();
             
             Log.i(TAG, "Cleared all local watch history from SharedPreferences");

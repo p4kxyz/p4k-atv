@@ -1,110 +1,140 @@
 package com.files.codes.view.presenter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
+import android.graphics.Color;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import androidx.cardview.widget.CardView;
 
-import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
 
 import com.files.codes.model.SearchContent;
+import com.files.codes.model.TvModel;
 import com.files.codes.R;
+
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 public class TvSearchPresenter extends Presenter {
-    private static int CARD_WIDTH = 460;
-    private static int CARD_HEIGHT = 345;
 
     private static Context mContext;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        Log.d("onCreateViewHolder", "creating viewholder");
         mContext = parent.getContext();
-        ImageCardView cardView = new ImageCardView(mContext);
-        cardView.setFocusable(true);
-        cardView.setFocusableInTouchMode(true);
-        cardView.requestLayout();
-        //((TextView)cardView.findViewById(R.id.content_text)).setTextColor(Color.LTGRAY);
-        return new ViewHolder(cardView);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_vertical_card, parent, false);
+        return new CustomViewHolder(view);
     }
-
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
-        SearchContent content = (SearchContent) item;
+        CustomViewHolder holder = (CustomViewHolder) viewHolder;
 
-        ((TvSearchPresenter.ViewHolder) viewHolder).mCardView.setMainImageDimensions(ViewGroup.MarginLayoutParams.MATCH_PARENT, CARD_HEIGHT);
-
-        ((TvSearchPresenter.ViewHolder) viewHolder).mCardView.setInfoVisibility(View.GONE);
-        ((TvSearchPresenter.ViewHolder) viewHolder).updateCardViewImage(content.getThumbnailUrl());
+        if (item instanceof TvModel) {
+            holder.bindTv((TvModel) item);
+        } else if (item instanceof SearchContent) {
+            holder.bindSearchContent((SearchContent) item);
+        }
     }
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-
+        CustomViewHolder holder = (CustomViewHolder) viewHolder;
+        holder.mainImage.setImageDrawable(null);
     }
 
-    static class ViewHolder extends Presenter.ViewHolder {
+    class CustomViewHolder extends Presenter.ViewHolder {
+        public CardView posterCard;
+        public ImageView mainImage;
+        public TextView tvTitle;
+        public TextView tvSubtitle;
 
-        private ImageCardView mCardView;
-        private Drawable mDefaultCardImage;
-        private PicassoImageCardViewTarget mImageCardViewTarget;
+        public LinearLayout llDuration;
+        public TextView tvDuration;
+        public TextView tvQuality;
+        public TextView tvYear;
+        public TextView tvImdb;
+        public View focusOverlay;
 
-        public ViewHolder(View view) {
+        public CustomViewHolder(View view) {
             super(view);
-            mCardView = (ImageCardView) view;
-            mImageCardViewTarget = new PicassoImageCardViewTarget(mCardView);
-            mDefaultCardImage = mContext
-                    .getResources()
-                    .getDrawable(R.drawable.logo);
+            posterCard = view.findViewById(R.id.poster_card);
+            mainImage = view.findViewById(R.id.main_image);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvSubtitle = view.findViewById(R.id.tv_subtitle);
+
+            llDuration = view.findViewById(R.id.ll_duration);
+            tvDuration = view.findViewById(R.id.tv_duration);
+            tvQuality = view.findViewById(R.id.tv_quality);
+            tvYear = view.findViewById(R.id.tv_year);
+            tvImdb = view.findViewById(R.id.tv_imdb);
+            focusOverlay = view.findViewById(R.id.focus_overlay);
+
+            view.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    if (v.getParent() instanceof View) {
+                        ((View) v.getParent()).setBackgroundResource(0);
+                        if (v.getParent().getClass().getName().contains("ShadowOverlayContainer")) {
+                            v.getParent().requestLayout();
+                        }
+                    }
+                }
+                @Override
+                public void onViewDetachedFromWindow(View v) {}
+            });
+
+            view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (hasFocus) {
+                        focusOverlay.setVisibility(View.VISIBLE);
+                        v.animate().scaleX(1.08f).scaleY(1.08f).setDuration(150).start();
+                    } else {
+                        focusOverlay.setVisibility(View.INVISIBLE);
+                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start();
+                    }
+                }
+            });
         }
 
-        public ImageCardView getCardView() {
-            return mCardView;
+        public void bindSearchContent(SearchContent vc) {
+            setupTitles(vc.getTitle());
+            hideAllTags();
+            loadImage(vc.getThumbnailUrl());
         }
 
-        protected void updateCardViewImage(String url) {
-
-            Picasso.get()
-                    .load(url)
-                    .resize(Double.valueOf(CARD_WIDTH * 2.5).intValue(), CARD_HEIGHT * 2)
-                    .centerCrop()
-                    .error(mDefaultCardImage)
-                    .into(mImageCardViewTarget);
-        }
-    }
-
-
-    static class PicassoImageCardViewTarget implements Target {
-
-
-        private ImageCardView mImageCardView;
-
-        public PicassoImageCardViewTarget(ImageCardView mImageCardView) {
-            this.mImageCardView = mImageCardView;
+        public void bindTv(TvModel tv) {
+            setupTitles(tv.getTvName());
+            hideAllTags();
+            loadImage(tv.getThumbnailUrl());
         }
 
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            Drawable bitmapDrawable = new BitmapDrawable(mContext.getResources(), bitmap);
-            mImageCardView.setMainImage(bitmapDrawable);
+        private void setupTitles(String fullTitle) {
+            if (fullTitle == null) fullTitle = "";
+            fullTitle = fullTitle.trim();
+
+            tvTitle.setText(fullTitle);
+            tvSubtitle.setVisibility(View.GONE);
         }
 
-        @Override
-        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-            mImageCardView.setMainImage(errorDrawable);
+        private void hideAllTags() {
+            llDuration.setVisibility(View.GONE);
         }
 
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+        private void loadImage(String imageUrl) {
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Picasso.get()
+                        .load(imageUrl)
+                        .placeholder(R.drawable.poster_placeholder)
+                        .error(R.drawable.logo)
+                        .into(mainImage);
+            } else {
+                mainImage.setImageResource(R.drawable.logo);
+            }
         }
     }
 }

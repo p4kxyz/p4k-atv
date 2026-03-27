@@ -40,16 +40,15 @@ public class SeasonSelectorPresenter extends Presenter {
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
         mContext = parent.getContext();
         
-        // Create a simple TextView as button
         TextView textView = new TextView(mContext);
         textView.setLayoutParams(new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ));
-        textView.setPadding(40, 30, 40, 30);
-        textView.setTextSize(20);
-        textView.setTextColor(Color.WHITE);
-        textView.setBackgroundColor(Color.parseColor("#1A1A1A"));
+        textView.setPadding(40, 20, 40, 20);
+        textView.setTextSize(17);
+        textView.setTextColor(0xFFFFFFFF);
+        textView.setBackgroundColor(0xFF2A2A3E);
         textView.setFocusable(true);
         textView.setFocusableInTouchMode(true);
         
@@ -83,9 +82,11 @@ public class SeasonSelectorPresenter extends Presenter {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    textView.setBackgroundColor(Color.parseColor("#FF6B35"));
+                    textView.setBackgroundColor(0xFF1565C0);
+                    textView.setTextColor(0xFFFFFFFF);
                 } else {
-                    textView.setBackgroundColor(Color.parseColor("#1A1A1A"));
+                    textView.setBackgroundColor(0xFF2A2A3E);
+                    textView.setTextColor(0xFFFFFFFF);
                 }
             }
         });

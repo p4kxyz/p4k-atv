@@ -119,10 +119,8 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         // Get userId from preferences
         if (PreferenceUtils.isLoggedIn(getContext())) {
             this.userId = PreferenceUtils.getUserId(getContext());
-            Log.d(TAG, "User is logged in. UserId: " + this.userId);
         } else {
             this.userId = "1";
-            Log.d(TAG, "User not logged in. Using default UserId: " + this.userId);
         }
 
     }
@@ -148,7 +146,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         movieTitle = view.findViewById(R.id.movie_title);
         movieDescription = view.findViewById(R.id.movie_description_tv);
         
-        Log.d(TAG, "Views initialized - movieTitle: " + (movieTitle != null ? "found" : "NOT FOUND"));
         playButton = view.findViewById(R.id.play_button);
         favoriteButton = view.findViewById(R.id.favorite_button);
         heroYear = view.findViewById(R.id.hero_year);
@@ -241,11 +238,9 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         
         // Check if this is a phim4k movie/series
         if (videoId.startsWith("phim4k_")) {
-            Log.d(TAG, "Detected phim4k content, ID: " + videoId);
             getPhim4kData(videoType, videoId);
             return;
         } else if (videoId.startsWith("kkphim4k_")) {
-            Log.d(TAG, "Detected kkphim4k content, ID: " + videoId);
             getKKPhim4kData(videoType, videoId);
             return;
         }
@@ -254,26 +249,19 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         
         // Use getSingleDetail API with type parameter
         String type = ("tvseries".equals(videoType) || "tv".equals(videoType)) ? "tvseries" : "movie";
-        Log.d(TAG, "API call - Key: " + com.files.codes.AppConfig.API_KEY + ", Type: " + type + ", ID: " + videoId);
         Call<MovieSingleDetails> call = apiService.getSingleDetail(com.files.codes.AppConfig.API_KEY, type, videoId);
         
-        Log.d(TAG, "Loading movie details - ID: " + videoId + ", Type: " + type);
         
         call.enqueue(new Callback<MovieSingleDetails>() {
             @Override
             public void onResponse(Call<MovieSingleDetails> call, Response<MovieSingleDetails> response) {
-                Log.d(TAG, "API Response Code: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     movieDetails = response.body();
-                    Log.d(TAG, "Movie loaded: " + movieDetails.getTitle());
                     displayMovieDetails();
                 } else {
-                    Log.e(TAG, "Failed to load movie details - Code: " + response.code());
                     if (response.errorBody() != null) {
                         try {
-                            Log.e(TAG, "Error body: " + response.errorBody().string());
                         } catch (Exception e) {
-                            Log.e(TAG, "Error reading error body: " + e.getMessage());
                         }
                     }
                 }
@@ -281,7 +269,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             
             @Override
             public void onFailure(Call<MovieSingleDetails> call, Throwable t) {
-                Log.e(TAG, "Network error: " + t.getMessage());
             }
         });
     }
@@ -289,13 +276,9 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     private void displayMovieDetails() {
         if (movieDetails == null) return;
         
-        Log.d(TAG, "Displaying movie details:");
-        Log.d(TAG, "- Title: " + movieDetails.getTitle());
-        Log.d(TAG, "- Videos count: " + (movieDetails.getVideos() != null ? movieDetails.getVideos().size() : "null"));
         if (movieDetails.getVideos() != null) {
             for (int i = 0; i < movieDetails.getVideos().size(); i++) {
                 Video video = movieDetails.getVideos().get(i);
-                Log.d(TAG, "  Video " + i + ": " + video.getLabel() + " - " + video.getFileType() + " - " + video.getFileUrl());
             }
         }
         
@@ -336,7 +319,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         if (playButton != null) {
             playButton.post(() -> {
                 playButton.requestFocus();
-                Log.d(TAG, "Auto-focused on Play button");
             });
         }
     }
@@ -345,14 +327,12 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         if (videoId != null && !videoId.isEmpty()) {
             String logoUrl = "https://api.phim4k.lol/uploads/logo/" + videoId + ".jpg";
             
-            Log.d(TAG, "Trying to load logo: " + logoUrl);
             
             Picasso.get()
                 .load(logoUrl)
                 .into(heroMovieLogo, new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
-                        Log.d(TAG, "Logo loaded successfully, showing both logo and title");
                         heroMovieLogo.setVisibility(View.VISIBLE);
                         // Keep title visible too - both logo and title can coexist
                         movieTitle.setVisibility(View.VISIBLE);
@@ -360,13 +340,11 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                     
                     @Override
                     public void onError(Exception e) {
-                        Log.d(TAG, "Logo load failed: " + e.getMessage() + ", showing title only");
                         heroMovieLogo.setVisibility(View.GONE);
                         movieTitle.setVisibility(View.VISIBLE);
                     }
                 });
         } else {
-            Log.d(TAG, "No video ID for logo, showing title only");
             heroMovieLogo.setVisibility(View.GONE);
             movieTitle.setVisibility(View.VISIBLE);
         }
@@ -444,7 +422,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     
     private void playMovie() {
         if (movieDetails != null) {
-            Log.d(TAG, "Playing movie - ID: " + videoId + ", Title: " + movieDetails.getTitle());
             
             // Check if this is a TV series with seasons/episodes
             if (movieDetails.getSeason() != null && !movieDetails.getSeason().isEmpty()) {
@@ -452,11 +429,9 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                 Season firstSeason = movieDetails.getSeason().get(0);
                 if (firstSeason.getEpisodes() != null && !firstSeason.getEpisodes().isEmpty()) {
                     Episode firstEpisode = firstSeason.getEpisodes().get(0);
-                    Log.d(TAG, "Auto-playing first episode of TV series: " + firstEpisode.getEpisodesName());
                     playEpisode(firstEpisode, 0);
                     return;
                 } else {
-                    Log.e(TAG, "TV series has no episodes in first season");
                 }
             }
             
@@ -470,15 +445,12 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                     openServerDialog(movieDetails.getVideos());
                 }
             } else {
-                Log.e(TAG, "No video sources available");
             }
         } else {
-            Log.e(TAG, "Cannot play movie - movieDetails is null");
         }
     }
     
     private void playVideoDirectly(Video video) {
-        Log.d(TAG, "Playing video directly: " + video.getLabel());
         
         Bundle bundle = androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
         
@@ -496,7 +468,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             try {
                 playbackModel.setId(Long.parseLong(videoId));
             } catch (NumberFormatException e) {
-                Log.e(TAG, "Failed to parse ID as Long: " + videoId + ", using hashCode");
                 playbackModel.setId((long) videoId.hashCode());
             }
         }
@@ -538,22 +509,12 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         }
         
         // Debug logging for external player issue
-        Log.e(TAG, "🎬 PLAYBACK DEBUG - Video ID: " + videoId);
-        Log.e(TAG, "🎬 PLAYBACK DEBUG - Title: " + (playbackModel.getTitle() != null ? playbackModel.getTitle() : "NULL"));
-        Log.e(TAG, "🎬 PLAYBACK DEBUG - VideoUrl: " + (playbackModel.getVideoUrl() != null ? playbackModel.getVideoUrl() : "NULL"));
-        Log.e(TAG, "🎬 PLAYBACK DEBUG - VideoType: " + (playbackModel.getVideoType() != null ? playbackModel.getVideoType() : "NULL"));
-        Log.e(TAG, "🎬 PLAYBACK DEBUG - Video Object: " + (video != null ? video.toString() : "NULL"));
 
         Intent intent = new Intent(getActivity(), PlayerActivity.class);
         intent.putExtra(com.files.codes.view.VideoPlaybackActivity.EXTRA_VIDEO, playbackModel);
         
         // 🔥 Add intent extras for enhanced watch history saving (same as VideoDetailsFragment)
         if (movieDetails != null) {
-            Log.e(TAG, "🎬 HeroStyleMovieDetailsFragment adding intent extras:");
-            Log.e(TAG, "  - ID: '" + videoId + "'");
-            Log.e(TAG, "  - Title: '" + movieDetails.getTitle() + "'");
-            Log.e(TAG, "  - Description: '" + movieDetails.getDescription() + "'");
-            Log.e(TAG, "  - Type: '" + movieDetails.getType() + "'");
             
             intent.putExtra("id", videoId);
             intent.putExtra("type", movieDetails.getType() != null ? movieDetails.getType() : "movie");
@@ -565,7 +526,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             intent.putExtra("imdb_rating", movieDetails.getImdbRating());
             intent.putExtra("runtime", movieDetails.getRuntime());
         } else {
-            Log.e(TAG, "🎬 ERROR: movieDetails is NULL, cannot add intent extras!");
         }
         
         // TEMP: Remove bundle animation to match backup behavior
@@ -619,7 +579,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                         try {
                             playbackModel.setId(Long.parseLong(videoId));
                         } catch (NumberFormatException e) {
-                            Log.e(TAG, "Failed to parse ID as Long: " + videoId + ", using hashCode");
                             playbackModel.setId((long) videoId.hashCode());
                         }
                     }
@@ -665,11 +624,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                     
                     // 🔥 Add intent extras for enhanced watch history saving (server selection)
                     if (movieDetails != null) {
-                        Log.e(TAG, "🎬 HeroStyleMovieDetailsFragment (server selection) adding intent extras:");
-                        Log.e(TAG, "  - ID: '" + videoId + "'");
-                        Log.e(TAG, "  - Title: '" + movieDetails.getTitle() + "'");
-                        Log.e(TAG, "  - Server: '" + obj.getLabel() + "'");
-                        Log.e(TAG, "  - Type: '" + movieDetails.getType() + "'");
                         
                         intent.putExtra("id", videoId);
                         intent.putExtra("type", movieDetails.getType() != null ? movieDetails.getType() : "movie");
@@ -681,7 +635,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                         intent.putExtra("imdb_rating", movieDetails.getImdbRating());
                         intent.putExtra("runtime", movieDetails.getRuntime());
                     } else {
-                        Log.e(TAG, "🎬 ERROR: movieDetails is NULL in server selection, cannot add intent extras!");
                     }
                     
                     // TEMP: Remove bundle animation to match backup behavior
@@ -709,11 +662,9 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
 
     
     private void getPhim4kData(String vtype, final String vId) {
-        Log.d(TAG, "Getting phim4k data for: " + vId);
         
         // Extract actual phim4k ID from full ID (remove "phim4k_" prefix)
         String actualId = vId.replace("phim4k_", "");
-        Log.d(TAG, "Getting phim4k data for actual ID: " + actualId);
 
         Phim4kClient phim4kClient = Phim4kClient.getInstance();
         phim4kClient.getMovieDetailWithMovie(actualId, new Phim4kClient.Phim4kDetailWithMovieCallback() {
@@ -721,7 +672,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             public void onSuccess(com.files.codes.model.VideoContent videoContent, Phim4kMovie phim4kMovie) {
                 if (getActivity() == null) return;
                 
-                Log.d(TAG, "Phim4k details received: " + videoContent.getTitle());
                 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -767,7 +717,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                                 }
                             }
                             movieDetails.setSeason(seasons);
-                            Log.d(TAG, "Created " + seasons.size() + " 'seasons' (servers) for phim4k TV series");
                         } 
                         // Handle Movie Logic - Flatten all servers to video list
                         else if (phim4kMovie != null && phim4kMovie.getEpisodes() != null) {
@@ -786,7 +735,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                                 }
                             }
                             movieDetails.setVideos(videos);
-                            Log.d(TAG, "Created " + videos.size() + " video links for phim4k movie");
                         }
                         
                         displayMovieDetails();
@@ -796,7 +744,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
 
             @Override
             public void onError(String error) {
-                Log.e(TAG, "Phim4k API error: " + error);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -810,11 +757,9 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     }
     
     private void getKKPhim4kData(String vtype, final String vId) {
-        Log.d(TAG, "Getting kkphim4k data for: " + vId);
         
         // Extract actual kkphim4k ID from full ID (remove "kkphim4k_" prefix)
         String actualId = vId.replace("kkphim4k_", "");
-        Log.d(TAG, "Getting kkphim4k data for actual ID: " + actualId);
 
         KKPhim4kClient kkPhim4kClient = KKPhim4kClient.getInstance();
         kkPhim4kClient.getMovieDetailWithMovie(actualId, new KKPhim4kClient.KKPhim4kDetailWithMovieCallback() {
@@ -822,7 +767,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             public void onSuccess(com.files.codes.model.VideoContent videoContent, Phim4kMovie phim4kMovie) {
                 if (getActivity() == null) return;
                 
-                Log.d(TAG, "KKPhim4k details received: " + videoContent.getTitle());
                 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -868,7 +812,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                                 }
                             }
                             movieDetails.setSeason(seasons);
-                            Log.d(TAG, "Created " + seasons.size() + " 'seasons' (servers) for kkphim4k TV series");
                         }
                         // Handle Movie Logic - Flatten all servers to video list
                         else if (phim4kMovie != null && phim4kMovie.getEpisodes() != null) {
@@ -887,7 +830,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                                 }
                             }
                             movieDetails.setVideos(videos);
-                            Log.d(TAG, "Created " + videos.size() + " video links for kkphim4k content");
                         }
                         
                         displayMovieDetails();
@@ -897,7 +839,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
 
             @Override
             public void onError(String error) {
-                Log.e(TAG, "KKPhim4k API error: " + error);
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -985,22 +926,17 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                 
                 // Add click listener to open genre activity
                 itemView.setOnClickListener(v -> {
-                    Log.d(TAG, "Genre tag clicked!");
                     int position = getAdapterPosition();
-                    Log.d(TAG, "Adapter position: " + position);
                     
                     if (position != RecyclerView.NO_POSITION && genres != null && position < genres.size()) {
                         com.files.codes.model.Genre genre = genres.get(position);
-                        Log.d(TAG, "Genre at position " + position + ": " + (genre != null ? genre.getName() : "null"));
                         openGenreActivity(genre);
                     } else {
-                        Log.e(TAG, "Invalid position or genres list. Position: " + position + ", Genres size: " + (genres != null ? genres.size() : "null"));
                     }
                 });
                 
                 // Add focus change listener for debugging
                 itemView.setOnFocusChangeListener((v, hasFocus) -> {
-                    Log.d(TAG, "Genre tag focus changed: " + hasFocus + " at position: " + getAdapterPosition());
                 });
             }
         }
@@ -1128,10 +1064,8 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     }
 
     private void setMovieTitle() {
-        Log.d(TAG, "setMovieTitle called - movieDetails: " + (movieDetails != null ? "not null" : "null"));
         if (movieDetails != null && movieDetails.getTitle() != null) {
             String rawTitle = movieDetails.getTitle();
-            Log.d(TAG, "Raw title: " + rawTitle);
             
             // Parse format: "Vietnamese Title (Year) English Title"
             // Use regex to find pattern: text (year) text
@@ -1146,26 +1080,20 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                 vietnameseTitle = matcher.group(1).trim();
                 englishTitle = matcher.group(3).trim(); // group 3 because group 2 is the year
                 
-                Log.d(TAG, "Pattern matched - Vietnamese: " + vietnameseTitle + ", English: " + englishTitle);
                 // Use Vietnamese title as main title
                 movieTitle.setText(vietnameseTitle);
             } else {
                 // Fallback: if no pattern match, use formatted title
                 String formattedTitle = formatMovieTitle(rawTitle);
-                Log.d(TAG, "Pattern not matched - Formatted title: " + formattedTitle);
                 if (formattedTitle.contains("\n")) {
                     String[] parts = formattedTitle.split("\n", 2);
                     movieTitle.setText(parts[0]);
-                    Log.d(TAG, "Using first part: " + parts[0]);
                 } else {
                     movieTitle.setText(formattedTitle);
-                    Log.d(TAG, "Using formatted title: " + formattedTitle);
                 }
             }
             movieTitle.setVisibility(View.VISIBLE);
-            Log.d(TAG, "Title set and visible");
         } else {
-            Log.d(TAG, "No title available - hiding title view");
             movieTitle.setVisibility(View.GONE);
         }
     }
@@ -1249,17 +1177,14 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     private void addToFav() {
         if (videoId == null) return;
         
-        Log.d(TAG, "Adding to favorites - VideoId: " + videoId + ", UserId: " + userId);
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<FavoriteModel> call = apiService.addToFavorite(AppConfig.API_KEY, userId, videoId);
 
         call.enqueue(new Callback<FavoriteModel>() {
             @Override
             public void onResponse(Call<FavoriteModel> call, Response<FavoriteModel> response) {
-                Log.d(TAG, "AddToFav response code: " + response.code());
                 if (getActivity() != null && isAdded()) {
                     if (response.code() == 200 && response.body() != null) {
-                        Log.d(TAG, "AddToFav response status: " + response.body().getStatus());
                         if (response.body().getStatus().equalsIgnoreCase("success")) {
                             isFavorite = true;
                             updateFavoriteButton();
@@ -1273,7 +1198,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                             new ToastMsg(getActivity()).toastIconError(errorMsg);
                         }
                     } else {
-                        Log.e(TAG, "AddToFav failed - Code: " + response.code() + ", Body: " + (response.body() != null));
                         new ToastMsg(getActivity()).toastIconError("Không thể thêm vào yêu thích");
                     }
                 }
@@ -1281,7 +1205,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<FavoriteModel> call, Throwable t) {
-                Log.e(TAG, "AddToFav API failure", t);
                 if (getActivity() != null && isAdded()) {
                     new ToastMsg(getActivity()).toastIconError("Không thể thêm vào yêu thích");
                 }
@@ -1295,17 +1218,14 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
     private void removeFromFav() {
         if (videoId == null) return;
         
-        Log.d(TAG, "Removing from favorites - VideoId: " + videoId + ", UserId: " + userId);
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<FavoriteModel> call = apiService.removeFromFavorite(AppConfig.API_KEY, userId, videoId);
 
         call.enqueue(new Callback<FavoriteModel>() {
             @Override
             public void onResponse(Call<FavoriteModel> call, Response<FavoriteModel> response) {
-                Log.d(TAG, "RemoveFromFav response code: " + response.code());
                 if (getActivity() != null && isAdded()) {
                     if (response.code() == 200 && response.body() != null) {
-                        Log.d(TAG, "RemoveFromFav response status: " + response.body().getStatus());
                         if (response.body().getStatus().equalsIgnoreCase("success")) {
                             isFavorite = false;
                             updateFavoriteButton();
@@ -1319,7 +1239,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                             new ToastMsg(getActivity()).toastIconError(errorMsg);
                         }
                     } else {
-                        Log.e(TAG, "RemoveFromFav failed - Code: " + response.code() + ", Body: " + (response.body() != null));
                         new ToastMsg(getActivity()).toastIconError("Không thể xóa khỏi yêu thích");
                     }
                 }
@@ -1327,7 +1246,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<FavoriteModel> call, Throwable t) {
-                Log.e(TAG, "RemoveFromFav API failure", t);
                 if (getActivity() != null && isAdded()) {
                     new ToastMsg(getActivity()).toastIconError("Không thể xóa khỏi yêu thích");
                 }
@@ -1343,28 +1261,22 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         
         // Only check favorite status if user is logged in
         if (!PreferenceUtils.isLoggedIn(getContext())) {
-            Log.d(TAG, "User not logged in, skipping favorite status check");
             isFavorite = false;
             updateFavoriteButton();
             return;
         }
         
-        Log.d(TAG, "Checking favorite status - VideoId: " + videoId + ", UserId: " + userId);
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<FavoriteModel> call = apiService.verifyFavoriteList(AppConfig.API_KEY, userId, videoId);
 
         call.enqueue(new Callback<FavoriteModel>() {
             @Override
             public void onResponse(Call<FavoriteModel> call, Response<FavoriteModel> response) {
-                Log.d(TAG, "GetFavStatus response code: " + response.code());
                 if (getActivity() != null && isAdded()) {
                     if (response.code() == 200 && response.body() != null) {
-                        Log.d(TAG, "GetFavStatus response status: " + response.body().getStatus());
                         isFavorite = response.body().getStatus().equalsIgnoreCase("success");
-                        Log.d(TAG, "Set isFavorite to: " + isFavorite);
                         updateFavoriteButton();
                     } else {
-                        Log.e(TAG, "GetFavStatus failed - Code: " + response.code() + ", Body: " + (response.body() != null));
                         // Silent failure, just set default state
                         isFavorite = false;
                         updateFavoriteButton();
@@ -1375,7 +1287,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             @Override
             public void onFailure(Call<FavoriteModel> call, Throwable t) {
                 // Silent failure for status check
-                Log.e(TAG, "Failed to check favorite status", t);
                 if (getActivity() != null && isAdded()) {
                     isFavorite = false;
                     updateFavoriteButton();
@@ -1442,27 +1353,105 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
      */
     private void showSeasonSelectorDialog() {
         if (allSeasons == null || allSeasons.isEmpty()) return;
-        
-        // Create season names array for dialog
+
         String[] seasonNames = new String[allSeasons.size()];
         for (int i = 0; i < allSeasons.size(); i++) {
             seasonNames[i] = allSeasons.get(i).getSeasonsName();
         }
-        
-        // Show selection dialog
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
-        builder.setTitle("Chọn Mùa Phim");
-        builder.setItems(seasonNames, (dialog, which) -> {
-            // User selected a season
-            currentSeasonIndex = which;
-            currentEpisodePage = 0;
-            
-            // Update UI
-            updateSeasonSelectorButton();
-            loadEpisodesForCurrentSeason();
-        });
-        
-        builder.show();
+
+        Runnable[] actions = new Runnable[seasonNames.length];
+        for (int i = 0; i < seasonNames.length; i++) {
+            final int idx = i;
+            actions[i] = () -> {
+                currentSeasonIndex = idx;
+                currentEpisodePage = 0;
+                updateSeasonSelectorButton();
+                loadEpisodesForCurrentSeason();
+            };
+        }
+        buildCustomListDialog("Chọn Mùa Phim", seasonNames, currentSeasonIndex, actions).show();
+    }
+
+    private android.app.Dialog buildCustomListDialog(String title, String[] items,
+            int checkedIndex, Runnable[] actions) {
+        android.app.Dialog dialog = new android.app.Dialog(requireContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+
+        android.widget.LinearLayout root = new android.widget.LinearLayout(requireContext());
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFF1E1E2E);
+        root.setPadding(dp(20), dp(20), dp(20), dp(12));
+
+        android.widget.TextView titleTv = new android.widget.TextView(requireContext());
+        titleTv.setText(title);
+        titleTv.setTextColor(0xFFFFFFFF);
+        titleTv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
+        titleTv.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        titleTv.setPadding(dp(4), 0, dp(4), dp(10));
+        root.addView(titleTv);
+
+        android.view.View divider = new android.view.View(requireContext());
+        divider.setBackgroundColor(0x55FFFFFF);
+        android.widget.LinearLayout.LayoutParams divLp = new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+        divLp.bottomMargin = dp(6);
+        root.addView(divider, divLp);
+
+        android.widget.ScrollView sv = new android.widget.ScrollView(requireContext());
+        sv.setVerticalScrollBarEnabled(false);
+        android.widget.LinearLayout ll = new android.widget.LinearLayout(requireContext());
+        ll.setOrientation(android.widget.LinearLayout.VERTICAL);
+
+        for (int i = 0; i < items.length; i++) {
+            final int idx = i;
+            boolean isSelected = (checkedIndex >= 0 && i == checkedIndex);
+            android.widget.TextView tv = new android.widget.TextView(requireContext());
+            tv.setText(isSelected ? "✓  " + items[i] : "     " + items[i]);
+            tv.setTextColor(isSelected ? 0xFF64B5F6 : 0xFFDDDDDD);
+            tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            tv.setPadding(dp(10), dp(13), dp(10), dp(13));
+            tv.setFocusable(true);
+            tv.setFocusableInTouchMode(false);
+            tv.setClickable(true);
+            tv.setBackground(null);
+            tv.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    v.setBackgroundColor(0x664FC3F7);
+                    ((android.widget.TextView) v).setTextColor(0xFFFFFFFF);
+                } else {
+                    v.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    boolean sel = (checkedIndex >= 0 && idx == checkedIndex);
+                    ((android.widget.TextView) v).setTextColor(sel ? 0xFF64B5F6 : 0xFFDDDDDD);
+                }
+            });
+            tv.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (actions != null && idx < actions.length && actions[idx] != null)
+                    actions[idx].run();
+            });
+            ll.addView(tv);
+            android.view.View sep = new android.view.View(requireContext());
+            sep.setBackgroundColor(0x22FFFFFF);
+            ll.addView(sep, new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        }
+        sv.addView(ll);
+        root.addView(sv, new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(400)));
+
+        dialog.setContentView(root);
+        android.view.Window w = dialog.getWindow();
+        if (w != null) {
+            w.setBackgroundDrawableResource(android.R.color.transparent);
+            w.setLayout(dp(480), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            w.setGravity(android.view.Gravity.CENTER);
+        }
+        return dialog;
+    }
+
+    private int dp(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
     
     /**
@@ -1504,7 +1493,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
      * Play selected episode
      */
     private void playEpisode(Episode episode, int position) {
-        Log.d(TAG, "Playing episode: " + episode.getEpisodesName());
         
         Bundle bundle = androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
         
@@ -1514,7 +1502,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         try {
             playbackModel.setId(Long.parseLong(episode.getEpisodesId()));
         } catch (NumberFormatException e) {
-            Log.w(TAG, "Failed to parse episode ID as Long: " + episode.getEpisodesId() + ", using hashCode");
             playbackModel.setId((long) episode.getEpisodesId().hashCode());
         }
         playbackModel.setMovieId(videoId); // Main series ID for watch history
@@ -1540,7 +1527,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         // Set episode navigation data for next/previous episode buttons
         if (movieDetails.getSeason() != null && !movieDetails.getSeason().isEmpty()) {
             playbackModel.setAllSeasons(movieDetails.getSeason());
-            Log.d(TAG, "Set allSeasons, total seasons: " + movieDetails.getSeason().size());
             
             // Find current season and episode index
             boolean foundEpisode = false;
@@ -1554,8 +1540,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
                             playbackModel.setCurrentEpisodeIndex(episodeIndex);
                             playbackModel.setTotalEpisodesInSeason(season.getEpisodes().size());
                             foundEpisode = true;
-                            Log.d(TAG, "Found episode in season " + seasonIndex + ", episode " + episodeIndex + 
-                                    ", total episodes in season: " + season.getEpisodes().size());
                             break;
                         }
                     }
@@ -1564,10 +1548,8 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             }
             
             if (!foundEpisode) {
-                Log.w(TAG, "Episode not found in seasons data for navigation: " + episode.getEpisodesId());
             }
         } else {
-            Log.w(TAG, "No season data available for episode navigation");
         }
         
         Intent intent = new Intent(getActivity(), PlayerActivity.class);
@@ -1575,11 +1557,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
         
         // 🔥 Add intent extras for enhanced watch history saving (episode playback)
         if (movieDetails != null) {
-            Log.e(TAG, "🎬 HeroStyleMovieDetailsFragment (playEpisode) adding intent extras:");
-            Log.e(TAG, "  - ID: '" + videoId + "'");
-            Log.e(TAG, "  - Title: '" + movieDetails.getTitle() + "'");
-            Log.e(TAG, "  - Episode: '" + episode.getEpisodesName() + "'");
-            Log.e(TAG, "  - Type: '" + movieDetails.getType() + "'");
             
             intent.putExtra("id", videoId);
             intent.putExtra("type", movieDetails.getType() != null ? movieDetails.getType() : "tvseries");
@@ -1591,7 +1568,6 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             intent.putExtra("imdb_rating", movieDetails.getImdbRating());
             intent.putExtra("runtime", movieDetails.getRuntime());
         } else {
-            Log.e(TAG, "🎬 ERROR: movieDetails is NULL in playEpisode, cannot add intent extras!");
         }
         
         // TEMP: Remove bundle animation to match backup behavior
@@ -1764,11 +1740,9 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
      */
     private void openGenreActivity(com.files.codes.model.Genre genre) {
         try {
-            Log.d(TAG, "Genre clicked - Name: " + genre.getName() + ", ID: " + genre.getGenreId());
             
             // Check if genre has valid data
             if (genre.getName() == null || genre.getName().isEmpty()) {
-                Log.e(TAG, "Genre name is null or empty");
                 new ToastMsg(getActivity()).toastIconError("Thông tin thể loại không hợp lệ");
                 return;
             }
@@ -1777,13 +1751,11 @@ public class HeroStyleMovieDetailsFragment extends Fragment {
             intent.putExtra("id", genre.getGenreId());
             intent.putExtra("title", genre.getName());
             
-            Log.d(TAG, "Starting ItemGenreActivity with genre: " + genre.getName() + " (ID: " + genre.getGenreId() + ")");
             
             // Try simple startActivity first without bundle
             startActivity(intent);
             
         } catch (Exception e) {
-            Log.e(TAG, "Error opening genre activity", e);
             new ToastMsg(getActivity()).toastIconError("Không thể mở danh sách thể loại: " + e.getMessage());
         }
     }

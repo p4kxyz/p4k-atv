@@ -39,7 +39,7 @@ public class LoginChooserActivity extends Activity {
     private FirebaseAuth firebaseAuth;
     private static int RC_GOOGLE_SIGN_IN = 123;
     private ProgressBar progressBar;
-    private Button googleSignInButton, phoneSignInButton;
+    private Button googleSignInButton, tvCodeButton, emailSignInButton, signUpButton;
 
 
     @Override
@@ -49,7 +49,25 @@ public class LoginChooserActivity extends Activity {
 
         progressBar = findViewById(R.id.progress_bar);
         googleSignInButton = findViewById(R.id.google_signIn_button);
-        phoneSignInButton = findViewById(R.id.phone_signIn_button);
+        tvCodeButton = findViewById(R.id.tv_code_login_button);
+        emailSignInButton = findViewById(R.id.email_signIn_button);
+        signUpButton = findViewById(R.id.sign_up_button);
+
+        if (tvCodeButton != null) tvCodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                startActivity(new Intent(LoginChooserActivity.this, LoginTvCodeActivity.class));
+            }
+        });
+        if (emailSignInButton != null) emailSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                startActivity(new Intent(LoginChooserActivity.this, LoginActivity.class));
+            }
+        });
+        if (signUpButton != null) signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                startActivity(new Intent(LoginChooserActivity.this, SignUpActivity.class));
+            }
+        });
 
         firebaseAuth = FirebaseAuth.getInstance();
         DatabaseHelper db = new DatabaseHelper(LoginChooserActivity.this);
@@ -65,9 +83,6 @@ public class LoginChooserActivity extends Activity {
         if (!AppConfig.ENABLE_GOOGLE_LOGIN){
             googleSignInButton.setVisibility(View.GONE);
         }
-        if (!AppConfig.ENABLE_PHONE_LOGIN){
-            phoneSignInButton.setVisibility(View.GONE);
-        }
 
         googleSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,23 +90,6 @@ public class LoginChooserActivity extends Activity {
                 googleSignIn();
             }
         });
-
-        phoneSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                phoneSignIn();
-            }
-        });
-    }
-
-    public void signUpBtn(View view) {
-        Intent intent = new Intent(LoginChooserActivity.this, SignUpActivity.class);
-        startActivity(intent);
-    }
-
-    public void emailSignInBtn(View view) {
-        Intent intent = new Intent(LoginChooserActivity.this, LoginActivity.class);
-        startActivity(intent);
     }
 
     private void phoneSignIn() {

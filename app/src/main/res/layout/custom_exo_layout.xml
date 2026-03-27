@@ -7,6 +7,9 @@
     android:layout_marginEnd="20dp"
     android:layoutDirection="ltr"
     tools:targetApi="28">
+<View android:id="@+id/exo_controls_background" android:layout_width="0dp" android:layout_height="0dp"/>
+<View android:id="@+id/exo_bottom_bar" android:layout_width="0dp" android:layout_height="0dp"/>
+
 
     <RelativeLayout
         android:id="@+id/info_layout"
@@ -52,7 +55,7 @@
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/bottom_gradient" />
+        android:background="#00000000" />
 
     <LinearLayout
         android:id="@+id/control_layout"

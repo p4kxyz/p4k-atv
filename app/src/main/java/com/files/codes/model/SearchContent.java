@@ -9,6 +9,10 @@ public class SearchContent {
     private String streamFrom;
     private String thumbnailUrl;
     private String releaseYear;
+    
+    private String runtime;
+    private String videoQuality;
+    private String imdbRating;
 
     public SearchContent() {
     }
@@ -22,7 +26,7 @@ public class SearchContent {
         this.streamFrom = streamFrom;
         this.thumbnailUrl = thumbnailUrl;
     }
-    
+
     public SearchContent(String id, String title, String description, String type, String streamUrl, String streamFrom, String thumbnailUrl, String releaseYear) {
         this.id = id;
         this.title = title;
@@ -96,5 +100,29 @@ public class SearchContent {
 
     public void setReleaseYear(String releaseYear) {
         this.releaseYear = releaseYear;
+    }
+
+    public String getRuntime() {
+        return runtime;
+    }
+
+    public void setRuntime(String runtime) {
+        this.runtime = runtime;
+    }
+
+    public String getVideoQuality() {
+        return videoQuality;
+    }
+
+    public void setVideoQuality(String videoQuality) {
+        this.videoQuality = videoQuality;
+    }
+
+    public String getImdbRating() {
+        return imdbRating;
+    }
+
+    public void setImdbRating(String imdbRating) {
+        this.imdbRating = imdbRating;
     }
 }

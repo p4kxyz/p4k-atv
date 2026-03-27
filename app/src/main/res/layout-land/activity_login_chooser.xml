@@ -46,15 +46,30 @@
             tools:visibility="visible" />
 
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center"
             android:layout_weight="1"
-            android:gravity="top|center"
-            android:orientation="vertical">
+            android:fillViewport="true">
 
-            <Button
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|center"
+                android:orientation="vertical">
+
+            <android.widget.Button
+                android:id="@+id/tv_code_login_button"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/button_focus"
+                android:text="Đăng nhập bằng mã QR"
+                android:drawableStart="@drawable/ic_qr_code_white_24dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp" />
+
+            <android.widget.Button
                 android:id="@+id/google_signIn_button"
                 android:layout_width="400dp"
                 android:layout_height="wrap_content"
@@ -65,19 +80,8 @@
                 android:drawableStart="@drawable/fui_ic_googleg_color_24dp"
                 android:paddingStart="20dp" />
 
-            <Button
-                android:id="@+id/phone_signIn_button"
-                android:layout_width="400dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:textAllCaps="true"
-                android:background="@drawable/button_focus"
-                android:text="@string/fui_sign_in_with_phone"
-                android:drawableStart="@drawable/fui_ic_phone_white_24dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"/>
-
-            <Button
+            <android.widget.Button
+                android:id="@+id/email_signIn_button"
                 android:layout_width="400dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -85,8 +89,7 @@
                 android:text="@string/fui_sign_in_with_email"
                 android:drawableStart="@drawable/fui_ic_mail_white_24dp"
                 android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:onClick="emailSignInBtn" />
+                android:paddingEnd="20dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -94,15 +97,17 @@
                 android:text="@string/dont_t_have_an_account"
                 android:layout_marginTop="20dp" />
 
-            <Button
+            <android.widget.Button
+                android:id="@+id/sign_up_button"
                 android:layout_width="400dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/button_focus"
-                android:text="@string/sign_up"
-                android:onClick="signUpBtn" />
+                android:text="@string/sign_up" />
 
-        </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 

@@ -30,10 +30,13 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
     private static final String TAG = "OTAUpdateManager";
     private static final int INSTALL_PERMISSION_REQUEST = 1001;
     
+    private static final long OTA_CHECK_COOLDOWN_MS = 60 * 60 * 1000L; // 1 giờ
+    private static final String PREF_OTA_LAST_CHECK = "ota_last_check_time";
+
     private Context context;
     private OTAUpdateService updateService;
     private OTADownloadManager downloadManager;
-    private AlertDialog updateDialog;
+    private android.app.Dialog updateDialog;
     private AlertDialog downloadDialog;
     private ProgressBar downloadProgress;
     private TextView downloadStatus;
@@ -57,19 +60,15 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
         // Always refresh context so dialogs use the current Activity window
         this.context = context;
         if (this.updateService == null) {
-            Log.e(TAG, "🔧 Creating OTAUpdateService...");
             this.updateService = new OTAUpdateService(context);
             this.updateService.setUpdateListener(this);
-            Log.e(TAG, "✅ OTAUpdateService created and Firebase initialized");
         } else {
             // Pass fresh context to updateService too
             this.updateService.setContext(context);
         }
         if (this.downloadManager == null) {
-            Log.e(TAG, "🔧 Creating OTADownloadManager...");
             this.downloadManager = new OTADownloadManager(context);
             this.downloadManager.setDownloadListener(this);
-            Log.e(TAG, "✅ OTADownloadManager created");
         }
     }
     
@@ -77,30 +76,34 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
      * Start checking for updates (shows toast if no update)
      */
     public void checkForUpdates() {
-        Log.e(TAG, "Starting OTA update check (manual)...");
         silentCheck = false;
         updateService.checkForUpdates();
     }
     
     /**
      * Check for updates silently - no toast if no update (for startup auto-check)
+     * Skips if checked within the last hour.
      */
     public void checkForUpdatesSilently() {
-        Log.e(TAG, "Starting OTA update check (silent)...");
+        android.content.SharedPreferences prefs = context.getSharedPreferences("ota_prefs", Context.MODE_PRIVATE);
+        long lastCheck = prefs.getLong(PREF_OTA_LAST_CHECK, 0);
+        long elapsed = System.currentTimeMillis() - lastCheck;
+        if (elapsed < OTA_CHECK_COOLDOWN_MS) {
+            return;
+        }
         silentCheck = true;
+        prefs.edit().putLong(PREF_OTA_LAST_CHECK, System.currentTimeMillis()).apply();
         updateService.checkForUpdates();
     }
     
     // OTAUpdateService.OTAUpdateListener implementation
     @Override
     public void onUpdateAvailable(OTAUpdateService.UpdateInfo updateInfo) {
-        Log.e(TAG, "✅✅ UPDATE AVAILABLE: " + updateInfo.version + " context=" + (context != null ? context.getClass().getSimpleName() : "null"));
         showUpdateDialog(updateInfo);
     }
 
     @Override
     public void onNoUpdateAvailable() {
-        Log.e(TAG, "✅✅ NO UPDATE - already on latest");
         if (!silentCheck) {
             new ToastMsg(context).toastIconSuccess("Bạn đang sử dụng phiên bản mới nhất!");
         }
@@ -108,13 +111,11 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
 
     @Override
     public void onUpdateCheckFailed(String error) {
-        Log.e(TAG, "❌❌ UPDATE CHECK FAILED: " + error);
     }
     
     // OTADownloadManager.OTADownloadListener implementation
     @Override
     public void onDownloadStarted() {
-        Log.d(TAG, "Download started");
         if (downloadProgress != null) {
             downloadProgress.setIndeterminate(true);
         }
@@ -125,7 +126,6 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
     
     @Override
     public void onDownloadProgress(int progress) {
-        Log.d(TAG, "Download progress: " + progress + "%");
         if (downloadProgress != null) {
             downloadProgress.setIndeterminate(false);
             downloadProgress.setProgress(progress);
@@ -137,7 +137,6 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
     
     @Override
     public void onDownloadCompleted(String apkPath) {
-        Log.d(TAG, "Download completed: " + apkPath);
         if (downloadDialog != null) {
             downloadDialog.dismiss();
         }
@@ -147,77 +146,210 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
     
     @Override
     public void onDownloadFailed(String error) {
-        Log.e(TAG, "Download failed: " + error);
         if (downloadDialog != null) {
             downloadDialog.dismiss();
         }
         new ToastMsg(context).toastIconError("Tải xuống thất bại: " + error);
     }
     
+    private int dp(int dpNum) {
+        return (int) (dpNum * context.getResources().getDisplayMetrics().density + 0.5f);
+    }
+
     /**
      * Show update available dialog
      */
     private void showUpdateDialog(OTAUpdateService.UpdateInfo updateInfo) {
         try {
-            // Wrap context with AppCompat theme - app uses Leanback theme which doesn't support AppCompat widgets
-            android.content.Context themedCtx = new androidx.appcompat.view.ContextThemeWrapper(
-                    context, androidx.appcompat.R.style.Theme_AppCompat_Dialog);
-            AlertDialog.Builder builder = new AlertDialog.Builder(themedCtx);
-            View dialogView = LayoutInflater.from(themedCtx).inflate(R.layout.dialog_ota_update, null);
-            Log.e(TAG, "🎨 showUpdateDialog: using themedCtx=" + themedCtx.getClass().getSimpleName());
-
-            TextView titleText = dialogView.findViewById(R.id.update_title);
-            TextView versionText = dialogView.findViewById(R.id.update_version);
-            TextView sizeText = dialogView.findViewById(R.id.update_size);
-            TextView changelogText = dialogView.findViewById(R.id.update_changelog);
-            Button updateButton = dialogView.findViewById(R.id.btn_update);
-            Button laterButton = dialogView.findViewById(R.id.btn_later);
-
-            titleText.setText(updateInfo.forceUpdate ? "Cập nhật bắt buộc" : "Cập nhật có sẵn");
-            versionText.setText("Phiên bản: " + updateInfo.version);
-            sizeText.setText("Kích thước: " + updateInfo.getFormattedFileSize());
-
-            // Fix \n literal from Firebase JSON -> real newlines
-            String changelog = updateInfo.changelog != null && !updateInfo.changelog.isEmpty()
-                    ? updateInfo.changelog.replace("\\n", "\n")
-                    : "• Cải thiện hiệu suất\n• Sửa lỗi";
-            changelogText.setText(changelog);
-
-            if (updateInfo.forceUpdate) {
-                laterButton.setVisibility(View.GONE);
+            android.app.Dialog dialog = new android.app.Dialog(context);
+            dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+            dialog.setCancelable(!updateInfo.forceUpdate);
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
             }
 
+            // Root container
+            android.widget.LinearLayout root = new android.widget.LinearLayout(context);
+            root.setOrientation(android.widget.LinearLayout.VERTICAL);
+            root.setPadding(dp(24), dp(24), dp(24), dp(24));
+            
+            // Background with rounded corners
+            android.graphics.drawable.GradientDrawable shape = new android.graphics.drawable.GradientDrawable();
+            shape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            shape.setColor(0xFF1E1E2E);
+            shape.setCornerRadius(dp(12));
+            root.setBackground(shape);
+
+            root.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                    dp(460), android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            // Title
+            android.widget.TextView titleView = new android.widget.TextView(context);
+            titleView.setText(updateInfo.forceUpdate ? "Cập nhật bắt buộc" : "Cập nhật có sẵn");
+            titleView.setTextColor(0xFFFFFFFF);
+            titleView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 20);
+            titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            titleView.setGravity(android.view.Gravity.CENTER);
+            titleView.setPadding(0, 0, 0, dp(16));
+            root.addView(titleView);
+
+            // Thin divider
+            android.view.View divider = new android.view.View(context);
+            divider.setBackgroundColor(0x33FFFFFF);
+            android.widget.LinearLayout.LayoutParams divLp = 
+                    new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+            divLp.bottomMargin = dp(16);
+            root.addView(divider, divLp);
+
+            // Version info
+            android.widget.TextView versionText = new android.widget.TextView(context);
+            versionText.setText("Phiên bản: " + updateInfo.version);
+            versionText.setTextColor(0xFFFFFFFF);
+            versionText.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 16);
+            versionText.setGravity(android.view.Gravity.CENTER);
+            versionText.setPadding(0, 0, 0, dp(6));
+            root.addView(versionText);
+
+            // Size info
+            android.widget.TextView sizeText = new android.widget.TextView(context);
+            sizeText.setText("Kích thước: " + updateInfo.getFormattedFileSize());
+            sizeText.setTextColor(0xFFAAAAAA);
+            sizeText.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14);
+            sizeText.setGravity(android.view.Gravity.CENTER);
+            sizeText.setPadding(0, 0, 0, dp(16));
+            root.addView(sizeText);
+
+            // Changelog Box
+            android.widget.ScrollView sv = new android.widget.ScrollView(context);
+            sv.setVerticalScrollBarEnabled(false);
+            
+            android.graphics.drawable.GradientDrawable scrollShape = new android.graphics.drawable.GradientDrawable();
+            scrollShape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            scrollShape.setColor(0xFF2A2A3E); // lighter inner background
+            scrollShape.setCornerRadius(dp(8));
+            sv.setBackground(scrollShape);
+            
+            sv.setPadding(dp(16), dp(16), dp(16), dp(16));
+
+            android.widget.TextView changelogText = new android.widget.TextView(context);
+            String changelogStr = updateInfo.changelog != null && !updateInfo.changelog.isEmpty()
+                    ? updateInfo.changelog.replace("\\n", "\n")
+                    : "• Cải thiện hiệu suất\n• Sửa lỗi";
+            changelogText.setText(changelogStr);
+            changelogText.setTextColor(0xFFFFFFFF);
+            changelogText.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 14);
+            changelogText.setLineSpacing(dp(4), 1.0f);
+            
+            sv.addView(changelogText);
+
+            android.widget.LinearLayout.LayoutParams svLp = 
+                    new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(140));
+            svLp.bottomMargin = dp(24);
+            root.addView(sv, svLp);
+
+            // Buttons Layout
+            android.widget.LinearLayout buttonLayout = new android.widget.LinearLayout(context);
+            buttonLayout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+
+            // Later Button
+            android.widget.TextView laterButton = new android.widget.TextView(context);
+            laterButton.setText("Để sau");
+            laterButton.setTextColor(0xFFDDDDDD);
+            laterButton.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            laterButton.setGravity(android.view.Gravity.CENTER);
+            laterButton.setPadding(0, dp(14), 0, dp(14));
+            laterButton.setFocusable(true);
+            laterButton.setClickable(true);
+            
+            android.graphics.drawable.GradientDrawable laterShape = new android.graphics.drawable.GradientDrawable();
+            laterShape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            laterShape.setColor(0xFF333344);
+            laterShape.setCornerRadius(dp(6));
+            laterButton.setBackground(laterShape);
+
+            android.widget.LinearLayout.LayoutParams laterLp = new android.widget.LinearLayout.LayoutParams(
+                    0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+            laterLp.rightMargin = dp(8);
+
+            // Update Button
+            android.widget.TextView updateButton = new android.widget.TextView(context);
+            updateButton.setText("✓ Cập nhật");
+            updateButton.setTextColor(0xFFFFFFFF);
+            updateButton.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            updateButton.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            updateButton.setGravity(android.view.Gravity.CENTER);
+            updateButton.setPadding(0, dp(14), 0, dp(14));
+            updateButton.setFocusable(true);
+            updateButton.setClickable(true);
+            
+            android.graphics.drawable.GradientDrawable updateShape = new android.graphics.drawable.GradientDrawable();
+            updateShape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            updateShape.setColor(0xFF007ACC); 
+            updateShape.setCornerRadius(dp(6));
+            updateButton.setBackground(updateShape);
+
+            android.widget.LinearLayout.LayoutParams updateLp = new android.widget.LinearLayout.LayoutParams(
+                    0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+            updateLp.leftMargin = dp(8);
+
+            // Focus states
+            View.OnFocusChangeListener focusListener = (v, hasFocus) -> {
+                if (hasFocus) {
+                    if (v == updateButton) {
+                        updateShape.setColor(0xFF64B5F6); // Lighter blue focus
+                        updateButton.setBackground(updateShape);
+                    } else {
+                        laterShape.setColor(0xFF555566); // Lighter grey focus
+                        laterButton.setBackground(laterShape);
+                    }
+                } else {
+                    if (v == updateButton) {
+                        updateShape.setColor(0xFF007ACC);
+                        updateButton.setBackground(updateShape);
+                    } else {
+                        laterShape.setColor(0xFF333344);
+                        laterButton.setBackground(laterShape);
+                    }
+                }
+            };
+            laterButton.setOnFocusChangeListener(focusListener);
+            updateButton.setOnFocusChangeListener(focusListener);
+
+            laterButton.setOnClickListener(v -> dialog.dismiss());
             updateButton.setOnClickListener(v -> {
-                updateDialog.dismiss();
+                dialog.dismiss();
                 startDownload(updateInfo);
             });
 
-            laterButton.setOnClickListener(v -> updateDialog.dismiss());
+            if (!updateInfo.forceUpdate) {
+                buttonLayout.addView(laterButton, laterLp);
+            } else {
+                updateLp.leftMargin = 0;
+            }
+            buttonLayout.addView(updateButton, updateLp);
 
-            builder.setView(dialogView);
-            builder.setCancelable(!updateInfo.forceUpdate);
+            root.addView(buttonLayout);
 
-            updateDialog = builder.create();
+            dialog.setContentView(root);
+            this.updateDialog = dialog;
 
             if (updateDialog.getWindow() != null) {
                 updateDialog.getWindow().clearFlags(
                     android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
             }
 
-            // Auto-focus update button after dialog is fully shown
             updateDialog.setOnShowListener(d -> {
                 updateButton.requestFocus();
-                Log.e(TAG, "🔵 Update button focused");
             });
 
             updateDialog.show();
 
         } catch (android.view.WindowManager.BadTokenException e) {
-            Log.e(TAG, "❌ BadTokenException showing dialog: " + e.getMessage());
             PreferenceUtils.saveString(context, "ota_pending_version", updateInfo.version);
             PreferenceUtils.saveString(context, "ota_pending_download_url", updateInfo.downloadUrl);
         } catch (Exception e) {
-            Log.e(TAG, "❌ Exception showing update dialog: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -275,17 +407,14 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
      * Show install confirmation dialog
      */
     private void showInstallDialog(String apkPath) {
-        Log.d(TAG, "Showing install dialog for APK: " + apkPath);
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Cài đặt cập nhật")
                .setMessage("Tải xuống hoàn tất! Bạn có muốn cài đặt cập nhật ngay bây giờ?")
                .setPositiveButton("Cài đặt", (dialog, which) -> {
-                   Log.d(TAG, "👆 User clicked Install button");
                    installUpdate(apkPath);
                })
                .setNegativeButton("Để sau", (dialog, which) -> {
                    // Save APK path for later installation
-                   Log.d(TAG, "👆 User clicked Later button");
                    PreferenceUtils.saveString(context, "ota_pending_apk", apkPath);
                    new ToastMsg(context).toastIconSuccess("Cập nhật đã sẵn sàng cài đặt");
                })
@@ -293,21 +422,17 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
         
         try {
             AlertDialog dialog = builder.show();
-            Log.d(TAG, "✅ Install dialog shown successfully");
             
             // Auto-click install after 3 seconds for Android TV
             new android.os.Handler().postDelayed(() -> {
                 if (dialog.isShowing()) {
-                    Log.d(TAG, "🤖 Auto-installing after 3 seconds for Android TV");
                     dialog.dismiss();
                     installUpdate(apkPath);
                 }
             }, 3000);
             
         } catch (Exception e) {
-            Log.e(TAG, "❌ Failed to show install dialog: " + e.getMessage());
             // Fallback: direct install
-            Log.d(TAG, "🔄 Fallback to direct install");
             installUpdate(apkPath);
         }
     }
@@ -389,24 +514,19 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
             if (downloadManager != null) {
                 downloadManager.cleanup();
                 downloadManager = null;
-                Log.d(TAG, "🧹 Download manager cleaned up");
             }
             
             if (updateDialog != null && updateDialog.isShowing()) {
                 updateDialog.dismiss();
                 updateDialog = null;
-                Log.d(TAG, "🧹 Update dialog dismissed");
             }
             
             if (downloadDialog != null && downloadDialog.isShowing()) {
                 downloadDialog.dismiss();
                 downloadDialog = null;
-                Log.d(TAG, "🧹 Download dialog dismissed");
             }
             
-            Log.d(TAG, "✅ OTA Update Manager cleanup completed");
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error during cleanup: " + e.getMessage());
         }
     }
 }

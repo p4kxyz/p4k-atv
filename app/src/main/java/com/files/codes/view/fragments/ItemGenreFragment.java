@@ -139,7 +139,7 @@ public class ItemGenreFragment extends VerticalGridSupportFragment {
 
                 Movie movie = (Movie) o;
 
-                Intent intent = new Intent(getActivity(), com.files.codes.view.HeroStyleVideoDetailsActivity.class);
+                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                 intent.putExtra("id", movie.getVideosId());
                 
                 // Fix: Check if it's TV series or movie
@@ -150,8 +150,6 @@ public class ItemGenreFragment extends VerticalGridSupportFragment {
                 intent.putExtra("type", type);
                 
                 intent.putExtra("thumbImage", movie.getThumbnailUrl());
-                
-                Log.d(TAG, "Opening HeroStyleVideoDetails for movie: " + movie.getTitle() + " (ID: " + movie.getVideosId() + ", Type: " + type + ")");
                 startActivity(intent);
             }
         };

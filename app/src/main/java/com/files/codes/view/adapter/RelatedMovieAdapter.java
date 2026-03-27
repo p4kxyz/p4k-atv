@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.files.codes.R;
@@ -16,6 +17,7 @@ import com.files.codes.model.movieDetails.RelatedMovie;
 import com.files.codes.view.HeroStyleVideoDetailsActivity;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RelatedMovieAdapter extends RecyclerView.Adapter<RelatedMovieAdapter.ViewHolder> {
@@ -69,8 +71,25 @@ public class RelatedMovieAdapter extends RecyclerView.Adapter<RelatedMovieAdapte
     }
 
     public void updateMovies(List<RelatedMovie> newMovies) {
-        this.movies = newMovies;
-        notifyDataSetChanged();
+        final List<RelatedMovie> oldList = this.movies;
+        final List<RelatedMovie> newList = newMovies != null ? newMovies : new ArrayList<>();
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override public int getOldListSize() { return oldList != null ? oldList.size() : 0; }
+            @Override public int getNewListSize() { return newList.size(); }
+            @Override public boolean areItemsTheSame(int oldPos, int newPos) {
+                String oldId = oldList.get(oldPos).getVideosId();
+                String newId = newList.get(newPos).getVideosId();
+                return oldId != null && oldId.equals(newId);
+            }
+            @Override public boolean areContentsTheSame(int oldPos, int newPos) {
+                RelatedMovie o = oldList.get(oldPos);
+                RelatedMovie n = newList.get(newPos);
+                return java.util.Objects.equals(o.getTitle(), n.getTitle())
+                    && java.util.Objects.equals(o.getThumbnailUrl(), n.getThumbnailUrl());
+            }
+        });
+        this.movies = newList;
+        result.dispatchUpdatesTo(this);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

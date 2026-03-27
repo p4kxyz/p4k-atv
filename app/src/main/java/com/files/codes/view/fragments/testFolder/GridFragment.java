@@ -43,6 +43,12 @@ public class GridFragment  extends Fragment implements BrowseSupportFragment.Mai
         if (gridPresenter == null) {
             throw new IllegalArgumentException("Grid presenter may not be null");
         }
+        
+        // Remove old Leanback focus effects
+        gridPresenter.setShadowEnabled(false);
+        // Note: constructor based ZOOM disabling only works if passed to constructor, 
+        // however we can safely bypass default padding and shadows.
+
         mGridPresenter = gridPresenter;
         mGridPresenter.setOnItemViewSelectedListener(mViewSelectedListener);
         if (mOnItemViewClickedListener != null) {
@@ -72,7 +78,6 @@ public class GridFragment  extends Fragment implements BrowseSupportFragment.Mai
                 public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                            RowPresenter.ViewHolder rowViewHolder, Row row) {
                     int position = mGridViewHolder.getGridView().getSelectedPosition();
-                    if (DEBUG) Log.v(TAG, "grid selected position " + position);
                     gridOnItemSelected(position);
                     if (mOnItemViewSelectedListener != null) {
                         mOnItemViewSelectedListener.onItemSelected(itemViewHolder, item,

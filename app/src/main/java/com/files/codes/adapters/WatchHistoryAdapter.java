@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.files.codes.R;
@@ -41,8 +42,24 @@ public class WatchHistoryAdapter extends RecyclerView.Adapter<WatchHistoryAdapte
     }
 
     public void setItems(List<WatchHistorySyncItem.WatchHistoryItem> items) {
-        this.items = items != null ? items : new ArrayList<>();
-        notifyDataSetChanged();
+        final List<WatchHistorySyncItem.WatchHistoryItem> oldList = new ArrayList<>(this.items);
+        final List<WatchHistorySyncItem.WatchHistoryItem> newList = items != null ? items : new ArrayList<>();
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override public int getOldListSize() { return oldList.size(); }
+            @Override public int getNewListSize() { return newList.size(); }
+            @Override public boolean areItemsTheSame(int oldPos, int newPos) {
+                return java.util.Objects.equals(oldList.get(oldPos).getVideoId(), newList.get(newPos).getVideoId());
+            }
+            @Override public boolean areContentsTheSame(int oldPos, int newPos) {
+                WatchHistorySyncItem.WatchHistoryItem o = oldList.get(oldPos);
+                WatchHistorySyncItem.WatchHistoryItem n = newList.get(newPos);
+                return java.util.Objects.equals(o.getTitle(), n.getTitle())
+                    && o.getPosition() == n.getPosition()
+                    && Float.compare(o.getProgressPercentage(), n.getProgressPercentage()) == 0;
+            }
+        });
+        this.items = newList;
+        result.dispatchUpdatesTo(this);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -162,8 +179,23 @@ public class WatchHistoryAdapter extends RecyclerView.Adapter<WatchHistoryAdapte
      * Update adapter with new items
      */
     public void updateItems(List<WatchHistorySyncItem.WatchHistoryItem> newItems) {
-        this.items.clear();
-        this.items.addAll(newItems);
-        notifyDataSetChanged();
+        final List<WatchHistorySyncItem.WatchHistoryItem> oldList = new ArrayList<>(this.items);
+        final List<WatchHistorySyncItem.WatchHistoryItem> newList = newItems != null ? newItems : new ArrayList<>();
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override public int getOldListSize() { return oldList.size(); }
+            @Override public int getNewListSize() { return newList.size(); }
+            @Override public boolean areItemsTheSame(int oldPos, int newPos) {
+                return java.util.Objects.equals(oldList.get(oldPos).getVideoId(), newList.get(newPos).getVideoId());
+            }
+            @Override public boolean areContentsTheSame(int oldPos, int newPos) {
+                WatchHistorySyncItem.WatchHistoryItem o = oldList.get(oldPos);
+                WatchHistorySyncItem.WatchHistoryItem n = newList.get(newPos);
+                return java.util.Objects.equals(o.getTitle(), n.getTitle())
+                    && o.getPosition() == n.getPosition()
+                    && Float.compare(o.getProgressPercentage(), n.getProgressPercentage()) == 0;
+            }
+        });
+        this.items = newList;
+        result.dispatchUpdatesTo(this);
     }
 }

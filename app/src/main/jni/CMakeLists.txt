@@ -6,6 +6,8 @@
 
 cmake_minimum_required(VERSION 3.10.2)
 
+project(api_config)
+
 # Declares and names the project.
 
 #project("oxootvdemo")
@@ -23,6 +25,16 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              api_config.cpp)
+
+        target_compile_options(api_config PRIVATE
+            -fvisibility=hidden
+            -fvisibility-inlines-hidden
+            -ffunction-sections
+            -fdata-sections)
+
+        set_target_properties(api_config PROPERTIES
+            CXX_VISIBILITY_PRESET hidden
+            VISIBILITY_INLINES_HIDDEN YES)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -47,3 +59,9 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
+
+            target_link_options(api_config PRIVATE
+                -Wl,--gc-sections
+                -Wl,--exclude-libs,ALL
+                -Wl,--strip-all
+                -Wl,--build-id=none)

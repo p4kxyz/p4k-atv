@@ -27,8 +27,13 @@ public class ProfileFragment extends GuidedStepSupportFragment {
     private static final int ACTION_ID_CHOOSE_PLAYER = 3;
     private static final int ACTION_ID_LOGIN = 4;
     private static final int ACTION_ID_CHECK_UPDATE = 5;
+    private static final int ACTION_ID_AUDIO_LANG = 6;
+    private static final int ACTION_ID_SUBTITLE_LANG = 7;
     private static final String PREF_USE_EXTERNAL_PLAYER = "use_external_player";
     private static final String PREF_SELECTED_PLAYER = "selected_player";
+    private static final String PLAYER_PREFS = "player_settings";
+    private static final String PREF_AUDIO_LANG = "pref_audio_lang";
+    private static final String PREF_SUBTITLE_LANG = "pref_subtitle_lang";
     private DatabaseHelper db;
 
     @NonNull
@@ -83,6 +88,28 @@ public class ProfileFragment extends GuidedStepSupportFragment {
             actions.add(choosePlayerAction);
         }
         
+        // Audio language preference
+        String prefAudioLang = getContext().getSharedPreferences(PLAYER_PREFS, MODE_PRIVATE)
+                .getString(PREF_AUDIO_LANG, "");
+        GuidedAction audioLangAction = new GuidedAction.Builder(getActivity())
+                .id(ACTION_ID_AUDIO_LANG)
+                .title("🔊 Ngôn ngữ âm thanh ưu tiên")
+                .description(getAudioLangDisplayName(prefAudioLang))
+                .editable(false)
+                .build();
+        actions.add(audioLangAction);
+
+        // Subtitle language preference
+        String prefSubLang = getContext().getSharedPreferences(PLAYER_PREFS, MODE_PRIVATE)
+                .getString(PREF_SUBTITLE_LANG, "");
+        GuidedAction subLangAction = new GuidedAction.Builder(getActivity())
+                .id(ACTION_ID_SUBTITLE_LANG)
+                .title("📝 Ngôn ngữ phụ đề ưu tiên")
+                .description(getSubtitleLangDisplayName(prefSubLang))
+                .editable(false)
+                .build();
+        actions.add(subLangAction);
+
         // Check for Updates Action (always visible)
         String verName = "";
         try {
@@ -144,6 +171,10 @@ public class ProfileFragment extends GuidedStepSupportFragment {
             // Show player selection dialog
             showPlayerSelectionDialog();
             
+        } else if (action.getId() == ACTION_ID_AUDIO_LANG) {
+            showAudioLangDialog();
+        } else if (action.getId() == ACTION_ID_SUBTITLE_LANG) {
+            showSubtitleLangDialog();
         } else if (action.getId() == ACTION_ID_CHECK_UPDATE) {
             android.widget.Toast.makeText(getContext(), "Đang kiểm tra cập nhật...", android.widget.Toast.LENGTH_SHORT).show();
             OTAUpdateManager.getInstance(getContext()).checkForUpdates();
@@ -157,17 +188,217 @@ public class ProfileFragment extends GuidedStepSupportFragment {
         }
     }
     
+    // -----------------------------------------------------------------------
+    // Custom dialog builder – bypasses AlertDialog list rendering
+    // (fixes blank list on Bonfire OS / JMGO)
+    // -----------------------------------------------------------------------
+    private int dp(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    private android.app.Dialog buildCustomListDialog(
+            String title, String[] items, int checkedIndex,
+            Runnable[] actions, Runnable onCancel) {
+
+        android.app.Dialog dialog = new android.app.Dialog(getActivity());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        if (onCancel != null) dialog.setOnCancelListener(d -> onCancel.run());
+
+        android.widget.LinearLayout root = new android.widget.LinearLayout(getActivity());
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFF1E1E2E);
+        root.setPadding(dp(20), dp(20), dp(20), dp(12));
+
+        android.widget.TextView titleView = new android.widget.TextView(getActivity());
+        titleView.setText(title);
+        titleView.setTextColor(0xFFFFFFFF);
+        titleView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
+        titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        titleView.setPadding(dp(4), 0, dp(4), dp(10));
+        root.addView(titleView);
+
+        android.view.View divider = new android.view.View(getActivity());
+        divider.setBackgroundColor(0x55FFFFFF);
+        android.widget.LinearLayout.LayoutParams divLp =
+                new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+        divLp.bottomMargin = dp(6);
+        root.addView(divider, divLp);
+
+        android.widget.ScrollView sv = new android.widget.ScrollView(getActivity());
+        sv.setVerticalScrollBarEnabled(false);
+        android.widget.LinearLayout ll = new android.widget.LinearLayout(getActivity());
+        ll.setOrientation(android.widget.LinearLayout.VERTICAL);
+
+        for (int i = 0; i < items.length; i++) {
+            final int idx = i;
+            boolean isSelected = (checkedIndex >= 0 && i == checkedIndex);
+
+            android.widget.TextView tv = new android.widget.TextView(getActivity());
+            tv.setText(isSelected ? "✓  " + items[i] : "     " + items[i]);
+            tv.setTextColor(isSelected ? 0xFF64B5F6 : 0xFFDDDDDD);
+            tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            tv.setPadding(dp(10), dp(13), dp(10), dp(13));
+            tv.setFocusable(true);
+            tv.setFocusableInTouchMode(false);
+            tv.setClickable(true);
+            tv.setBackground(null);
+            tv.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    v.setBackgroundColor(0x664FC3F7);
+                    ((android.widget.TextView) v).setTextColor(0xFFFFFFFF);
+                } else {
+                    v.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    boolean sel = (checkedIndex >= 0 && idx == checkedIndex);
+                    ((android.widget.TextView) v).setTextColor(sel ? 0xFF64B5F6 : 0xFFDDDDDD);
+                }
+            });
+            tv.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (actions != null && idx < actions.length && actions[idx] != null)
+                    actions[idx].run();
+            });
+            ll.addView(tv);
+
+            android.view.View sep = new android.view.View(getActivity());
+            sep.setBackgroundColor(0x22FFFFFF);
+            ll.addView(sep, new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        }
+        sv.addView(ll);
+        root.addView(sv, new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(360)));
+
+        if (onCancel != null) {
+            android.view.View btnDiv = new android.view.View(getActivity());
+            btnDiv.setBackgroundColor(0x33FFFFFF);
+            android.widget.LinearLayout.LayoutParams bdLp =
+                    new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+            bdLp.topMargin = dp(6);
+            root.addView(btnDiv, bdLp);
+
+            android.widget.TextView cancelBtn = new android.widget.TextView(getActivity());
+            cancelBtn.setText("Hủy");
+            cancelBtn.setTextColor(0xFF90CAF9);
+            cancelBtn.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            cancelBtn.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            cancelBtn.setPadding(dp(10), dp(12), dp(10), dp(4));
+            cancelBtn.setFocusable(true);
+            cancelBtn.setFocusableInTouchMode(false);
+            cancelBtn.setClickable(true);
+            cancelBtn.setBackground(null);
+            cancelBtn.setGravity(android.view.Gravity.END);
+            cancelBtn.setOnFocusChangeListener((v, hasFocus) ->
+                    v.setBackgroundColor(hasFocus ? 0x33FFFFFF : android.graphics.Color.TRANSPARENT));
+            cancelBtn.setOnClickListener(v -> { dialog.dismiss(); onCancel.run(); });
+            root.addView(cancelBtn, new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT));
+        }
+
+        dialog.setContentView(root);
+        android.view.Window w = dialog.getWindow();
+        if (w != null) {
+            w.setLayout(dp(480), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            w.setGravity(android.view.Gravity.CENTER);
+            w.setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        return dialog;
+    }
+
+    private void refreshActions() {
+        List<GuidedAction> newActions = new java.util.ArrayList<>();
+        onCreateActions(newActions, null);
+        setActions(newActions);
+    }
+
+    private void showAudioLangDialog() {
+        final String[] displayNames = {
+            "Không đặt (tự động)", "Tiếng Việt (vi)", "Tiếng Anh (en)",
+            "Tiếng Nhật (ja)", "Tiếng Trung (zh)", "Tiếng Hàn (ko)"
+        };
+        final String[] values = {"", "vi", "en", "ja", "zh", "ko"};
+
+        android.content.SharedPreferences prefs =
+                getContext().getSharedPreferences(PLAYER_PREFS, MODE_PRIVATE);
+        String current = prefs.getString(PREF_AUDIO_LANG, "");
+        int checked = 0;
+        for (int i = 0; i < values.length; i++) if (current.equals(values[i])) { checked = i; break; }
+
+        Runnable[] actions = new Runnable[displayNames.length];
+        for (int i = 0; i < displayNames.length; i++) {
+            final int idx = i;
+            actions[i] = () -> {
+                prefs.edit().putString(PREF_AUDIO_LANG, values[idx]).apply();
+                android.widget.Toast.makeText(getContext(),
+                        "✅ Đã đặt: " + displayNames[idx], android.widget.Toast.LENGTH_SHORT).show();
+                refreshActions();
+            };
+        }
+        buildCustomListDialog("🔊 Ngôn ngữ âm thanh ưu tiên",
+                displayNames, checked, actions, null).show();
+    }
+
+    private void showSubtitleLangDialog() {
+        final String[] displayNames = {
+            "Không đặt (tự động)", "Tiếng Việt (vi)", "Tiếng Anh (en)",
+            "Tiếng Nhật (ja)", "Tiếng Trung (zh)", "Tiếng Hàn (ko)", "Tắt hoàn toàn"
+        };
+        final String[] values = {"", "vi", "en", "ja", "zh", "ko", "off"};
+
+        android.content.SharedPreferences prefs =
+                getContext().getSharedPreferences(PLAYER_PREFS, MODE_PRIVATE);
+        String current = prefs.getString(PREF_SUBTITLE_LANG, "");
+        int checked = 0;
+        for (int i = 0; i < values.length; i++) if (current.equals(values[i])) { checked = i; break; }
+
+        Runnable[] actions = new Runnable[displayNames.length];
+        for (int i = 0; i < displayNames.length; i++) {
+            final int idx = i;
+            actions[i] = () -> {
+                prefs.edit().putString(PREF_SUBTITLE_LANG, values[idx]).apply();
+                android.widget.Toast.makeText(getContext(),
+                        "✅ Đã đặt: " + displayNames[idx], android.widget.Toast.LENGTH_SHORT).show();
+                refreshActions();
+            };
+        }
+        buildCustomListDialog("📝 Ngôn ngữ phụ đề ưu tiên",
+                displayNames, checked, actions, null).show();
+    }
+
+    private String getAudioLangDisplayName(String value) {
+        switch (value) {
+            case "vi": return "Tiếng Việt (vi)";
+            case "en": return "Tiếng Anh (en)";
+            case "ja": return "Tiếng Nhật (ja)";
+            case "zh": return "Tiếng Trung (zh)";
+            case "ko": return "Tiếng Hàn (ko)";
+            default:   return "Không đặt (tự động)";
+        }
+    }
+
+    private String getSubtitleLangDisplayName(String value) {
+        switch (value) {
+            case "vi":  return "Tiếng Việt (vi)";
+            case "en":  return "Tiếng Anh (en)";
+            case "ja":  return "Tiếng Nhật (ja)";
+            case "zh":  return "Tiếng Trung (zh)";
+            case "ko":  return "Tiếng Hàn (ko)";
+            case "off": return "Tắt hoàn toàn";
+            default:    return "Không đặt (tự động)";
+        }
+    }
+
     private void showPlayerSelectionDialog() {
         SharedPreferences prefs = getContext().getSharedPreferences(Constants.USER_LOGIN_STATUS, MODE_PRIVATE);
         String currentPlayer = prefs.getString(PREF_SELECTED_PLAYER, "just");
-        
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.choose_player);
-        
+
         final String[] players = {
             getString(R.string.p4k_player),
             getString(R.string.kodi_player),
-            getString(R.string.just_player), 
+            getString(R.string.just_player),
             getString(R.string.mx_player),
             "Vimu Player",
             getString(R.string.vlc_player),
@@ -177,34 +408,28 @@ public class ProfileFragment extends GuidedStepSupportFragment {
             getString(R.string.zidoo_realtek),
             getString(R.string.zidoo_amlogic)
         };
-        final String[] playerValues = {"p4k", "kodi", "just", "mx", "vimu", "vlc", "nplayer", "dune_realtek", "dune_amlogic", "zidoo_realtek", "zidoo_amlogic"};
-        
-        int checkedItem = 0;
+        final String[] playerValues = {
+            "p4k", "kodi", "just", "mx", "vimu", "vlc", "nplayer",
+            "dune_realtek", "dune_amlogic", "zidoo_realtek", "zidoo_amlogic"
+        };
+
+        int checked = 0;
         for (int i = 0; i < playerValues.length; i++) {
-            if (currentPlayer.equals(playerValues[i])) {
-                checkedItem = i;
-                break;
-            }
+            if (currentPlayer.equals(playerValues[i])) { checked = i; break; }
         }
-        
-        builder.setSingleChoiceItems(players, checkedItem, (dialog, which) -> {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(PREF_SELECTED_PLAYER, playerValues[which]);
-            editor.apply();
-            
-            String message = "✅ Đã chọn " + players[which];
-            android.widget.Toast.makeText(getContext(), message, android.widget.Toast.LENGTH_SHORT).show();
-            
-            dialog.dismiss();
-            
-            // Refresh actions to update description immediately
-            List<GuidedAction> newActions = new java.util.ArrayList<>();
-            onCreateActions(newActions, null);
-            setActions(newActions);
-        });
-        
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
-        builder.show();
+
+        Runnable[] actions = new Runnable[players.length];
+        for (int i = 0; i < players.length; i++) {
+            final int idx = i;
+            actions[i] = () -> {
+                prefs.edit().putString(PREF_SELECTED_PLAYER, playerValues[idx]).apply();
+                android.widget.Toast.makeText(getContext(),
+                        "✅ Đã chọn " + players[idx], android.widget.Toast.LENGTH_SHORT).show();
+                refreshActions();
+            };
+        }
+        buildCustomListDialog(getString(R.string.choose_player),
+                players, checked, actions, null).show();
     }
     
     // Helper method to get player display name

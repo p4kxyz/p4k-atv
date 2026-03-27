@@ -19,6 +19,7 @@ import com.files.codes.utils.PreferenceUtils;
 import com.files.codes.utils.RetrofitClient;
 
 import com.files.codes.view.fragments.SplashFragment;
+import com.files.codes.view.HomeActivity;
 import com.files.codes.view.fragments.testFolder.HomeNewActivity;
 
 import retrofit2.Call;

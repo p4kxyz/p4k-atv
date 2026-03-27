@@ -14,6 +14,8 @@ import com.files.codes.model.SearchModel;
 import com.files.codes.model.config.Configuration;
 import com.files.codes.model.movieDetails.MovieSingleDetails;
 import com.files.codes.model.subscription.ActiveStatus;
+import com.files.codes.model.subscription.TvCodeCheckResponse;
+import com.files.codes.model.subscription.TvCodeResponse;
 import com.files.codes.model.subscription.User;
 
 import java.util.List;
@@ -75,6 +77,24 @@ public interface ApiService {
     Call<List<Movie>> getMovieByCountry(@Header("API-KEY") String apiKey,
                                         @Query("id") String id,
                                         @Query("page") int page_number);
+
+    @GET("latest_movies")
+    Call<List<Movie>> getLatestMovies(@Header("API-KEY") String apiKey,
+                                      @Query("limit") int limit,
+                                      @Query("genre_id") String genreId,
+                                      @Query("country_id") String countryId,
+                                      @Query("range_from") String rangeFrom,
+                                      @Query("range_to") String rangeTo,
+                                      @Query("page") int page);
+
+    @GET("latest_tvseries")
+    Call<List<Movie>> getLatestTvSeries(@Header("API-KEY") String apiKey,
+                                        @Query("limit") int limit,
+                                        @Query("genre_id") String genreId,
+                                        @Query("country_id") String countryId,
+                                        @Query("range_from") String rangeFrom,
+                                        @Query("range_to") String rangeTo,
+                                        @Query("page") int page);
 
     @GET("single_details")
     Call<MovieSingleDetails> getSingleDetail(@Header("API-KEY") String apiKey,
@@ -161,5 +181,13 @@ public interface ApiService {
     Call<List<Movie>> searchByActor(@Header("API-KEY") String key,
                                    @Query("q") String actorName,
                                    @Query("page") int page);
+
+    // TV Code Login
+    @GET("generate_tv_code")
+    Call<TvCodeResponse> generateTvCode(@Header("API-KEY") String apiKey);
+
+    @GET("check_tv_code")
+    Call<TvCodeCheckResponse> checkTvCode(@Header("API-KEY") String apiKey,
+                                          @Query("code") String code);
 
 }

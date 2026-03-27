@@ -1,0 +1,408 @@
+private void openUnifiedSettingsDialog() {
+        // Subtitle settings dialog with all customization options
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Cài đặt phụ đề");
+        
+        // Create a ScrollView to handle long content
+        android.widget.ScrollView scrollView = new android.widget.ScrollView(this);
+        
+        // Create a vertical layout
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 10);
+        
+        SharedPreferences prefs = getSharedPreferences("subtitle_settings", MODE_PRIVATE);
+        
+        // Font size controls
+        TextView fontSizeLabel = new TextView(this);
+        fontSizeLabel.setText("Cỡ chữ:");
+        fontSizeLabel.setTextSize(16);
+        fontSizeLabel.setPadding(0, 10, 0, 10);
+        
+        LinearLayout fontSizeLayout = new LinearLayout(this);
+        fontSizeLayout.setOrientation(LinearLayout.HORIZONTAL);
+        
+        Button fontSizeMinusBtn = new Button(this);
+        fontSizeMinusBtn.setText("-");
+        Button fontSizePlusBtn = new Button(this);
+        fontSizePlusBtn.setText("+");
+        TextView fontSizeTV = new TextView(this);
+        fontSizeTV.setText(prefs.getInt("font_size", 20) + "sp");
+        fontSizeTV.setGravity(android.view.Gravity.CENTER);
+        fontSizeTV.setPadding(20, 0, 20, 0);
+        
+        fontSizeLayout.addView(fontSizeMinusBtn);
+        fontSizeLayout.addView(fontSizeTV);
+        fontSizeLayout.addView(fontSizePlusBtn);
+        
+        // Font type controls
+        TextView fontTypeLabel = new TextView(this);
+        fontTypeLabel.setText("Kiểu chữ:");
+        fontTypeLabel.setTextSize(16);
+        fontTypeLabel.setPadding(0, 20, 0, 10);
+        
+        LinearLayout fontTypeLayout = new LinearLayout(this);
+        fontTypeLayout.setOrientation(LinearLayout.HORIZONTAL);
+        
+        Button fontTypePrevBtn = new Button(this);
+        fontTypePrevBtn.setText("◀");
+        Button fontTypeNextBtn = new Button(this);
+        fontTypeNextBtn.setText("▶");
+        TextView fontTypeTV = new TextView(this);
+        
+        String[] fontNames = {"Mặc định", "Sans Serif", "Serif", "Monospace", "Tiếng Việt"};
+        int currentFontType = prefs.getInt("font_type", 4); // Default to Vietnamese
+        // Bounds checking to prevent crash
+        if (currentFontType >= fontNames.length) {
+            currentFontType = 4; // Default to Vietnamese
+            prefs.edit().putInt("font_type", currentFontType).apply();
+        }
+        fontTypeTV.setText(fontNames[currentFontType]);
+        fontTypeTV.setGravity(android.view.Gravity.CENTER);
+        fontTypeTV.setPadding(20, 0, 20, 0);
+        
+        fontTypeLayout.addView(fontTypePrevBtn);
+        fontTypeLayout.addView(fontTypeTV);
+        fontTypeLayout.addView(fontTypeNextBtn);
+        
+        // Position controls
+        TextView positionLabel = new TextView(this);
+        positionLabel.setText("Vị trí:");
+        positionLabel.setTextSize(16);
+        positionLabel.setPadding(0, 20, 0, 10);
+        
+        LinearLayout positionLayout = new LinearLayout(this);
+        positionLayout.setOrientation(LinearLayout.HORIZONTAL);
+        
+        Button positionUpBtn = new Button(this);
+        positionUpBtn.setText("Lên");
+        Button positionDownBtn = new Button(this);
+        positionDownBtn.setText("Xuống");
+        TextView positionTV = new TextView(this);
+        
+        // Position logic - offset from default position (negative = closer to bottom, positive = further up)
+        int currentOffset = prefs.getInt("vertical_offset", 0);
+        positionTV.setText("Dịch chuyển (" + (currentOffset > 0 ? "+" : "") + currentOffset + "%)");
+        positionTV.setGravity(android.view.Gravity.CENTER);
+        positionTV.setPadding(20, 0, 20, 0);
+        
+        positionLayout.addView(positionUpBtn);
+        positionLayout.addView(positionTV);
+        positionLayout.addView(positionDownBtn);
+        
+        // Background switch
+        LinearLayout backgroundLayout = new LinearLayout(this);
+        backgroundLayout.setOrientation(LinearLayout.HORIZONTAL);
+        backgroundLayout.setPadding(0, 20, 0, 10);
+        TextView backgroundLabel = new TextView(this);
+        backgroundLabel.setText("Nền: ");
+        backgroundLabel.setTextSize(16);
+        Switch backgroundSwitch = new Switch(this);
+        backgroundSwitch.setChecked(prefs.getBoolean("background", false));
+        
+        backgroundLayout.addView(backgroundLabel);
+        backgroundLayout.addView(backgroundSwitch);
+        
+        // Text Color controls
+        TextView textColorLabel = new TextView(this);
+        textColorLabel.setText("Màu chữ:");
+        textColorLabel.setTextSize(16);
+        textColorLabel.setPadding(0, 20, 0, 10);
+        
+        LinearLayout textColorLayout = new LinearLayout(this);
+        textColorLayout.setOrientation(LinearLayout.HORIZONTAL);
+        
+        Button textColorPrevBtn = new Button(this);
+        textColorPrevBtn.setText("◀");
+        Button textColorNextBtn = new Button(this);
+        textColorNextBtn.setText("▶");
+        TextView textColorTV = new TextView(this);
+        
+        String[] colorNames = {"Trắng", "Vàng", "Đỏ", "Xanh lá", "Xanh dương", "Cam", "Hồng", "Xanh lơ"};
+        int[] colorValues = {Color.WHITE, Color.YELLOW, Color.RED, Color.GREEN, 
+                            Color.BLUE, 0xFFFF8C00, 0xFFFFC0CB, Color.CYAN}; // Orange, Pink
+        int currentTextColor = prefs.getInt("text_color", 0);
+        // Bounds checking to prevent crash
+        if (currentTextColor >= colorNames.length) {
+            currentTextColor = 0; // Default to White
+            prefs.edit().putInt("text_color", currentTextColor).apply();
+        }
+        textColorTV.setText(colorNames[currentTextColor]);
+        textColorTV.setTextColor(colorValues[currentTextColor]);
+        textColorTV.setGravity(android.view.Gravity.CENTER);
+        textColorTV.setPadding(20, 0, 20, 0);
+        
+        textColorLayout.addView(textColorPrevBtn);
+        textColorLayout.addView(textColorTV);
+        textColorLayout.addView(textColorNextBtn);
+        
+        // Outline Color controls
+        TextView outlineColorLabel = new TextView(this);
+        outlineColorLabel.setText("Màu viền:");
+        outlineColorLabel.setTextSize(16);
+        outlineColorLabel.setPadding(0, 20, 0, 10);
+        
+        LinearLayout outlineColorLayout = new LinearLayout(this);
+        outlineColorLayout.setOrientation(LinearLayout.HORIZONTAL);
+        
+        Button outlineColorPrevBtn = new Button(this);
+        outlineColorPrevBtn.setText("◀");
+        Button outlineColorNextBtn = new Button(this);
+        outlineColorNextBtn.setText("▶");
+        TextView outlineColorTV = new TextView(this);
+        
+        String[] outlineColorNames = {"Trong suốt", "Đen", "Trắng", "Đỏ", "Xanh dương", "Vàng"};
+        int[] outlineColorValues = {Color.TRANSPARENT, Color.BLACK, Color.WHITE, Color.RED, Color.BLUE, Color.YELLOW};
+        int currentOutlineColor = prefs.getInt("outline_color", 1);
+        // Bounds checking to prevent crash
+        if (currentOutlineColor >= outlineColorNames.length) {
+            currentOutlineColor = 1; // Default to Black
+            prefs.edit().putInt("outline_color", currentOutlineColor).apply();
+        }
+        outlineColorTV.setText(outlineColorNames[currentOutlineColor]);
+        // Show the actual color like text color does
+        if (currentOutlineColor == 0) {
+            outlineColorTV.setTextColor(Color.GRAY); // Show gray for "None"
+        } else {
+            outlineColorTV.setTextColor(outlineColorValues[currentOutlineColor]);
+        }
+        outlineColorTV.setGravity(android.view.Gravity.CENTER);
+        outlineColorTV.setPadding(20, 0, 20, 0);
+        outlineColorTV.setGravity(android.view.Gravity.CENTER);
+        
+        outlineColorLayout.addView(outlineColorPrevBtn);
+        outlineColorLayout.addView(outlineColorTV);
+        outlineColorLayout.addView(outlineColorNextBtn);
+        
+        // Playback Speed controls
+        TextView playbackSpeedLabel = new TextView(this);
+        playbackSpeedLabel.setText("Tốc độ phát:");
+        playbackSpeedLabel.setTextSize(16);
+        playbackSpeedLabel.setPadding(0, 20, 0, 10);
+        
+        LinearLayout playbackSpeedLayout = new LinearLayout(this);
+        playbackSpeedLayout.setOrientation(LinearLayout.HORIZONTAL);
+        playbackSpeedLayout.setGravity(android.view.Gravity.CENTER);
+        
+        float currentSpeed = prefs.getFloat("playback_speed", 1.0f);
+        
+        Button speed05 = new Button(this);
+        speed05.setText("0.5x");
+        speed05.setTextSize(12);
+        if (currentSpeed == 0.5f) speed05.setBackgroundColor(Color.GREEN);
+        
+        Button speed075 = new Button(this);
+        speed075.setText("0.75x");
+        speed075.setTextSize(12);
+        if (currentSpeed == 0.75f) speed075.setBackgroundColor(Color.GREEN);
+        
+        Button speed10 = new Button(this);
+        speed10.setText("1.0x");
+        speed10.setTextSize(12);
+        if (currentSpeed == 1.0f) speed10.setBackgroundColor(Color.GREEN);
+        
+        Button speed15 = new Button(this);
+        speed15.setText("1.5x");
+        speed15.setTextSize(12);
+        if (currentSpeed == 1.5f) speed15.setBackgroundColor(Color.GREEN);
+        
+        Button speed20 = new Button(this);
+        speed20.setText("2.0x");
+        speed20.setTextSize(12);
+        if (currentSpeed == 2.0f) speed20.setBackgroundColor(Color.GREEN);
+        
+        Button speed30 = new Button(this);
+        speed30.setText("3.0x");
+        speed30.setTextSize(12);
+        if (currentSpeed == 3.0f) speed30.setBackgroundColor(Color.GREEN);
+        
+        playbackSpeedLayout.addView(speed05);
+        playbackSpeedLayout.addView(speed075);
+        playbackSpeedLayout.addView(speed10);
+        playbackSpeedLayout.addView(speed15);
+        playbackSpeedLayout.addView(speed20);
+        playbackSpeedLayout.addView(speed30);
+        
+        // Reset button
+        Button resetBtn = new Button(this);
+        resetBtn.setText("Khôi phục mặc định");
+        resetBtn.setPadding(0, 30, 0, 0);
+        
+        // Add all views to layout
+        layout.addView(fontSizeLabel);
+        layout.addView(fontSizeLayout);
+        layout.addView(fontTypeLabel);
+        layout.addView(fontTypeLayout);
+        layout.addView(positionLabel);
+        layout.addView(positionLayout);
+        layout.addView(backgroundLayout);
+        layout.addView(textColorLabel);
+        layout.addView(textColorLayout);
+        layout.addView(outlineColorLabel);
+        layout.addView(outlineColorLayout);
+        layout.addView(playbackSpeedLabel);
+        layout.addView(playbackSpeedLayout);
+        layout.addView(resetBtn);
+        
+        // Set up button listeners
+        fontSizeMinusBtn.setOnClickListener(v -> {
+            int currentSize = Integer.parseInt(fontSizeTV.getText().toString().replace("sp", ""));
+            if (currentSize > 12) {
+                currentSize -= 2;
+                fontSizeTV.setText(currentSize + "sp");
+                saveAndApplySubtitleSetting("font_size", currentSize);
+            }
+        });
+        
+        fontSizePlusBtn.setOnClickListener(v -> {
+            int currentSize = Integer.parseInt(fontSizeTV.getText().toString().replace("sp", ""));
+            if (currentSize < 40) {
+                currentSize += 2;
+                fontSizeTV.setText(currentSize + "sp");
+                saveAndApplySubtitleSetting("font_size", currentSize);
+            }
+        });
+        
+        fontTypePrevBtn.setOnClickListener(v -> {
+            int currentType = prefs.getInt("font_type", 0);
+            currentType = (currentType - 1 + fontNames.length) % fontNames.length;
+            fontTypeTV.setText(fontNames[currentType]);
+            saveAndApplySubtitleSetting("font_type", currentType);
+        });
+        
+        fontTypeNextBtn.setOnClickListener(v -> {
+            int currentType = prefs.getInt("font_type", 0);
+            currentType = (currentType + 1) % fontNames.length;
+            fontTypeTV.setText(fontNames[currentType]);
+            saveAndApplySubtitleSetting("font_type", currentType);
+        });
+        
+        positionUpBtn.setOnClickListener(v -> {
+            int offset = prefs.getInt("vertical_offset", 0);
+            offset += 5; // Move up (increase offset from bottom - higher value = further from bottom)
+            offset = Math.min(offset, 80); // Max 80% from bottom
+            String newPositionText = offset == 0 ? "Giữa" : "Lên +" + offset + "%";
+            positionTV.setText(newPositionText);
+            saveAndApplySubtitleSetting("vertical_offset", offset);
+        });
+        
+        positionDownBtn.setOnClickListener(v -> {
+            int offset = prefs.getInt("vertical_offset", 0);
+            offset -= 5; // Move down (decrease offset - negative values = closer to bottom edge)
+            offset = Math.max(offset, -10); // Min -10% (very close to bottom edge)
+            String newPositionText = offset == 0 ? "Giữa" : "Xuống " + offset + "%";
+            positionTV.setText(newPositionText);
+            saveAndApplySubtitleSetting("vertical_offset", offset);
+        });
+        
+        backgroundSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            saveAndApplySubtitleSetting("background", isChecked);
+        });
+        
+        // Text color controls
+        textColorPrevBtn.setOnClickListener(v -> {
+            int index = (prefs.getInt("text_color", 0) - 1 + colorNames.length) % colorNames.length;
+            prefs.edit().putInt("text_color", index).apply();
+            textColorTV.setText(colorNames[index]);
+            textColorTV.setTextColor(colorValues[index]);
+            applySubtitleSettings();
+        });
+        
+        textColorNextBtn.setOnClickListener(v -> {
+            int index = (prefs.getInt("text_color", 0) + 1) % colorNames.length;
+            prefs.edit().putInt("text_color", index).apply();
+            textColorTV.setText(colorNames[index]);
+            textColorTV.setTextColor(colorValues[index]);
+            applySubtitleSettings();
+        });
+        
+        // Outline color controls
+        outlineColorPrevBtn.setOnClickListener(v -> {
+            int index = (prefs.getInt("outline_color", 1) - 1 + outlineColorNames.length) % outlineColorNames.length;
+            prefs.edit().putInt("outline_color", index).apply();
+            outlineColorTV.setText(outlineColorNames[index]);
+            // Show the actual color like text color does
+            if (index == 0) {
+                outlineColorTV.setTextColor(Color.GRAY); // Show gray for "None"
+            } else {
+                outlineColorTV.setTextColor(outlineColorValues[index]);
+            }
+            applySubtitleSettings();
+        });
+        
+        outlineColorNextBtn.setOnClickListener(v -> {
+            int index = (prefs.getInt("outline_color", 1) + 1) % outlineColorNames.length;
+            prefs.edit().putInt("outline_color", index).apply();
+            outlineColorTV.setText(outlineColorNames[index]);
+            // Show the actual color like text color does
+            if (index == 0) {
+                outlineColorTV.setTextColor(Color.GRAY); // Show gray for "None"
+            } else {
+                outlineColorTV.setTextColor(outlineColorValues[index]);
+            }
+            applySubtitleSettings();
+        });
+        
+        // Playback speed controls
+        View.OnClickListener speedClickListener = v -> {
+            float speed = 1.0f;
+            if (v == speed05) speed = 0.5f;
+            else if (v == speed075) speed = 0.75f;
+            else if (v == speed10) speed = 1.0f;
+            else if (v == speed15) speed = 1.5f;
+            else if (v == speed20) speed = 2.0f;
+            else if (v == speed30) speed = 3.0f;
+            
+            // Reset all button backgrounds
+            speed05.setBackgroundColor(Color.TRANSPARENT);
+            speed075.setBackgroundColor(Color.TRANSPARENT);
+            speed10.setBackgroundColor(Color.TRANSPARENT);
+            speed15.setBackgroundColor(Color.TRANSPARENT);
+            speed20.setBackgroundColor(Color.TRANSPARENT);
+            speed30.setBackgroundColor(Color.TRANSPARENT);
+            
+            // Highlight selected button
+            ((Button)v).setBackgroundColor(Color.GREEN);
+            
+            // Save and apply speed
+            prefs.edit().putFloat("playback_speed", speed).apply();
+            setPlaybackSpeed(speed);
+        };
+        
+        speed05.setOnClickListener(speedClickListener);
+        speed075.setOnClickListener(speedClickListener);
+        speed10.setOnClickListener(speedClickListener);
+        speed15.setOnClickListener(speedClickListener);
+        speed20.setOnClickListener(speedClickListener);
+        speed30.setOnClickListener(speedClickListener);
+        
+        resetBtn.setOnClickListener(v -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("font_size", 20);
+            editor.putInt("font_type", 4); // Default to Vietnamese
+            editor.putInt("vertical_offset", 0);
+            editor.putBoolean("background", false);
+            editor.putInt("text_color", 0); // White
+            editor.putInt("outline_color", 1); // Black
+            editor.putFloat("playback_speed", 1.0f); // Normal speed
+            editor.apply();
+            
+            fontSizeTV.setText("20sp");
+            fontTypeTV.setText(fontNames[4]); // Default to Vietnamese
+            positionTV.setText("Giữa");
+            backgroundSwitch.setChecked(false);
+            textColorTV.setText(colorNames[0]);
+            textColorTV.setTextColor(colorValues[0]);
+            outlineColorTV.setText(outlineColorNames[1]);
+            outlineColorTV.setTextColor(outlineColorValues[1]); // Show black color for reset
+            
+            Toast.makeText(PlayerActivity.this, "Đã khôi phục cài đặt gốc", Toast.LENGTH_SHORT).show();
+            applySubtitleSettings();
+        });
+        
+        // Add layout to ScrollView and ScrollView to dialog
+        scrollView.addView(layout);
+        builder.setView(scrollView);
+        builder.setPositiveButton("Đóng", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }

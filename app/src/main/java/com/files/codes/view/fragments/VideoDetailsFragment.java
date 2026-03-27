@@ -180,13 +180,11 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
     private void setupHeroStyleListeners(HeroStyleMovieDetailsPresenter heroPresenter) {
         // Set up Play button listener
         heroPresenter.setOnPlayClickListener(movie -> {
-            Log.d(TAG, "Play button clicked for movie: " + movie.getTitle());
             playMovie(movie);
         });
         
         // Set up Favorite button listener
         heroPresenter.setOnFavoriteClickListener(movie -> {
-            Log.d(TAG, "Favorite button clicked for movie: " + movie.getTitle());
             toggleFavorite(movie);
         });
     }
@@ -196,19 +194,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
         if (movieDetails != null && movieDetails.getVideos() != null && !movieDetails.getVideos().isEmpty()) {
             
             // Debug: Check movieDetails data before sending to PlayerActivity
-            Log.d(TAG, "🎬 VideoDetailsFragment playMovie debug:");
-            Log.d(TAG, "  - VideosId: '" + movieDetails.getVideosId() + "'");
-            Log.d(TAG, "  - Title: '" + movieDetails.getTitle() + "'");
-            Log.d(TAG, "  - Slug: '" + movieDetails.getSlug() + "'");
-            Log.d(TAG, "  - Type: '" + movieDetails.getType() + "'");
-            Log.d(TAG, "  - Description: '" + movieDetails.getDescription() + "'");
-            Log.d(TAG, "  - Release: '" + movieDetails.getRelease() + "'");
-            Log.d(TAG, "  - Runtime: '" + movieDetails.getRuntime() + "'");
-            Log.d(TAG, "  - ImdbRating: '" + movieDetails.getImdbRating() + "'");
-            Log.d(TAG, "  - Genre count: " + (movieDetails.getGenre() != null ? movieDetails.getGenre().size() : 0));
-            Log.d(TAG, "  - Cast count: " + (movieDetails.getCastAndCrew() != null ? movieDetails.getCastAndCrew().size() : 0));
-            Log.d(TAG, "  - Director count: " + (movieDetails.getDirector() != null ? movieDetails.getDirector().size() : 0));
-            Log.d(TAG, "  - Videos count: " + (movieDetails.getVideos() != null ? movieDetails.getVideos().size() : 0));
             
             // Get video ID - try multiple sources
             String videoId = movieDetails.getVideosId();
@@ -216,12 +201,10 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                 // Fallback: try to get from first video in videos list
                 if (movieDetails.getVideos() != null && !movieDetails.getVideos().isEmpty()) {
                     videoId = movieDetails.getVideos().get(0).getVideoFileId();
-                    Log.w(TAG, "⚠️ Using video file ID from videos[0]: " + videoId);
                 }
             }
             
             if (videoId == null || videoId.isEmpty() || videoId.equals("null")) {
-                Log.e(TAG, "❌ Cannot play movie - no valid video ID found");
                 // Could show error message to user here
                 return;
             }
@@ -249,12 +232,10 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
 
     private void toggleFavorite(MovieSingleDetails movie) {
         // Placeholder - not used in hero style
-        Log.d(TAG, "toggleFavorite called - placeholder");
     }
 
     private void setUpDetailsOverviewRow() {
         if (getActivity() == null || !isAdded()) {
-            Log.w(TAG, "setUpDetailsOverviewRow: Fragment not attached, skipping setup");
             return;
         }
         
@@ -267,29 +248,23 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
 
             // Check if this is a phim4k movie/series
             if (id != null && id.startsWith("phim4k_")) {
-                Log.e(TAG, "setUpDetailsOverviewRow: Detected phim4k content, ID: " + id);
                 getPhim4kData(type, id);
                 getFavStatus();
             } else if (id != null && id.startsWith("kkphim4k_")) {
-                Log.e(TAG, "setUpDetailsOverviewRow: Detected kkphim4k content, ID: " + id);
                 getKKPhim4kData(type, id);
                 getFavStatus();
             } else if (type != null && type.equals("movie")) {
                 // fetch movie details
-                Log.e(TAG, "setUpDetailsOverviewRow: Loading movie data for ID: " + id);
                 getData(type, id);
                 getFavStatus();
 
             } else if (type != null && type.equals("tvseries")) {
                 // fetch tv series details
-                Log.e(TAG, "setUpDetailsOverviewRow: Loading TV series data for ID: " + id);
                 getTvSeries(type, id);
                 getFavStatus();
             } else {
-                Log.w(TAG, "setUpDetailsOverviewRow: Unknown type: " + type);
             }
         } catch (Exception e) {
-            Log.e(TAG, "setUpDetailsOverviewRow: Error setting up details overview", e);
         }
     }
 
@@ -423,12 +398,10 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
 
     private void bindMovieDetails(MovieSingleDetails singleDetails) {
         if (singleDetails == null) {
-            Log.e(TAG, "bindMovieDetails: singleDetails is null, cannot bind details");
             return;
         }
         
         if (mDetailsOverviewRow == null) {
-            Log.e(TAG, "bindMovieDetails: mDetailsOverviewRow is null, creating new one");
             mDetailsOverviewRow = new DetailsOverviewRow(singleDetails);
             if (mAdapter != null) {
                 mAdapter.add(mDetailsOverviewRow);
@@ -436,7 +409,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
         }
         
         if (getActivity() == null || getContext() == null) {
-            Log.e(TAG, "bindMovieDetails: Activity or Context is null, cannot bind");
             return;
         }
         
@@ -445,7 +417,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
         mDetailsOverviewRow.setItem(movieDetails);
         loadImage(thumbUrl);
         
-        Log.e(TAG, "bindMovieDetails: Successfully bound details for " + movieDetails.getTitle());
     }
 
     private void changePalette(Bitmap bmp) {
@@ -493,7 +464,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                 }
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_server_tv, null);
             RecyclerView serverRv = view.findViewById(R.id.serverRv);
             ServerAdapter serverAdapter = new ServerAdapter(getActivity(), videoList, "movie");
@@ -503,9 +473,13 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
 
             Button closeBt = view.findViewById(R.id.close_bt);
 
-            builder.setView(view);
-
-            final AlertDialog dialog = builder.create();
+            android.app.Dialog dialog = new android.app.Dialog(getActivity());
+            dialog.setContentView(view);
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0xFF1E1E2E));
+                dialog.getWindow().setLayout(dp(560), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setGravity(android.view.Gravity.CENTER);
+            }
             dialog.show();
 
             closeBt.setOnClickListener(new View.OnClickListener() {
@@ -537,7 +511,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                         try {
                             video.setId(Long.parseLong(id));
                         } catch (NumberFormatException e) {
-                            Log.e("VideoDetailsFragment", "Failed to parse ID as Long: " + id + ", using hashCode");
                             video.setId((long) id.hashCode());
                         }
                     }
@@ -556,13 +529,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                     video.setIsPaid(movieDetails.getIsPaid());
                     
                     // Log movie details for debugging
-                    Log.e("VideoDetailsFragment", "Movie ID: " + id);
-                    Log.e("VideoDetailsFragment", "Title: " + movieDetails.getTitle());
-                    Log.e("VideoDetailsFragment", "Description: " + (movieDetails.getDescription() != null ? movieDetails.getDescription() : "NULL"));
-                    Log.e("VideoDetailsFragment", "Release: " + (movieDetails.getRelease() != null ? movieDetails.getRelease() : "NULL"));
-                    Log.e("VideoDetailsFragment", "Runtime: " + (movieDetails.getRuntime() != null ? movieDetails.getRuntime() : "NULL"));
-                    Log.e("VideoDetailsFragment", "VideoQuality: " + (movieDetails.getVideoQuality() != null ? movieDetails.getVideoQuality() : "NULL"));
-                    Log.e("VideoDetailsFragment", "IsTvSeries: " + (movieDetails.getIsTvseries() != null ? movieDetails.getIsTvseries() : "NULL"));
                     
                     // Set available metadata for watch history
                     if (movieDetails.getRelease() != null) {
@@ -606,14 +572,12 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
             @Override
             public void onResponse(Call<MovieSingleDetails> call, Response<MovieSingleDetails> response) {
                 if (getActivity() == null || !isAdded()) {
-                    Log.w(TAG, "getData onResponse: Fragment not attached, skipping response handling");
                     return;
                 }
                 
                 try {
                     fm.beginTransaction().remove(spinnerFragment).commitAllowingStateLoss();
                 } catch (Exception e) {
-                    Log.w(TAG, "getData onResponse: Error removing spinner fragment", e);
                 }
                 
                 if (response.code() == 200 && response.body() != null) {
@@ -623,7 +587,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                     
                     setMovieActionAdapter(favStatus);
                     bindMovieDetails(singleDetails);
-                    Log.e(TAG, "getData onResponse: Successfully loaded movie details for " + singleDetails.getTitle());
 
                     //new DetailRowBuilderTask().execute(singleDetails);
                     String[] subcategories = {
@@ -642,7 +605,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                         mAdapter.add(new ListRow(header, rowAdapter));
                     }
                 } else {
-                    Log.e(TAG, "getData onResponse: Failed to load data - Response code: " + response.code());
                 }
             }
 
@@ -652,11 +614,9 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                     return;
                 }
                 
-                Log.e(TAG, "getData onFailure: Failed to load movie data", t);
                 try {
                     fm.beginTransaction().remove(spinnerFragment).commitAllowingStateLoss();
                 } catch (Exception e) {
-                    Log.w(TAG, "getData onFailure: Error removing spinner fragment", e);
                 }
             }
         });
@@ -818,7 +778,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
 
         // Extract actual phim4k ID from full ID (remove "phim4k_" prefix)
         String actualId = vId.replace("phim4k_", "");
-        Log.e(TAG, "Getting phim4k data for: " + actualId);
 
         Phim4kClient phim4kClient = Phim4kClient.getInstance();
         phim4kClient.getMovieDetailWithMovie(actualId, new Phim4kClient.Phim4kDetailWithMovieCallback() {
@@ -826,7 +785,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
             public void onSuccess(VideoContent videoContent, Phim4kMovie phim4kMovie) {
                 if (getActivity() == null) return;
                 
-                Log.e(TAG, "Phim4k details received: " + videoContent.getTitle());
                 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -858,7 +816,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                                 }
                             }
                             phim4kDetails.setVideos(videos);
-                            Log.e(TAG, "Created " + videos.size() + " video links for phim4k content");
                         }
                         
                         isPaid = "0";
@@ -901,7 +858,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                                     // Use server name as the header (e.g., "Nguồn 1", "VIP")
                                     HeaderItem header = new HeaderItem(0, episodeServer.getServerName());
                                     mAdapter.add(new ListRow(header, serverAdapter));
-                                    Log.e(TAG, "Added server row for: " + episodeServer.getServerName());
                                 }
                             }
                         }
@@ -915,7 +871,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
             public void onError(String error) {
                 if (getActivity() == null) return;
                 
-                Log.e(TAG, "Phim4k error: " + error);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -934,7 +889,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
 
         // Extract actual kkphim4k ID from full ID (remove "kkphim4k_" prefix)
         String actualId = vId.replace("kkphim4k_", "");
-        Log.e(TAG, "Getting kkphim4k data for: " + actualId);
 
         KKPhim4kClient kkPhim4kClient = KKPhim4kClient.getInstance();
         kkPhim4kClient.getMovieDetailWithMovie(actualId, new KKPhim4kClient.KKPhim4kDetailWithMovieCallback() {
@@ -942,7 +896,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
             public void onSuccess(VideoContent videoContent, Phim4kMovie phim4kMovie) {
                 if (getActivity() == null) return;
                 
-                Log.e(TAG, "KKPhim4k details received: " + videoContent.getTitle());
                 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -974,7 +927,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                                 }
                             }
                             kkPhim4kDetails.setVideos(videos);
-                            Log.e(TAG, "Created " + videos.size() + " video links for kkphim4k content");
                         }
                         
                         isPaid = "0";
@@ -1016,7 +968,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                                     // Add a new row for this server
                                     HeaderItem header = new HeaderItem(0, episodeServer.getServerName());
                                     mAdapter.add(new ListRow(header, serverAdapter));
-                                    Log.e(TAG, "Added server row: " + episodeServer.getServerName());
                                 }
                             }
                         }
@@ -1030,7 +981,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
             public void onError(String error) {
                 if (getActivity() == null) return;
                 
-                Log.e(TAG, "KKPhim4k error: " + error);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -1046,14 +996,12 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
     public void onResume() {
         super.onResume();
         
-        Log.e(TAG, "onResume: VideoDetailsFragment resumed");
         
         // Add small delay to ensure UI is stable after returning from player
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (getActivity() == null || !isAdded()) {
-                    Log.w(TAG, "onResume: Fragment not attached, skipping data check");
                     return;
                 }
                 
@@ -1067,29 +1015,24 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
         boolean needsReload = false;
         
         if (movieDetails == null) {
-            Log.e(TAG, "checkAndReloadDataIfNeeded: movieDetails is null, needs reload");
             needsReload = true;
         }
         
         if (mDetailsOverviewRow == null) {
-            Log.e(TAG, "checkAndReloadDataIfNeeded: mDetailsOverviewRow is null, needs reload");
             needsReload = true;
         }
         
         if (mAdapter == null) {
-            Log.e(TAG, "checkAndReloadDataIfNeeded: mAdapter is null, recreating");
             setUpAdapter();
             needsReload = true;
         }
         
         // If adapter exists but has no items, also reload
         if (mAdapter != null && mAdapter.size() == 0) {
-            Log.e(TAG, "checkAndReloadDataIfNeeded: mAdapter has no items, needs reload");
             needsReload = true;
         }
         
         if (needsReload && id != null && type != null) {
-            Log.e(TAG, "checkAndReloadDataIfNeeded: Reloading data for id=" + id + ", type=" + type);
             
             // Clear any existing data to prevent conflicts
             if (mAdapter != null) {
@@ -1099,7 +1042,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
             // Recreate the details overview row
             setUpDetailsOverviewRow();
         } else if (!needsReload) {
-            Log.e(TAG, "checkAndReloadDataIfNeeded: Data is valid, no reload needed");
         }
     }
     
@@ -1159,30 +1101,20 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
             seasonNames[i] = allSeasons.get(i).getSeasonsName();
         }
 
-        // Show AlertDialog with single choice
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Select Season");
-        builder.setSingleChoiceItems(seasonNames, currentSeasonIndex,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which != currentSeasonIndex) {
-                            Log.d(TAG, "Season changed from " + currentSeasonIndex + " to " + which);
-                            currentSeasonIndex = which;
-                            currentPage = 0; // Reset to first page
-
-                            Log.d(TAG, "New season name: " + allSeasons.get(currentSeasonIndex).getSeasonsName());
-                            
-                            // Update UI
-                            updateSeasonSelectorRow();
-                            loadEpisodesForCurrentSeason();
-                            updatePaginationRow();
-                        }
-                        dialog.dismiss();
-                    }
-                });
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        Runnable[] actions = new Runnable[allSeasons.size()];
+        for (int i = 0; i < allSeasons.size(); i++) {
+            final int idx = i;
+            actions[i] = () -> {
+                if (idx != currentSeasonIndex) {
+                    currentSeasonIndex = idx;
+                    currentPage = 0;
+                    updateSeasonSelectorRow();
+                    loadEpisodesForCurrentSeason();
+                    updatePaginationRow();
+                }
+            };
+        }
+        buildCustomListDialog("Chọn mùa", seasonNames, currentSeasonIndex, actions).show();
     }
 
     /**
@@ -1190,12 +1122,10 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
      */
     private void updateSeasonSelectorRow() {
         if (allSeasons == null || allSeasons.isEmpty()) {
-            Log.e(TAG, "updateSeasonSelectorRow: allSeasons is null or empty");
             return;
         }
 
         String newSeasonName = allSeasons.get(currentSeasonIndex).getSeasonsName();
-        Log.d(TAG, "updateSeasonSelectorRow: Updating to season " + currentSeasonIndex + ": " + newSeasonName);
 
         // STEP 1: Remove ALL existing season selector rows to prevent duplicates
         for (int i = mAdapter.size() - 1; i >= 0; i--) {
@@ -1208,7 +1138,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
                         adapter.size() > 0 && 
                         adapter.get(0) instanceof SeasonSelectorItem) {
                         mAdapter.remove(item);
-                        Log.d(TAG, "updateSeasonSelectorRow: Removed old season selector row at position " + i);
                     }
                 }
             }
@@ -1232,7 +1161,6 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
         // STEP 3: Add at position 1 (after DetailsOverviewRow)
         mAdapter.add(1, seasonSelectorRow);
         
-        Log.d(TAG, "updateSeasonSelectorRow: Added new season selector row at position 1 with name: " + newSeasonName);
     }
 
     /**
@@ -1343,6 +1271,94 @@ public class VideoDetailsFragment extends DetailsSupportFragment implements Pale
         currentPage = newPage;
         loadEpisodesForCurrentSeason();
         updatePaginationRow();
+    }
+
+    // ── Custom dialog helper ─────────────────────────────────────────────────
+    private android.app.Dialog buildCustomListDialog(String title, String[] items, int checkedIndex, Runnable[] actions) {
+        android.app.Dialog dialog = new android.app.Dialog(requireContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+
+        android.widget.LinearLayout root = new android.widget.LinearLayout(requireContext());
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFF1E1E2E);
+        root.setPadding(dp(20), dp(20), dp(20), dp(12));
+
+        // Title
+        android.widget.TextView titleTv = new android.widget.TextView(requireContext());
+        titleTv.setText(title);
+        titleTv.setTextColor(0xFFFFFFFF);
+        titleTv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
+        titleTv.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        titleTv.setPadding(dp(4), 0, dp(4), dp(10));
+        root.addView(titleTv);
+
+        // Divider
+        android.view.View divider = new android.view.View(requireContext());
+        divider.setBackgroundColor(0x55FFFFFF);
+        android.widget.LinearLayout.LayoutParams divLP = new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, dp(1));
+        divLP.bottomMargin = dp(6);
+        root.addView(divider, divLP);
+
+        // Scroll + item list (max 400dp)
+        android.widget.ScrollView scroll = new android.widget.ScrollView(requireContext());
+        scroll.setVerticalScrollBarEnabled(false);
+
+        android.widget.LinearLayout listLayout = new android.widget.LinearLayout(requireContext());
+        listLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+
+        for (int i = 0; i < items.length; i++) {
+            final int idx = i;
+            boolean isSelected = (checkedIndex >= 0 && i == checkedIndex);
+            android.widget.TextView tv = new android.widget.TextView(requireContext());
+            tv.setText(isSelected ? "✓  " + items[i] : "     " + items[i]);
+            tv.setTextColor(isSelected ? 0xFF64B5F6 : 0xFFDDDDDD);
+            tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            tv.setPadding(dp(10), dp(13), dp(10), dp(13));
+            tv.setFocusable(true);
+            tv.setFocusableInTouchMode(false);
+            tv.setClickable(true);
+            tv.setBackground(null);
+            tv.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    v.setBackgroundColor(0x664FC3F7);
+                    ((android.widget.TextView) v).setTextColor(0xFFFFFFFF);
+                } else {
+                    v.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    boolean sel = (checkedIndex >= 0 && idx == checkedIndex);
+                    ((android.widget.TextView) v).setTextColor(sel ? 0xFF64B5F6 : 0xFFDDDDDD);
+                }
+            });
+            tv.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (actions != null && idx < actions.length && actions[idx] != null)
+                    actions[idx].run();
+            });
+            listLayout.addView(tv);
+            // Separator
+            android.view.View sep = new android.view.View(requireContext());
+            sep.setBackgroundColor(0x22FFFFFF);
+            listLayout.addView(sep, new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        }
+
+        scroll.addView(listLayout);
+        root.addView(scroll, new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(400)));
+
+        dialog.setContentView(root);
+        android.view.Window w = dialog.getWindow();
+        if (w != null) {
+            w.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            w.setLayout(dp(480), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            w.setGravity(android.view.Gravity.CENTER);
+        }
+        return dialog;
+    }
+
+    private int dp(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 }
 

@@ -72,7 +72,7 @@ public class ActorMoviesFragment extends GridFragment {
         setOnItemViewSelectedListener(getDefaultItemSelectedListener());
 
         // setup - same as MoviesFragment
-        VerticalGridPresenter gridPresenter = new VerticalGridPresenter();
+        VerticalGridPresenter gridPresenter = new VerticalGridPresenter(androidx.leanback.widget.FocusHighlight.ZOOM_FACTOR_NONE, false);
         gridPresenter.setNumberOfColumns(NUM_COLUMNS);
         setGridPresenter(gridPresenter);
 
@@ -95,7 +95,12 @@ public class ActorMoviesFragment extends GridFragment {
                 intent.putExtra("type", "movie");
                 intent.putExtra("thumbImage", movie.getThumbnailUrl());
 
-                ImageView imageView = ((ImageCardView) viewHolder.view).getMainImageView();
+                ImageView imageView = null;
+                if (viewHolder.view instanceof androidx.leanback.widget.ImageCardView) {
+                    imageView = ((androidx.leanback.widget.ImageCardView) viewHolder.view).getMainImageView();
+                } else {
+                    imageView = viewHolder.view.findViewById(R.id.main_image);
+                }
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
                         imageView, VideoDetailsFragment.TRANSITION_NAME).toBundle();
                 startActivity(intent, bundle);

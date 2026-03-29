@@ -224,7 +224,6 @@ public class PlayerActivity extends Activity {
     private final Handler timeBarFocusLockHandler = new Handler();
     private final Handler logoBurnInHandler = new Handler();
     private boolean roundedSubtitleBackgroundEnabled = false;
-    private int roundedSubtitleBackgroundColor = 0xB3000000;
     private boolean roundedSubtitleCueRendererAttached = false;
     private final Player.Listener roundedSubtitleCueListener = new Player.Listener() {
         @Override
@@ -3415,11 +3414,6 @@ public class PlayerActivity extends Activity {
             Log.e(TAG, "❌ saveWatchHistoryWithData: model or manager is null");
             return;
         }
-
-        if (!isOxooSourceForWatchHistory()) {
-            Log.d(TAG, "⏭️ Skip watch history save for non-OXOO source");
-            return;
-        }
         
         // Check for valid duration and position
         boolean validDuration = duration > 0 && duration != Long.MIN_VALUE;
@@ -3674,43 +3668,6 @@ public class PlayerActivity extends Activity {
         } else {
             Log.e(TAG, "Cannot save watch history - invalid duration or position: pos=" + currentPosition + ", dur=" + duration);
         }
-    }
-
-    private boolean isOxooSourceForWatchHistory() {
-        String sourceExtra = null;
-        if (getIntent() != null) {
-            sourceExtra = getIntent().getStringExtra("source");
-        }
-
-        if (sourceExtra != null) {
-            String src = sourceExtra.toLowerCase(Locale.US);
-            if (src.contains("phim4k") || src.contains("kkphim4k")) {
-                return false;
-            }
-        }
-
-        List<String> idCandidates = new ArrayList<>();
-        if (model != null && model.getMovieId() != null) {
-            idCandidates.add(model.getMovieId());
-        }
-        if (completeMovieData != null && completeMovieData.getVideosId() != null) {
-            idCandidates.add(completeMovieData.getVideosId());
-        }
-        if (getIntent() != null && getIntent().getStringExtra("id") != null) {
-            idCandidates.add(getIntent().getStringExtra("id"));
-        }
-
-        for (String id : idCandidates) {
-            if (id == null) {
-                continue;
-            }
-            String normalized = id.toLowerCase(Locale.US);
-            if (normalized.startsWith("phim4k_") || normalized.startsWith("kkphim4k_")) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -4224,13 +4181,6 @@ public class PlayerActivity extends Activity {
         int fontType = prefs.getInt("font_type", 4); // Default to Vietnamese (index 4)
         boolean background = prefs.getBoolean("background", false);
         roundedSubtitleBackgroundEnabled = background;
-        int[] backgroundColorValues = {0xB3000000, 0xB3282828, 0xB33B2F2F, 0xB3202D4A, 0xB31F4A3A};
-        int backgroundColorIndex = prefs.getInt("background_color", 0);
-        if (backgroundColorIndex < 0 || backgroundColorIndex >= backgroundColorValues.length) {
-            backgroundColorIndex = 0;
-            prefs.edit().putInt("background_color", backgroundColorIndex).apply();
-        }
-        roundedSubtitleBackgroundColor = backgroundColorValues[backgroundColorIndex];
         int textColorIndex = prefs.getInt("text_color", 0);
         int outlineColorIndex = prefs.getInt("outline_color", 0);
 
@@ -4295,7 +4245,6 @@ public class PlayerActivity extends Activity {
             
             Log.d(TAG, "Applied subtitle - colors: text=" + Integer.toHexString(textColor) + 
                       ", outline=" + Integer.toHexString(outlineColor) + " (index=" + outlineColorIndex + ")" +
-                      ", bg=" + Integer.toHexString(roundedSubtitleBackgroundColor) + " (index=" + backgroundColorIndex + ")" +
                       ", position: " + verticalOffset + "% offset, bottomPadding: " + bottomPadding);
         }
     }
@@ -4364,7 +4313,7 @@ public class PlayerActivity extends Activity {
 
             if (i > lineStart) {
                 spannable.setSpan(
-                    new RoundedBackgroundSpan(roundedSubtitleBackgroundColor, dp(8), dp(6), dp(2)),
+                        new RoundedBackgroundSpan(0xB3000000, dp(4), dp(6), dp(2)),
                         lineStart,
                         i,
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -4684,47 +4633,6 @@ public class PlayerActivity extends Activity {
         
         backgroundLayout.addView(backgroundLabel);
         backgroundLayout.addView(backgroundSwitch);
-
-        // Background color controls
-        TextView backgroundColorLabel = new TextView(this);
-        backgroundColorLabel.setTextColor(0xFFFFFFFF);
-        backgroundColorLabel.setText("Màu nền:");
-        backgroundColorLabel.setTextSize(16);
-        backgroundColorLabel.setPadding(0, 10, 0, 10);
-
-        LinearLayout backgroundColorLayout = new LinearLayout(this);
-        backgroundColorLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        Button backgroundColorPrevBtn = new Button(this);
-        backgroundColorPrevBtn.setText("◀");
-        backgroundColorPrevBtn.setTextColor(0xFFFFFFFF);
-        android.graphics.drawable.GradientDrawable backgroundColorPrevBtnBg = new android.graphics.drawable.GradientDrawable();
-        backgroundColorPrevBtnBg.setColor(0xFF3A3A4C); backgroundColorPrevBtnBg.setCornerRadius(dp(8)); backgroundColorPrevBtn.setBackground(backgroundColorPrevBtnBg);
-
-        Button backgroundColorNextBtn = new Button(this);
-        backgroundColorNextBtn.setText("▶");
-        backgroundColorNextBtn.setTextColor(0xFFFFFFFF);
-        android.graphics.drawable.GradientDrawable backgroundColorNextBtnBg = new android.graphics.drawable.GradientDrawable();
-        backgroundColorNextBtnBg.setColor(0xFF3A3A4C); backgroundColorNextBtnBg.setCornerRadius(dp(8)); backgroundColorNextBtn.setBackground(backgroundColorNextBtnBg);
-
-        TextView backgroundColorTV = new TextView(this);
-        backgroundColorTV.setTextColor(0xFFFFFFFF);
-
-        String[] backgroundColorNames = {"Đen", "Xám đậm", "Nâu đậm", "Xanh đậm", "Xanh rêu"};
-        int[] backgroundColorPreviewValues = {0xFF000000, 0xFF282828, 0xFF3B2F2F, 0xFF20304A, 0xFF1F4A3A};
-        int currentBackgroundColor = prefs.getInt("background_color", 0);
-        if (currentBackgroundColor < 0 || currentBackgroundColor >= backgroundColorNames.length) {
-            currentBackgroundColor = 0;
-            prefs.edit().putInt("background_color", currentBackgroundColor).apply();
-        }
-        backgroundColorTV.setText(backgroundColorNames[currentBackgroundColor]);
-        backgroundColorTV.setTextColor(backgroundColorPreviewValues[currentBackgroundColor]);
-        backgroundColorTV.setGravity(android.view.Gravity.CENTER);
-        backgroundColorTV.setPadding(20, 0, 20, 0);
-
-        backgroundColorLayout.addView(backgroundColorPrevBtn);
-        backgroundColorLayout.addView(backgroundColorTV);
-        backgroundColorLayout.addView(backgroundColorNextBtn);
         
         // Text Color controls
         TextView textColorLabel = new TextView(this);
@@ -4893,8 +4801,6 @@ public class PlayerActivity extends Activity {
         applyWhiteFocusBorder(fontTypeNextBtn);
         applyWhiteFocusBorder(positionUpBtn);
         applyWhiteFocusBorder(positionDownBtn);
-        applyWhiteFocusBorder(backgroundColorPrevBtn);
-        applyWhiteFocusBorder(backgroundColorNextBtn);
         applyWhiteFocusBorder(textColorPrevBtn);
         applyWhiteFocusBorder(textColorNextBtn);
         applyWhiteFocusBorder(outlineColorPrevBtn);
@@ -4915,8 +4821,6 @@ public class PlayerActivity extends Activity {
         layout.addView(positionLabel);
         layout.addView(positionLayout);
         layout.addView(backgroundLayout);
-        layout.addView(backgroundColorLabel);
-        layout.addView(backgroundColorLayout);
         layout.addView(textColorLabel);
         layout.addView(textColorLayout);
         layout.addView(outlineColorLabel);
@@ -4978,23 +4882,6 @@ public class PlayerActivity extends Activity {
         
         backgroundSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             saveAndApplySubtitleSetting("background", isChecked);
-        });
-
-        // Background color controls
-        backgroundColorPrevBtn.setOnClickListener(v -> {
-            int index = (prefs.getInt("background_color", 0) - 1 + backgroundColorNames.length) % backgroundColorNames.length;
-            prefs.edit().putInt("background_color", index).apply();
-            backgroundColorTV.setText(backgroundColorNames[index]);
-            backgroundColorTV.setTextColor(backgroundColorPreviewValues[index]);
-            applySubtitleSettings();
-        });
-
-        backgroundColorNextBtn.setOnClickListener(v -> {
-            int index = (prefs.getInt("background_color", 0) + 1) % backgroundColorNames.length;
-            prefs.edit().putInt("background_color", index).apply();
-            backgroundColorTV.setText(backgroundColorNames[index]);
-            backgroundColorTV.setTextColor(backgroundColorPreviewValues[index]);
-            applySubtitleSettings();
         });
         
         // Text color controls
@@ -5077,7 +4964,6 @@ public class PlayerActivity extends Activity {
             editor.putInt("font_type", 4); // Default to Vietnamese
             editor.putInt("vertical_offset", 0);
             editor.putBoolean("background", false);
-            editor.putInt("background_color", 0); // Black
             editor.putInt("text_color", 0); // White
             editor.putInt("outline_color", 1); // Black
             editor.putFloat("playback_speed", 1.0f); // Normal speed
@@ -5087,8 +4973,6 @@ public class PlayerActivity extends Activity {
             fontTypeTV.setText(fontNames[4]); // Default to Vietnamese
             positionTV.setText("Giữa");
             backgroundSwitch.setChecked(false);
-            backgroundColorTV.setText(backgroundColorNames[0]);
-            backgroundColorTV.setTextColor(backgroundColorPreviewValues[0]);
             textColorTV.setText(colorNames[0]);
             textColorTV.setTextColor(colorValues[0]);
             outlineColorTV.setText(outlineColorNames[1]);

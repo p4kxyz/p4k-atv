@@ -3415,11 +3415,6 @@ public class PlayerActivity extends Activity {
             Log.e(TAG, "❌ saveWatchHistoryWithData: model or manager is null");
             return;
         }
-
-        if (!isOxooSourceForWatchHistory()) {
-            Log.d(TAG, "⏭️ Skip watch history save for non-OXOO source");
-            return;
-        }
         
         // Check for valid duration and position
         boolean validDuration = duration > 0 && duration != Long.MIN_VALUE;
@@ -3674,43 +3669,6 @@ public class PlayerActivity extends Activity {
         } else {
             Log.e(TAG, "Cannot save watch history - invalid duration or position: pos=" + currentPosition + ", dur=" + duration);
         }
-    }
-
-    private boolean isOxooSourceForWatchHistory() {
-        String sourceExtra = null;
-        if (getIntent() != null) {
-            sourceExtra = getIntent().getStringExtra("source");
-        }
-
-        if (sourceExtra != null) {
-            String src = sourceExtra.toLowerCase(Locale.US);
-            if (src.contains("phim4k") || src.contains("kkphim4k")) {
-                return false;
-            }
-        }
-
-        List<String> idCandidates = new ArrayList<>();
-        if (model != null && model.getMovieId() != null) {
-            idCandidates.add(model.getMovieId());
-        }
-        if (completeMovieData != null && completeMovieData.getVideosId() != null) {
-            idCandidates.add(completeMovieData.getVideosId());
-        }
-        if (getIntent() != null && getIntent().getStringExtra("id") != null) {
-            idCandidates.add(getIntent().getStringExtra("id"));
-        }
-
-        for (String id : idCandidates) {
-            if (id == null) {
-                continue;
-            }
-            String normalized = id.toLowerCase(Locale.US);
-            if (normalized.startsWith("phim4k_") || normalized.startsWith("kkphim4k_")) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**

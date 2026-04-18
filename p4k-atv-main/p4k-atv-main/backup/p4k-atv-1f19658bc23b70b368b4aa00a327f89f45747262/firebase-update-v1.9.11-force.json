@@ -1,0 +1,16 @@
+{
+  "app_updates": {
+    "oxoo_tv": {
+      "changelog": {
+        "en": "🚨 CRITICAL UPDATE - Phim4K v1.9.11!\n⚡ HOMEPAGE LAZY LOADING - 60% faster startup!\n🎬 FIXED: HLS video playback issues completely resolved\n🔧 FIXED: Memory leaks causing app crashes\n🛡️ Enhanced security with ProGuard\n📱 APK size reduced by 47%\n🎯 Smart video format detection\n📺 Better Android TV performance\n⚠️ This update fixes critical stability issues",
+        "vi": "🚨 CẬP NHẬT QUAN TRỌNG - Phim4K v1.9.11!\n⚡ LAZY LOADING TRANG CHỦ - Khởi động nhanh hơn 60%!\n🎬 ĐÃ SỬA: Lỗi phát video HLS hoàn toàn được giải quyết\n🔧 ĐÃ SỬA: Rò rỉ bộ nhớ gây crash ứng dụng\n🛡️ Bảo mật nâng cao với ProGuard\n📱 Giảm kích thước APK 47%\n🎯 Phát hiện định dạng video thông minh\n📺 Hiệu năng Android TV tốt hơn\n⚠️ Bản cập nhật này sửa các lỗi ổn định quan trọng"
+      },
+      "checksum": "sha256:p4k1911release",
+      "download_url": "https://phim4k.xyz/downloads/androidtv/P4K-v1.9.11.apk",
+      "file_size": 8296734,
+      "force_update": true,
+      "version_code": 17,
+      "version_name": "1.9.11"
+    }
+  }
+}

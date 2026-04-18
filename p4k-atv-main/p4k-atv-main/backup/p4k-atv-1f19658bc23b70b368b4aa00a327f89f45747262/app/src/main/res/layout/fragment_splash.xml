@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.fragments.SplashFragment">
+
+    <!-- Background image: Capture.JPG -->
+    <ImageView
+        android:id="@+id/splashBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/capture"
+        android:contentDescription="splash background" />
+
+    <!-- Dim overlay to make background 70% darker (70% opacity black) -->
+    <View
+        android:id="@+id/dimOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B3000000" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <ImageView
+            android:id="@+id/logoView"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:src="@drawable/lgoo"
+            android:layout_gravity="center"
+            android:padding="20dp" />
+
+        <!-- Animated slogan split into two halves that slide in from left and right -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:id="@+id/sloganLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phim4K Mang Cả Rạp"
+                android:textColor="@android:color/white"
+                android:textSize="40sp"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.01"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/sloganRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đến Ngôi Nhà Của Bạn"
+                android:textColor="@android:color/white"
+                android:textSize="40sp"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.01"
+                android:layout_marginStart="6dp"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:visibility="visible"
+            android:indeterminate="true"
+            android:indeterminateTintMode="src_atop"
+            android:indeterminateTint="@color/spinnerColor" />
+
+    </LinearLayout>
+
+</FrameLayout>

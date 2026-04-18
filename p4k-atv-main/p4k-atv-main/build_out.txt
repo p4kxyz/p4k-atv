@@ -1,0 +1,95 @@
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:compileDebugAidl NO-SOURCE
+> Task :app:compileDebugRenderscript NO-SOURCE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:dataBindingMergeGenClassesDebug UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:dataBindingTriggerDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+
+> Task :app:compileDebugJavaWithJavac
+
+> Task :app:compileDebugJavaWithJavac FAILED
+17 actionable tasks: 1 executed, 16 up-to-date
+
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:977: error: cannot find symbol
+                    buildCustomListDialog("Subtitles", new String[]{"On", "Off"}, -1, actions, null).show();
+                    ^
+  symbol:   method buildCustomListDialog(String,String[],int,Runnable[],<null>)
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1558: error: cannot find symbol
+                currentAspectRatio = aspectRatios[index];
+                ^
+  symbol:   variable currentAspectRatio
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1558: error: cannot find symbol
+                currentAspectRatio = aspectRatios[index];
+                                     ^
+  symbol:   variable aspectRatios
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1559: error: cannot find symbol
+                if (playerView != null) {
+                    ^
+  symbol:   variable playerView
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1560: error: cannot find symbol
+                    playerView.setResizeMode(currentAspectRatio);
+                                             ^
+  symbol:   variable currentAspectRatio
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1560: error: cannot find symbol
+                    playerView.setResizeMode(currentAspectRatio);
+                    ^
+  symbol:   variable playerView
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1566: error: cannot find symbol
+        for (int i = 0; i < aspectRatios.length; i++) {
+                            ^
+  symbol:   variable aspectRatios
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1567: error: cannot find symbol
+            if (aspectRatios[i] == currentAspectRatio) {
+                ^
+  symbol:   variable aspectRatios
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1567: error: cannot find symbol
+            if (aspectRatios[i] == currentAspectRatio) {
+                                   ^
+  symbol:   variable currentAspectRatio
+  location: class PlayerActivity
+D:\22\p4k-atv\app\src\main\java\com\files\codes\view\PlayerActivity.java:1573: error: cannot find symbol
+        buildCustomListDialog("Ch?n t? l? màn hình", aspectRatioOptions, checkedIndex, actions, null).show();
+        ^
+  symbol:   method buildCustomListDialog(String,String[],int,Runnable[],<null>)
+  location: class PlayerActivity
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+10 errors
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output. Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 13s

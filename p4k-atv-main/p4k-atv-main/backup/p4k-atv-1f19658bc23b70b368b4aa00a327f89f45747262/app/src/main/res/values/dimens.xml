@@ -1,0 +1,36 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+
+    <!--general spacing-->
+    <dimen name="spacing_medium">5dp</dimen>
+    <dimen name="spacing_middle">10dp</dimen>
+    <dimen name="spacing_large">15dp</dimen>
+    <dimen name="spacing_smlarge">18dp</dimen>
+    <dimen name="spacing_mlarge">10dp</dimen>
+    <dimen name="spacing_xlarge">35dp</dimen>
+    <dimen name="spacing_xxlarge">50dp</dimen>
+    <dimen name="lb_details_v2_card_height">430dp</dimen>
+
+    <dimen name="country_card_width">100dp</dimen>
+    <dimen name="country_card_height">100dp</dimen>
+
+    <dimen name="padding_of_controller_button">4dp</dimen>
+
+    //card dimen
+    <dimen name="default_image_card_width">185dp</dimen>
+    <dimen name="default_image_card_height">278dp</dimen>
+
+    <dimen name="movie_image_card_width">120dp</dimen>
+    <dimen name="movie_image_card_height">172dp</dimen>
+
+    <!-- Hero Banner Dimensions (Default: Works for both 1080p and 4K) -->
+    <dimen name="hero_banner_height">600dp</dimen>
+    <dimen name="hero_banner_margin_top">-320dp</dimen>
+    <dimen name="hero_poster_width">160dp</dimen>
+    <dimen name="hero_poster_height">240dp</dimen>
+    <dimen name="hero_poster_margin_end">120dp</dimen>
+    <dimen name="hero_content_padding_start">120dp</dimen>
+    <dimen name="hero_content_padding_end">200dp</dimen>
+    <dimen name="hero_content_padding_bottom">0dp</dimen>
+
+</resources>

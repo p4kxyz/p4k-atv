@@ -1,0 +1,206 @@
+<resources>
+    <string name="app_name">Phim4K</string>
+    <string name="browse_title">Video của Công ty Bạn</string>
+    <string name="related_movies">Video Liên quan</string>
+    <string name="grid_view">Xem Lưới</string>
+    <string name="error_fragment">Lỗi Fragment</string>
+    <string name="personal_settings">Cài đặt Cá nhân</string>
+    <string name="watch_trailer_1">Xem trailer</string>
+    <string name="watch_trailer_2">MIỄN PHÍ</string>
+    <string name="rent_1">Thuê Theo Ngày</string>
+    <string name="rent_2">Từ $1.99</string>
+    <string name="buy_1">Mua và Sở hữu</string>
+    <string name="buy_2">$9.99</string>
+
+    <!-- Error messages -->
+    <string name="error_fragment_message">Đã xảy ra lỗi</string>
+    <string name="dismiss_error">Đóng</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="sign_up_now">Đăng ký ngay</string>
+    <string name="sign_up">Đăng ký</string>
+    <string name="login">Đăng nhập</string>
+    <string name="login_using_your_email_address">Đăng nhập bằng địa chỉ email</string>
+    <string name="email_address">Địa chỉ Email</string>
+    <string name="dont_t_have_an_account">Chưa có tài khoản?</string>
+    <string name="sign_up_using_your_email_address">Đăng ký bằng địa chỉ email</string>
+    <string name="continue_with_google">Tiếp tục với Google</string>
+    <string name="something_went_wrong">Đã xảy ra lỗi.</string>
+
+    <string name="featured_tv_channels">Kênh TV Nổi bật</string>
+    <string name="latest_movie">Phim Mới nhất</string>
+    <string name="latest_tv_series">Phim Bộ Mới nhất</string>
+    <string name="more">Thêm</string>
+    <string name="movie">Phim Lẻ</string>
+    <string name="live_tv">TV Trực tiếp</string>
+    <string name="tv_series">Phim Bộ</string>
+    <string name="country">Quốc gia</string>
+    <string name="genre">Thể loại</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="myaccount">Tài khoản</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="no_item_found">Không tìm thấy kết quả</string>
+    <string name="cast_n_crew">Diễn viên và Đoàn phim</string>
+    <string name="signin">Đăng nhập</string>
+    <string name="reset">Đặt lại Mật khẩu</string>
+    <string name="register">Đăng ký</string>
+    <string name="full_name">Họ và Tên</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="save">Lưu</string>
+    <string name="director">Đạo diễn :</string>
+    <string name="comments">Bình luận</string>
+    <string name="your_comments">Bình luận của bạn</string>
+    <string name="add_comments">Thêm Bình luận</string>
+    <string name="no_internet">Không có kết nối internet !</string>
+    <string name="copyright">Bản quyền</string>
+    <string name="contact_us">Liên hệ chúng tôi</string>
+    <string name="title_activity_item_show">ItemShowActivity</string>
+    <string name="title_activity_details">DetailsActivity</string>
+    <string name="title_activity_reply">ReplyActivity</string>
+    <string name="play_now">Phát ngay</string>
+    <string name="go_premium">Nâng cấp Premium</string>
+    <string name="program_guide">Lịch chương trình</string>
+    <string name="live">TRỰC TIẾP</string>
+    <string name="watching_on">Đang xem trực tiếp trên</string>
+    <string name="all_tv_channel">Tất cả Kênh TV</string>
+    <string name="you_may_also_like">Có thể bạn cũng thích</string>
+    <string name="dark_mode">Chế độ Tối</string>
+    <string name="tv_channels">Kênh TV</string>
+    <string name="watching_catch_up_tv">Xem TV Bù</string>
+    <string name="deactive_account_text">Nếu bạn không muốn sử dụng tài khoản này, bạn có thể vô hiệu hóa dễ dàng.</string>
+    <string name="reason_to_deactivate_account">Lý do vô hiệu hóa tài khoản</string>
+    <string name="enter_password">Nhập Mật khẩu</string>
+    <string name="long_text">Aliquam eu mauris lectus. Pellentesque lacinia ut urna ut gravida. Proin libero sem, auctor in posuere sit amet</string>
+
+    <string name="fetch_error">Không thể tải dữ liệu</string>
+    <string name="login_first">Bạn cần đăng nhập trước</string>
+    <string name="login_or_signup_first">Bạn cần đăng nhập/đăng ký.</string>
+    <string name="comment_empty">Bình luận không được để trống</string>
+    <string name="error_toast">Đã xảy ra lỗi ! thử lại sau</string>
+    <string name="deactivate_account">Vô hiệu hóa Tài khoản</string>
+    <string name="explore_by_genre">Khám phá theo Thể loại</string>
+    <string name="explore_by_country">Khám phá theo Quốc gia</string>
+    <string name="share_this_app">Chia sẻ Ứng dụng</string>
+    <string name="connect_to_tv">Kết nối với TV</string>
+    <string name="share_body">Tôi muốn chia sẻ ứng dụng TV &amp; Phim này. Bạn có thể tải xuống từ playstore :\n    https://play.google.com/store/apps/details?id=</string>
+    <string name="term_of_services">Điều khoản Dịch vụ</string>
+    <string name="accept">Chấp nhận</string>
+    <string name="decline">Từ chối</string>
+    <string name="account_deactivate_info"><![CDATA[Tài khoản của bạn sẽ bị vô hiệu hóa & chỉ admin mới có thể kích hoạt lại.]]></string>
+    <string name="regular_program">Chương trình Thường</string>
+    <string name="international">Quốc tế</string>
+    <string name="server">Máy chủ</string>
+    <string name="_1080p">1080P</string>
+    <string name="dummy_name">Nguyễn Văn A</string>
+    <string name="notifications">THÔNG BÁO</string>
+    <string name="push_notification">Thông báo Đẩy</string>
+    <string name="others">KHÁC</string>
+    <string name="no_data_found">Không tìm thấy dữ liệu.</string>
+    <string name="no_more_data_found">Không còn dữ liệu nào.</string>
+    <string name="no_subscription_history">Không tìm thấy lịch sử đăng ký.</string>
+    <string name="plan">Gói</string>
+    <string name="no_active_subscription_found">Không tìm thấy gói đăng ký đang hoạt động.</string>
+    <string name="upgrade_membership">Nâng cấp Thành viên</string>
+    <string name="p_date">Ngày T.Toán</string>
+    <string name="from">Từ</string>
+    <string name="to">Đến</string>
+    <string name="action">Hành động</string>
+    <string name="status">Trạng thái</string>
+    <string name="by_tapping_the_button_you_agree_to_oxxo_term_amp_condition_and_privacy_policy"><![CDATA[Bằng cách nhấn nút, bạn đồng ý với Điều khoản & Điều kiện và Chính sách Bảo mật của Oxxo.]]></string>
+
+    <string name="paid_content">Bạn đang cố gắng xem nội dung trả phí. Vui lòng đăng ký gói trước.</string>
+    <string name="subscription_required">Yêu cầu Đăng ký</string>
+    <string name="subscribe_text">Đăng ký</string>
+    <string name="payment_success">Thanh toán Thành công.</string>
+    <string name="invalid_card">Thẻ không hợp lệ</string>
+    <string name="subscribe_error">Để đăng ký gói, bạn phải đăng nhập trước.</string>
+    <string name="something_went_text">Đã xảy ra lỗi, thử lại hoặc liên hệ với nhà phát triển.</string>
+    <string name="go_back">Quay lại</string>
+    <string name="cvv">CVV</string>
+    <string name="mm_yy">MM/YY</string>
+    <string name="card_number">Số Thẻ</string>
+    <string name="downloading">Đang tải xuống</string>
+    <string name="download_completed">Tải xuống Hoàn tất</string>
+    <string name="watch_now">Xem ngay</string>
+    <string name="download">Tải xuống</string>
+    <string name="select_server">Chọn Máy chủ</string>
+    <string name="home">Trang chủ</string>
+    <string name="buy_any_subscription_below_and_enjoy_oxoo_prime">Mua bất kỳ gói đăng ký nào bên dưới và tận hưởng các tính năng cao cấp của mytvonline.</string>
+    <string name="all_tv_channels">Kênh TV</string>
+    <string name="all_kids_videos">Tất cả Video Trẻ em</string>
+    <string name="all_tv_series">Tất cả Phim Bộ</string>
+    <string name="unlimited_movies">Phim Không giới hạn</string>
+    <string name="please_select_your_payment_method">Vui lòng chọn phương thức thanh toán</string>
+    <string name="download_appear_text">Các mục tải xuống của bạn sẽ xuất hiện ở đây. Không tìm thấy mục tải xuống.</string>
+    <string name="send">Gửi</string>
+    <string name="searcError_message">Tiêu đề và Loại không được để trống</string>
+    <string name="external_download_links">Liên kết Tải xuống Bên ngoài:</string>
+    <string name="rating">Đánh giá</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Chào fragment trống</string>
+    <string name="add_to_fav">Thêm vào yêu thích</string>
+    <string name="remove_from_fav">Xóa khỏi Yêu thích</string>
+
+    <string name="enter_your_activation_code">Nhập mã kích hoạt của bạn</string>
+    <string name="enter_code">Nhập mã ở đây</string>
+    <string name="get_activation_code_following">Làm theo các bước dưới đây để lấy mã:</string>
+    <string name="instruction_2">2. Sau đó vào Cài đặt.</string>
+    <string name="instruction_3">3. Sau đó nhấp vào "Kết nối với TV."</string>
+    <string name="signout">Đăng xuất</string>
+    <string name="connect">Kết nối</string>
+    <string name="user_name">Tên người dùng:</string>
+    <string name="emailTv">Email:</string>
+    <string name="expire_date">Ngày hết hạn:</string>
+    <string name="signed_in_as">Đã đăng nhập với:</string>
+    <string name="connecting">Đang kết nối...</string>
+    <string name="active_plan">Gói Đang hoạt động:</string>
+
+    <!-- dialog instruction -->
+    <string name="dialog_instruction_1">1. Mua gói từ điện thoại/website của bạn.</string>
+    <string name="dialog_instruction_2">2. Đóng ứng dụng này. </string>
+    <string name="dialog_instruction_3">3. Mở lại ứng dụng này. </string>
+    <string name="continue_browsing">Tiếp tục duyệt</string>
+    <!--login alert dialog instruction -->
+    <string name="login_alert_dialog_instructions_1">1. Bạn phải đăng nhập để xem nội dung trả phí.</string>
+    <string name="login_alert_dialog_instructions_2">2. Nhấp nút bên dưới để đăng nhập.</string>
+
+    <string name="enter_below_code_on_your_tv">Nhập mã bên dưới trên TV của bạn</string>
+    <string name="all_radio_channels">Tất cả Kênh Radio</string>
+    <string name="listening_on">Đang nghe trên</string>
+    <string name="type_keyword">Nhập từ khóa</string>
+    <string name="year_range">Khoảng Năm</string>
+    <string name="cancel">Hủy</string>
+    <string name="tv_category">Loại TV</string>
+    <string name="name">Tên</string>
+    <string name="all_countries">Tất cả Quốc gia</string>
+    <string name="all_categories">Tất cả Danh mục</string>
+    <string name="external_download">Tải xuống Bên ngoài</string>
+    <string name="inApp_download">Tải xuống Trong ứng dụng</string>
+    <string name="select_download_server">Chọn Máy chủ Tải xuống</string>
+    <string name="all_genres">Tất cả Thể loại</string>
+    <string name="no_subtitle_found">Không tìm thấy phụ đề cho video này.</string>
+    <string name="select_subtitle">Chọn Phụ đề</string>
+    <string name="no_other_server_found">Không tìm thấy máy chủ khác</string>
+    <string name="embed_not_supported">Tệp nhúng không được hỗ trợ.</string>
+    <!--Notification Channel-->
+    <string name="now_playing_channel_description">Hiển thị nhạc đang phát</string>
+    <string name="now_playing_channel_name">Đang phát</string>
+    <string name="recommended_for_you">Phim dành cho Bạn</string>
+    <string name="image_description">Mô tả Hình ảnh</string>
+    <string name="close">Đóng</string>
+    <string name="movie_title">Tiêu đề Phim</string>
+    <string name="poster">Poster</string>
+    <string name="you_are_not_logged_in">Bạn chưa đăng nhập.</string>
+    <string name="want_to_sign_out">Bạn có thực sự muốn đăng xuất?</string>
+    <string name="featured_genre">Phim Hay Nổi Bật</string>
+    <string name="featured_description">Phim nổi bật được tuyển chọn</string>
+    <string name="release_date">Ngày phát hành</string>
+    <string name="you_are_watching_on">Bạn đang xem trên</string>
+    <string name="please_enter_valid_email">Vui lòng nhập email hợp lệ</string>
+    <string name="please_enter_password">Vui lòng nhập mật khẩu</string>
+    <string name="please_enter_name">Vui lòng nhập tên</string>
+    <string name="successfully_registered">Đăng ký thành công</string>
+
+</resources>

@@ -1,0 +1,225 @@
+﻿--------- beginning of main
+02-08 20:57:18.839  8148  8148 I oxootv.spagree: Late-enabling -Xcheck:jni
+02-08 20:57:18.865  8148  8148 W oxootv.spagree: Unexpected CPU variant for X86 using defaults: x86
+02-08 20:57:19.092  8148  8148 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10080; state: ENABLED
+02-08 20:57:19.460  8148  8148 V GraphicsEnvironment: ANGLE Developer option for 'com.oxootv.spagreen' set to: 'default'
+02-08 20:57:19.471  8148  8148 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+02-08 20:57:19.476  8148  8148 D NetworkSecurityConfig: No Network Security Config specified, using platform default
+02-08 20:57:19.476  8148  8148 D NetworkSecurityConfig: No Network Security Config specified, using platform default
+02-08 20:57:19.549  8148  8148 I FirebaseApp: Device unlocked: initializing all Firebase APIs for app [DEFAULT]
+02-08 20:57:19.584  8148  8148 I FirebaseInitProvider: FirebaseApp initialization successful
+02-08 20:57:19.602  8148  8194 I DynamiteModule: Considering local module com.google.android.gms.measurement.dynamite:92 and remote module com.google.android.gms.measurement.dynamite:84
+02-08 20:57:19.602  8148  8194 I DynamiteModule: Selected local version of com.google.android.gms.measurement.dynamite
+02-08 20:57:19.734  8148  8198 I FA      : App measurement initialized, version: 79000
+02-08 20:57:19.734  8148  8198 I FA      : To enable debug logging run: adb shell setprop log.tag.FA VERBOSE
+02-08 20:57:19.734  8148  8198 I FA      : To enable faster debug mode event logging run:
+02-08 20:57:19.734  8148  8198 I FA      :   adb shell setprop debug.firebase.analytics.app com.oxootv.spagreen
+02-08 20:57:19.899  8148  8210 D libEGL  : loaded /vendor/lib/egl/libEGL_emulation.so
+02-08 20:57:19.900  8148  8210 D libEGL  : loaded /vendor/lib/egl/libGLESv1_CM_emulation.so
+02-08 20:57:19.902  8148  8210 D libEGL  : loaded /vendor/lib/egl/libGLESv2_emulation.so
+02-08 20:57:19.998  8148  8148 W oxootv.spagree: Accessing hidden method Ljava/lang/invoke/MethodHandles$Lookup;-><init>(Ljava/lang/Class;I)V (unsupported, reflection, allowed)
+02-08 20:57:20.110  8148  8148 D RenderScript HIDL Adaptation: IRenderScriptDevice::getService()
+02-08 20:57:20.111  8148  8148 D RenderScript HIDL Adaptation: IRenderScriptDevice::getService() returned 0x0
+02-08 20:57:20.111  8148  8148 D RenderScript HIDL Adaptation: Using Fallback Path.
+02-08 20:57:20.117  8148  8148 D oxootv.spagree: Successfully queried cache dir: /data/user_de/0/com.oxootv.spagreen/code_cache
+02-08 20:57:20.117  8148  8148 D RenderScript: Setting cache dir: /data/user_de/0/com.oxootv.spagreen/code_cache
+02-08 20:57:20.163  8148  8198 I FA      : Tag Manager is not found and thus will not be used
+02-08 20:57:20.206  8148  8208 D HostConnection: createUnique: call
+02-08 20:57:20.209  8148  8208 D HostConnection: HostConnection::get() New Host Connection established 0xea706830, tid 8208
+02-08 20:57:20.215  8148  8208 D HostConnection: HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+02-08 20:57:20.218  8148  8208 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+02-08 20:57:20.221  8148  8208 D EGL_emulation: eglCreateContext: 0xea707b00: maj 3 min 0 rcv 3
+02-08 20:57:20.224  8148  8208 D EGL_emulation: eglMakeCurrent: 0xea707b00: ver 3 0 (tinfo 0xe8533040) (first time)
+02-08 20:57:20.242  8148  8208 I Gralloc4: mapper 4.x is not supported
+02-08 20:57:20.242  8148  8208 D HostConnection: createUnique: call
+02-08 20:57:20.242  8148  8208 D HostConnection: HostConnection::get() New Host Connection established 0xea706b40, tid 8208
+02-08 20:57:20.243  8148  8208 D goldfish-address-space: allocate: Ask for block of size 0x100
+02-08 20:57:20.243  8148  8208 D goldfish-address-space: allocate: ioctl allocate returned offset 0x3efffe000 size 0x2000
+02-08 20:57:20.264  8148  8208 W Gralloc4: allocator 4.x is not supported
+02-08 20:57:20.280  8148  8208 D HostConnection: HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+02-08 20:57:21.083  8148  8157 I oxootv.spagree: Background young concurrent copying GC freed 36275(2174KB) AllocSpace objects, 14(344KB) LOS objects, 87% free, 3608KB/27MB, paused 538us,576us total 209.996ms
+02-08 20:57:21.577  8148  8208 D EGL_emulation: app_time_stats: avg=18.38ms min=2.65ms max=99.51ms count=43
+02-08 20:57:22.588  8148  8208 D EGL_emulation: app_time_stats: avg=9.76ms min=2.87ms max=21.54ms count=56
+02-08 20:57:22.852  8148  8148 D HomeNewActivity: ≡ƒô║ Android TV detected, skipping install permission check
+02-08 20:57:22.852  8148  8148 D HomeNewActivity: Γ£à All permissions granted, starting OTA check...
+02-08 20:57:24.771  8148  8208 D EGL_emulation: app_time_stats: avg=20.37ms min=2.75ms max=544.53ms count=57
+02-08 20:57:24.790  8148  8148 E HOME_DEBUG: ≡ƒöÑ HomeFragment.onCreate - tvRecommendationManager initialized
+02-08 20:57:24.791  8148  8148 E HOME_DEBUG: ≡ƒöÑ HomeFragment.onCreate - registering LiveData observer on activity: com.files.codes.view.fragments.testFolder.HomeNewActivity@1dd261b
+02-08 20:57:24.826  8148  8148 E HOME_DEBUG: ≡ƒöÑ onChanged FIRED! homeContentList=NOT NULL, list size=7
+02-08 20:57:24.826  8148  8148 E HOME_DEBUG: ≡ƒöÑ loadRows called! list=size=7
+02-08 20:57:24.826  8148  8148 E HOME_DEBUG: ≡ƒöÑ Found featured content in loadRows: 24 items -> addFeaturedContentFromHomepage
+02-08 20:57:24.826  8148  8148 E TvRecommendationManager: >>> addFeaturedContentFromHomepage called, list=24
+02-08 20:57:24.826  8148  8148 E TvRecommendationManager: >>> addToRecommended called, list=10
+02-08 20:57:24.827  8148  8148 E TvRecommendationManager: >>> createRecommendationChannel: isTvProviderAvailable=true
+02-08 20:57:24.848  8148  8148 E TvRecommendationManager: >>> Found existing channel: 5
+02-08 20:57:24.852  8148  8148 W TvRecommendationManager: Could not clear old programs: Selection not allowed for content://android.media.tv/preview_program
+02-08 20:57:24.873  8148  8148 D TvRecommendationManager: Added to Recommended: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:24.880  8148  8148 D TvRecommendationManager: Added to Recommended: ─É╞░ß╗¥ng Cung Kß╗│ ├ün: Thanh Vß╗Ñ Phong Minh (2026) Unveil: Jadewind
+02-08 20:57:24.895  8148  8148 D TvRecommendationManager: Added to Recommended: C├▓n Ra Thß╗â Thß╗æng G├¼ Nß╗»a? (2026) How Dare You!?
+02-08 20:57:24.913  8148  8148 D TvRecommendationManager: Added to Recommended: C├íc Tr├▓ Ch╞íi Cß╗ºa Beast (2024) Beast Games
+02-08 20:57:24.920  8148  8148 D TvRecommendationManager: Added to Recommended: SpongeBob: Lß╗¥i Nguyß╗ün Hß║úi Tß║╖c (2025) The SpongeBob Movie: Search for SquarePants
+02-08 20:57:24.925  8148  8148 D TvRecommendationManager: Added to Recommended: TEE YOD: QUß╗╢ ─éN Tß║áNG 3 (2025) Death Whisperer 3
+02-08 20:57:24.931  8148  8148 D TvRecommendationManager: Added to Recommended: Hoa M├íu (2026) Bloody Flower
+02-08 20:57:24.941  8148  8148 D TvRecommendationManager: Added to Recommended: ─É├¬m Nay Dß║½u T├¼nh Y├¬u N├áy Biß║┐n Mß║Ñt Khß╗Åi Thß║┐ Gian (2025) Even If This Love Disappears Tonight
+02-08 20:57:24.970  8148  8148 D TvRecommendationManager: Added to Recommended: C├┤ Hß║ºu G├íi (2025) The Housemaid
+02-08 20:57:24.979  8148  8148 D TvRecommendationManager: Added to Recommended: Tam Quß╗æc ─É├¡ch Tinh Kh├┤ng ─Éß╗ç Nhß║Ñt Bß╗Ö (2025) 
+02-08 20:57:24.979  8148  8148 E TvRecommendationManager: >>> addToRecommended complete: 10/10 programs added to channel 5
+02-08 20:57:24.980  8148  8148 D TvRecommendationManager: Added 10 featured movies from homepage to TV Recommended
+02-08 20:57:24.993  8148  8148 D HomeActivity: ≡ƒÜÇ Loading initial content batch: 9 items
+02-08 20:57:24.994  8148  8148 D HomeActivity: ≡ƒöì loadFixedHeroBanner called with video: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:24.994  8148  8148 D HomeActivity: ≡ƒÄ¼ Category 0: Phim Hay Nha N├¡
+02-08 20:57:24.994  8148  8148 D HomeActivity: ≡ƒîì Country ID found: korea_content - Title: Drama xß╗⌐ Kim Chi
+02-08 20:57:24.994  8148  8148 D HomeActivity: ≡ƒîì Country ID found: china_content - Title: Tr╞░ß╗¥ng thi├¬n Drama T├áu
+02-08 20:57:24.994  8148  8148 D HomeActivity: ≡ƒîì Country ID found: vietnam_content - Title: X╞░ß╗ƒng phim xß╗⌐ ─É├┤ng L├áo
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒÄ¡ Genre ID found: animation_content - Title: Xi n├¬ Tuß╗òi th╞í
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒôé Phim Bß╗Ö: Phim Bß╗Ö Mß╗¢i Nhß║Ñt
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒôé Phim4k Free1: Nguß╗ôn Phim Free 1
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒôé KKPhim4k Free2: Nguß╗ôn Free 2
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒöº Created Korea category (ID 13)
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒöº Created China category (ID 15)
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒöº Created Vietnam category (ID 5)
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒöº Created Animation category (Genre ID 13)
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒöº Created Phim Le category (ID 2)
+02-08 20:57:24.995  8148  8148 D HomeActivity: Γ£à Category 2: Drama Xß╗⌐ Kim Chi
+02-08 20:57:24.995  8148  8148 D HomeActivity: Γ£à Category 3: Tr╞░ß╗¥ng Thi├¬n Drama "T├áu"
+02-08 20:57:24.995  8148  8148 D HomeActivity: Γ£à Category 4: X╞░ß╗ƒng phim Xß╗⌐ ─É├┤ng L├áo
+02-08 20:57:24.995  8148  8148 D HomeActivity: Γ£à Category 5: Xi N├¬ Tuß╗òi Th╞í
+02-08 20:57:24.995  8148  8148 D HomeActivity: Γ£à Category 6: Phim Lß║╗ Mß╗¢i Nhß║Ñt
+02-08 20:57:24.995  8148  8148 D HomeActivity: Γ£à Category 7: Phim Bß╗Ö Mß╗¢i Nhß║Ñt
+02-08 20:57:24.995  8148  8148 D HomeActivity: Γ£à Total categories loaded: 7
+02-08 20:57:24.995  8148  8148 D HomeActivity: ≡ƒÄ» Current category index: 0
+02-08 20:57:24.996  8148  8148 D HomeActivity: Γ£à No padding - Hero Banner only mode
+02-08 20:57:25.014  8148  8148 D HomeNewActivity: ≡ƒÜÇ Starting OTA update check...
+02-08 20:57:25.015  8148  8148 D HomeNewActivity: ≡ƒô▒ Getting OTAUpdateManager instance...
+02-08 20:57:25.022  8148  8148 E OTAUpdateManager: ≡ƒöº Creating OTAUpdateService...
+02-08 20:57:25.026  8148  8148 D OTAUpdateService: OTA Update Service created with context
+02-08 20:57:25.026  8148  8148 E OTAUpdateService: ≡ƒöÑ Initializing Firebase Database...
+02-08 20:57:25.195  8148  8148 E OTAUpdateService: Γ£à Firebase initialized successfully!
+02-08 20:57:25.195  8148  8148 E OTAUpdateService: Firebase URL: https://website-19a7d-default-rtdb.asia-southeast1.firebasedatabase.app
+02-08 20:57:25.195  8148  8148 E OTAUpdateService: Firebase path: app_updates/phim4k
+02-08 20:57:25.195  8148  8148 E OTAUpdateManager: Γ£à OTAUpdateService created and Firebase initialized
+02-08 20:57:25.195  8148  8148 E OTAUpdateManager: ≡ƒöº Creating OTADownloadManager...
+02-08 20:57:25.196  8148  8148 E OTADownloadManager: ≡ƒôí Registering download receiver...
+02-08 20:57:25.197  8148  8148 E OTADownloadManager: ≡ƒôí Γ£à Download receiver registered successfully!
+02-08 20:57:25.197  8148  8148 E OTAUpdateManager: Γ£à OTADownloadManager created
+02-08 20:57:25.197  8148  8148 D HomeNewActivity: Γ£à OTAUpdateManager instance created: SUCCESS
+02-08 20:57:25.197  8148  8148 D HomeNewActivity: ≡ƒöì Calling checkForUpdates...
+02-08 20:57:25.197  8148  8148 E OTAUpdateManager: Starting OTA update check...
+02-08 20:57:25.197  8148  8148 E OTAUpdateService: ≡ƒöä Checking for updates with fresh data...
+02-08 20:57:25.202  8148  8148 D HomeNewActivity: Γ£à checkForUpdates called successfully
+02-08 20:57:25.202  8148  8148 D HomeActivity: Γ£à Hero banner container found in Fragment
+02-08 20:57:25.222  8148  8148 E ThemeUtils: View class androidx.appcompat.widget.AppCompatButton is an AppCompat widget that can only be used with a Theme.AppCompat theme (or descendant).
+02-08 20:57:25.239  8148  8148 E ThemeUtils: View class androidx.appcompat.widget.AppCompatButton is an AppCompat widget that can only be used with a Theme.AppCompat theme (or descendant).
+02-08 20:57:25.245  8148  8148 D HomeActivity: Γ£à Hero banner view inflated
+02-08 20:57:25.247  8148  8148 D HomeActivity: Γ£à Hero banner view added to container
+02-08 20:57:25.247  8148  8148 D HomeActivity: ≡ƒôÉ Screen dimensions: 1920x1080 px
+02-08 20:57:25.247  8148  8148 D HomeActivity: ≡ƒôÉ Target 16:9 size: 1920x1080 px
+02-08 20:57:25.248  8148  8148 D HomeActivity: ≡ƒîÉ ========== CLOUDFLARE URL ==========
+02-08 20:57:25.248  8148  8148 D HomeActivity: ≡ƒîÉ Original: https://api.phim4k.lol/uploads/poster_image/16169.jpg
+02-08 20:57:25.248  8148  8148 D HomeActivity: ≡ƒîÉ Cloudflare: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:57:25.248  8148  8148 D HomeActivity: ≡ƒîÉ Size: 1920x1080 px (fit=cover)
+02-08 20:57:25.248  8148  8148 D HomeActivity: ≡ƒîÉ =====================================
+02-08 20:57:25.257  8148  8148 D HomeActivity: Γ£à Fixed Hero Banner loaded successfully with title: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:25.265  8148  8148 D HomeActivity: ≡ƒÄ¼ Lazy loading: Initial 10 of 24 thumbnails
+02-08 20:57:25.266  8148  8148 D HomeActivity: Γ£à Thumbnails grid setup with 24 items and focus listener
+02-08 20:57:25.593  8148  8148 D HomeActivity: ≡ƒÄ¿ ========== BITMAP LOADED (CURRENT APP) ==========
+02-08 20:57:25.594  8148  8148 D HomeActivity: ≡ƒÄ¿ URL: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:57:25.595  8148  8148 D HomeActivity: ≡ƒÄ¿ Bitmap size: 1920x1080 px
+02-08 20:57:25.595  8148  8148 D HomeActivity: ≡ƒÄ¿ ImageView scaleType: CENTER_CROP
+02-08 20:57:25.595  8148  8148 D HomeActivity: ≡ƒÄ¿ ImageView size: 0x0 px
+02-08 20:57:25.595  8148  8148 D HomeActivity: ≡ƒÄ¿ AdjustViewBounds: false
+02-08 20:57:25.595  8148  8148 D HomeActivity: ≡ƒÄ¿ ===================================================
+02-08 20:57:25.610  8148  8148 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:57:25.612  8148  8148 D HomeActivity: ≡ƒôì Thumbnail grid focus changed - Position: 0
+02-08 20:57:25.612  8148  8148 D HomeActivity: ≡ƒÄ» Thumbnail focused: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:25.612  8148  8148 D HomeActivity: ≡ƒôÉ Screen dimensions: 1920x1080 px
+02-08 20:57:25.612  8148  8148 D HomeActivity: ≡ƒôÉ Target 16:9 size: 1920x1080 px
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒîÉ ========== CLOUDFLARE URL ==========
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒîÉ Original: https://api.phim4k.lol/uploads/poster_image/16169.jpg
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒîÉ Cloudflare: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒîÉ Size: 1920x1080 px (fit=cover)
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒîÉ =====================================
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒÄ¿ ========== BITMAP LOADED (CURRENT APP) ==========
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒÄ¿ URL: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒÄ¿ Bitmap size: 1920x1080 px
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒÄ¿ ImageView scaleType: CENTER_CROP
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒÄ¿ ImageView size: 1920x1080 px
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒÄ¿ AdjustViewBounds: false
+02-08 20:57:25.613  8148  8148 D HomeActivity: ≡ƒÄ¿ ===================================================
+02-08 20:57:25.617  8148  8148 D HomeActivity: Γ£à Hero Banner content updated: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:25.619  8148  8148 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:57:25.624  8148  8148 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:57:25.626  8148  8148 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:57:25.628  8148  8148 D HeroThumbnailPresenter: Thumbnail size: 322x182px (density: 2.0x)
+02-08 20:57:25.637  8148  8252 W PersistentConnection: pc_0 - Firebase Database connection was forcefully killed by the server. Will not attempt reconnect. Reason: The Firebase database 'website-19a7d-default-rtdb' has reached its peak connections limit. If you are the Firebase owner, consider upgrading.
+02-08 20:57:25.640  8148  8148 W View    : requestLayout() improperly called by android.widget.TextView{ae56a39 V.ED..... ......ID 80,10-118,43 #7f0b0207 app:id/hero_imdb_rating} during layout: running second layout pass
+02-08 20:57:25.640  8148  8148 W View    : requestLayout() improperly called by android.widget.TextView{b21c87e V.ED..... ......ID 24,12-81,42 #7f0b0214 app:id/hero_year} during layout: running second layout pass
+02-08 20:57:25.640  8148  8148 W View    : requestLayout() improperly called by android.widget.TextView{7ecf1df V.ED..... ......ID 24,12-111,42 #7f0b020d app:id/hero_quality} during layout: running second layout pass
+02-08 20:57:25.667  8148  8148 E HOME_DEBUG: ≡ƒöÑ onChanged FIRED! homeContentList=NOT NULL, list size=7
+02-08 20:57:25.667  8148  8148 E HOME_DEBUG: ≡ƒöÑ loadRows called! list=size=7
+02-08 20:57:25.667  8148  8148 E HOME_DEBUG: ≡ƒöÑ Found featured content in loadRows: 24 items -> addFeaturedContentFromHomepage
+02-08 20:57:25.667  8148  8148 E TvRecommendationManager: >>> addFeaturedContentFromHomepage called, list=24
+02-08 20:57:25.668  8148  8148 E TvRecommendationManager: >>> addToRecommended called, list=10
+02-08 20:57:25.668  8148  8148 E TvRecommendationManager: >>> createRecommendationChannel: isTvProviderAvailable=true
+02-08 20:57:25.672  8148  8148 E TvRecommendationManager: >>> Found existing channel: 5
+02-08 20:57:25.675  8148  8148 W TvRecommendationManager: Could not clear old programs: Selection not allowed for content://android.media.tv/preview_program
+02-08 20:57:25.684  8148  8148 D TvRecommendationManager: Added to Recommended: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:25.690  8148  8148 D TvRecommendationManager: Added to Recommended: ─É╞░ß╗¥ng Cung Kß╗│ ├ün: Thanh Vß╗Ñ Phong Minh (2026) Unveil: Jadewind
+02-08 20:57:25.694  8148  8148 D TvRecommendationManager: Added to Recommended: C├▓n Ra Thß╗â Thß╗æng G├¼ Nß╗»a? (2026) How Dare You!?
+02-08 20:57:25.700  8148  8148 D TvRecommendationManager: Added to Recommended: C├íc Tr├▓ Ch╞íi Cß╗ºa Beast (2024) Beast Games
+02-08 20:57:25.706  8148  8148 D TvRecommendationManager: Added to Recommended: SpongeBob: Lß╗¥i Nguyß╗ün Hß║úi Tß║╖c (2025) The SpongeBob Movie: Search for SquarePants
+02-08 20:57:25.710  8148  8148 D TvRecommendationManager: Added to Recommended: TEE YOD: QUß╗╢ ─éN Tß║áNG 3 (2025) Death Whisperer 3
+02-08 20:57:25.711  8148  8156 I oxootv.spagree: JIT allocated 75KB for compiled code of void android.view.View.<init>(android.content.Context, android.util.AttributeSet, int, int)
+02-08 20:57:25.713  8148  8148 D TvRecommendationManager: Added to Recommended: Hoa M├íu (2026) Bloody Flower
+02-08 20:57:25.717  8148  8148 D TvRecommendationManager: Added to Recommended: ─É├¬m Nay Dß║½u T├¼nh Y├¬u N├áy Biß║┐n Mß║Ñt Khß╗Åi Thß║┐ Gian (2025) Even If This Love Disappears Tonight
+02-08 20:57:25.721  8148  8148 D TvRecommendationManager: Added to Recommended: C├┤ Hß║ºu G├íi (2025) The Housemaid
+02-08 20:57:25.724  8148  8148 D TvRecommendationManager: Added to Recommended: Tam Quß╗æc ─É├¡ch Tinh Kh├┤ng ─Éß╗ç Nhß║Ñt Bß╗Ö (2025) 
+02-08 20:57:25.724  8148  8148 E TvRecommendationManager: >>> addToRecommended complete: 10/10 programs added to channel 5
+02-08 20:57:25.724  8148  8148 D TvRecommendationManager: Added 10 featured movies from homepage to TV Recommended
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒÜÇ Loading initial content batch: 9 items
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒöì loadFixedHeroBanner called with video: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒÄ¼ Category 0: Phim Hay Nha N├¡
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒîì Country ID found: korea_content - Title: Drama xß╗⌐ Kim Chi
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒîì Country ID found: china_content - Title: Tr╞░ß╗¥ng thi├¬n Drama T├áu
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒîì Country ID found: vietnam_content - Title: X╞░ß╗ƒng phim xß╗⌐ ─É├┤ng L├áo
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒÄ¡ Genre ID found: animation_content - Title: Xi n├¬ Tuß╗òi th╞í
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒôé Phim Bß╗Ö: Phim Bß╗Ö Mß╗¢i Nhß║Ñt
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒôé Phim4k Free1: Nguß╗ôn Phim Free 1
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒôé KKPhim4k Free2: Nguß╗ôn Free 2
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒöº Created Korea category (ID 13)
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒöº Created China category (ID 15)
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒöº Created Vietnam category (ID 5)
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒöº Created Animation category (Genre ID 13)
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒöº Created Phim Le category (ID 2)
+02-08 20:57:25.725  8148  8148 D HomeActivity: Γ£à Category 2: Drama Xß╗⌐ Kim Chi
+02-08 20:57:25.725  8148  8148 D HomeActivity: Γ£à Category 3: Tr╞░ß╗¥ng Thi├¬n Drama "T├áu"
+02-08 20:57:25.725  8148  8148 D HomeActivity: Γ£à Category 4: X╞░ß╗ƒng phim Xß╗⌐ ─É├┤ng L├áo
+02-08 20:57:25.725  8148  8148 D HomeActivity: Γ£à Category 5: Xi N├¬ Tuß╗òi Th╞í
+02-08 20:57:25.725  8148  8148 D HomeActivity: Γ£à Category 6: Phim Lß║╗ Mß╗¢i Nhß║Ñt
+02-08 20:57:25.725  8148  8148 D HomeActivity: Γ£à Category 7: Phim Bß╗Ö Mß╗¢i Nhß║Ñt
+02-08 20:57:25.725  8148  8148 D HomeActivity: Γ£à Total categories loaded: 7
+02-08 20:57:25.725  8148  8148 D HomeActivity: ≡ƒÄ» Current category index: 0
+02-08 20:57:25.726  8148  8148 D HomeActivity: Γ£à No padding - Hero Banner only mode
+02-08 20:57:25.727  8148  8148 D HomeActivity: Γ£à Hero banner container found in Fragment
+02-08 20:57:25.731  8148  8148 E ThemeUtils: View class androidx.appcompat.widget.AppCompatButton is an AppCompat widget that can only be used with a Theme.AppCompat theme (or descendant).
+02-08 20:57:25.732  8148  8148 E ThemeUtils: View class androidx.appcompat.widget.AppCompatButton is an AppCompat widget that can only be used with a Theme.AppCompat theme (or descendant).
+02-08 20:57:25.734  8148  8148 D HomeActivity: Γ£à Hero banner view inflated
+02-08 20:57:25.736  8148  8148 D HomeActivity: Γ£à Hero banner view added to container
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒôÉ Screen dimensions: 1920x1080 px
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒôÉ Target 16:9 size: 1920x1080 px
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒîÉ ========== CLOUDFLARE URL ==========
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒîÉ Original: https://api.phim4k.lol/uploads/poster_image/16169.jpg
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒîÉ Cloudflare: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒîÉ Size: 1920x1080 px (fit=cover)
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒîÉ =====================================
+02-08 20:57:25.736  8148  8148 D HomeActivity: ≡ƒÄ¿ ========== BITMAP LOADED (CURRENT APP) ==========
+02-08 20:57:25.737  8148  8148 D HomeActivity: ≡ƒÄ¿ URL: https://api.phim4k.lol/cdn-cgi/image/width=1920,height=1080,fit=cover,quality=90,format=auto/uploads/poster_image/16169.jpg
+02-08 20:57:25.737  8148  8148 D HomeActivity: ≡ƒÄ¿ Bitmap size: 1920x1080 px
+02-08 20:57:25.737  8148  8148 D HomeActivity: ≡ƒÄ¿ ImageView scaleType: CENTER_CROP
+02-08 20:57:25.737  8148  8148 D HomeActivity: ≡ƒÄ¿ ImageView size: 0x0 px
+02-08 20:57:25.737  8148  8148 D HomeActivity: ≡ƒÄ¿ AdjustViewBounds: false
+02-08 20:57:25.737  8148  8148 D HomeActivity: ≡ƒÄ¿ ===================================================
+02-08 20:57:25.738  8148  8148 D HomeActivity: Γ£à Fixed Hero Banner loaded successfully with title: Trao Em Cß║ú V┼⌐ Trß╗Ñ (2026) Our Universe
+02-08 20:57:25.747  8148  8148 W RecyclerView: No adapter attached; skipping layout
+02-08 20:57:25.832  8148  8208 D EGL_emulation: app_time_stats: avg=23.62ms min=3.80ms max=236.73ms count=34
+02-08 20:57:25.835  8148  8148 D HomeActivity: ≡ƒÄ» Auto-focused on thumbnail grid - Success: true

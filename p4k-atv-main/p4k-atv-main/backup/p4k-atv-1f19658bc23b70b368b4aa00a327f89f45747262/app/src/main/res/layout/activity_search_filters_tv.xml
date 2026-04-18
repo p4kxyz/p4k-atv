@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1a1a1a"
+    android:padding="40dp"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔍 Tìm Kiếm Nâng Cao"
+            android:textSize="36sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:layout_marginBottom="40dp"
+            android:gravity="center"/>
+
+        <!-- Search Query -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📝 Từ khóa tìm kiếm:"
+            android:textSize="22sp"
+            android:textColor="#cccccc"
+            android:layout_marginBottom="12dp"/>
+        
+        <EditText
+            android:id="@+id/search_query_input"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Nhập tên phim hoặc diễn viên..."
+            android:textColor="#ffffff"
+            android:textColorHint="#888888"
+            android:textSize="20sp"
+            android:padding="20dp"
+            android:layout_marginBottom="30dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:imeOptions="actionSearch"
+            android:inputType="text"/>
+
+        <!-- Genre Filter -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📂 Thể loại:"
+            android:textSize="22sp"
+            android:textColor="#cccccc"
+            android:layout_marginBottom="12dp"/>
+        
+        <Button
+            android:id="@+id/btn_select_genre"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:text="Tất cả thể loại ▼"
+            android:textSize="20sp"
+            android:textColor="#ffffff"
+            android:background="@drawable/spinner_bg"
+            android:gravity="center_vertical|start"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:layout_marginBottom="30dp"
+            android:focusable="true"
+            android:nextFocusDown="@id/btn_select_country"/>
+
+        <!-- Country Filter -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🌍 Quốc gia:"
+            android:textSize="22sp"
+            android:textColor="#cccccc"
+            android:layout_marginBottom="12dp"/>
+        
+        <Button
+            android:id="@+id/btn_select_country"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:text="Tất cả quốc gia ▼"
+            android:textSize="20sp"
+            android:textColor="#ffffff"
+            android:background="@drawable/spinner_bg"
+            android:gravity="center_vertical|start"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:layout_marginBottom="30dp"
+            android:focusable="true"
+            android:nextFocusUp="@id/btn_select_genre"
+            android:nextFocusDown="@id/btn_select_year_from"/>
+
+        <!-- Year Range -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📅 Năm phát hành:"
+            android:textSize="22sp"
+            android:textColor="#cccccc"
+            android:layout_marginBottom="12dp"/>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="40dp">
+            
+            <Button
+                android:id="@+id/btn_select_year_from"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_weight="1"
+                android:text="Từ năm: Bất kỳ ▼"
+                android:textSize="18sp"
+                android:textColor="#ffffff"
+                android:background="@drawable/spinner_bg"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginEnd="15dp"
+                android:focusable="true"
+                android:nextFocusUp="@id/btn_select_country"
+                android:nextFocusRight="@id/btn_select_year_to"
+                android:nextFocusDown="@id/btn_clear_filters"/>
+            
+            <Button
+                android:id="@+id/btn_select_year_to"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_weight="1"
+                android:text="Đến năm: Bất kỳ ▼"
+                android:textSize="18sp"
+                android:textColor="#ffffff"
+                android:background="@drawable/spinner_bg"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginStart="15dp"
+                android:focusable="true"
+                android:nextFocusUp="@id/btn_select_country"
+                android:nextFocusLeft="@id/btn_select_year_from"
+                android:nextFocusDown="@id/btn_search"/>
+        </LinearLayout>
+
+        <!-- Current Filters Display -->
+        <TextView
+            android:id="@+id/tv_current_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bộ lọc hiện tại: Không có"
+            android:textSize="18sp"
+            android:textColor="#FFC107"
+            android:padding="15dp"
+            android:background="#2a2a2a"
+            android:layout_marginBottom="30dp"
+            android:visibility="visible"/>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            
+            <Button
+                android:id="@+id/btn_clear_filters"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="🗑️ XÓA BỘ LỌC"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                android:background="@drawable/button_secondary_bg"
+                android:layout_marginEnd="20dp"
+                android:focusable="true"
+                android:nextFocusUp="@id/btn_select_year_from"
+                android:nextFocusRight="@id/btn_search"/>
+            
+            <Button
+                android:id="@+id/btn_search"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight="1"
+                android:text="🔍 TÌM KIẾM"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                android:background="@drawable/button_primary_bg"
+                android:layout_marginStart="20dp"
+                android:focusable="true"
+                android:nextFocusUp="@id/btn_select_year_to"
+                android:nextFocusLeft="@id/btn_clear_filters"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+
+

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Focused state - white border with dark outline for contrast -->
+    <item android:state_focused="true">
+        <layer-list>
+            <!-- Outer dark border for contrast against white images -->
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#00000000" />
+                    <stroke
+                        android:width="3dp"
+                        android:color="#88000000" />
+                    <corners android:radius="6dp" />
+                </shape>
+            </item>
+            <!-- Inner white border -->
+            <item
+                android:left="1dp"
+                android:top="1dp"
+                android:right="1dp"
+                android:bottom="1dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="#00000000" />
+                    <stroke
+                        android:width="2dp"
+                        android:color="#FFFFFF" />
+                    <corners android:radius="5dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+    <!-- Default state - transparent -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+        </shape>
+    </item>
+</selector>

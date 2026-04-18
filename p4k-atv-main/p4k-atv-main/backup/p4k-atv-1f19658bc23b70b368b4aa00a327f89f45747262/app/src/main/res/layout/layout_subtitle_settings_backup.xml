@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="450dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/rounded_dialog_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Subtitle Settings"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Font Size -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Font Size:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_font_size_minus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="-"
+            android:textSize="18sp"
+            android:layout_marginEnd="5dp" />
+
+        <TextView
+            android:id="@+id/tv_font_size"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:text="20sp"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:layout_marginHorizontal="10dp" />
+
+        <Button
+            android:id="@+id/btn_font_size_plus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="+"
+            android:textSize="18sp"
+            android:layout_marginStart="5dp" />
+    </LinearLayout>
+
+    <!-- Font Type -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Font:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spinner_font"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white" />
+    </LinearLayout>
+
+    <!-- Vertical Position -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Vertical Position:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_position_down"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="↓"
+            android:textSize="18sp"
+            android:layout_marginEnd="5dp" />
+
+        <TextView
+            android:id="@+id/tv_position"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="Bottom"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:layout_marginHorizontal="10dp" />
+
+        <Button
+            android:id="@+id/btn_position_up"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="↑"
+            android:textSize="18sp"
+            android:layout_marginStart="5dp" />
+    </LinearLayout>
+
+    <!-- Position Presets -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Quick Position:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <RadioGroup
+            android:id="@+id/radio_group_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bottom"
+                android:textColor="@android:color/white"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radio_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Center"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp" />
+
+            <RadioButton
+                android:id="@+id/radio_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Top"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="10dp" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <!-- Background -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Background:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Switch
+            android:id="@+id/switch_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- Dual Subtitle -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Dual Subtitle:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Switch
+            android:id="@+id/switch_dual_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- Primary Subtitle Track Selection -->
+    <LinearLayout
+        android:id="@+id/layout_primary_track"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="15dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Primary Track:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spinner_primary_track"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white" />
+    </LinearLayout>
+
+    <!-- Secondary Subtitle Track Selection -->
+    <LinearLayout
+        android:id="@+id/layout_secondary_track"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Secondary Track:"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spinner_secondary_track"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white" />
+    </LinearLayout>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:layout_marginEnd="10dp" />
+
+        <Button
+            android:id="@+id/btn_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply" />
+    </LinearLayout>
+
+</LinearLayout>

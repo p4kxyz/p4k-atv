@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.files.codes.view.CustomFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:id="@+id/custom_frame_layout">
+
+    <!-- Fragment Container (Behind Hero Banner, scrollable) -->
+    <FrameLayout
+        android:id="@+id/rows_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top|start">
+        
+        <fragment
+            android:id="@+id/page_list_fragment"
+            android:name="com.files.codes.view.fragments.testFolder.HomeNewFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+            
+    </FrameLayout>
+
+    <!-- Search Orb removed - using Leanback's built-in SearchOrbView instead -->
+    
+    <!-- Sidebar Menu (Above everything, elevation=30dp) -->
+    <FrameLayout
+        android:id="@+id/header_container"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="top|start"
+        android:visibility="gone"
+        android:elevation="30dp" />
+
+</com.files.codes.view.CustomFrameLayout>

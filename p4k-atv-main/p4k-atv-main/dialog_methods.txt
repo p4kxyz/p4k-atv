@@ -1,0 +1,182 @@
+    // --- Bổ sung phương thức hiển thị dialog cho Lịch sử xem ---
+    private int dp(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    private void showWatchHistoryOptionsDialog(VideoContent videoContent) {
+        String[] options = {"Tiếp tục xem", "Xóa khỏi lịch sử"};
+        Runnable[] actions = new Runnable[] {
+            () -> playWatchHistoryVideo(videoContent),
+            () -> deleteWatchHistoryItemLocally(videoContent)
+        };
+
+        android.app.Dialog dialog = buildCustomListDialog(
+            videoContent.getTitle() != null ? videoContent.getTitle() : "Tùy chọn", options, -1, actions, null
+        );
+        dialog.show();
+    }
+
+    private void playWatchHistoryVideo(VideoContent videoContent) {
+        String description = videoContent.getDescription();
+        long currentPosition = 0;
+        if (description != null && description.startsWith("WATCH_HISTORY:")) {
+            try {
+                currentPosition = Long.parseLong(description.substring("WATCH_HISTORY:".length()));
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        String contentType = "movie";
+        if (videoContent.getIsTvseries() != null && videoContent.getIsTvseries().equals("1")) {
+            contentType = "tvseries";
+        } else if (videoContent.getType() != null) {
+            contentType = videoContent.getType();
+        }
+
+        String videoUrl = videoContent.getVideoUrl();
+        if (videoUrl == null || videoUrl.trim().isEmpty()) {
+            android.widget.Toast.makeText(getActivity(), "Video chưa có link phát, đang chuyển đến trang chi tiết...", android.widget.Toast.LENGTH_SHORT).show();
+            android.content.Intent intent = new android.content.Intent(getActivity(), HeroStyleVideoDetailsActivity.class);
+            intent.putExtra("id", videoContent.getId());
+            intent.putExtra("type", contentType);
+            intent.putExtra("thumbImage", videoContent.getThumbnailUrl() != null ? videoContent.getThumbnailUrl() : "");
+            startActivity(intent);
+            return;
+        }
+
+        android.content.Intent intent = new android.content.Intent(getActivity(), com.files.codes.view.PlayerActivity.class);
+        intent.putExtra("id", videoContent.getId());
+        intent.putExtra("type", contentType);
+        intent.putExtra("title", videoContent.getTitle());
+        intent.putExtra("poster", videoContent.getPosterUrl());
+        intent.putExtra("thumbnail", videoContent.getThumbnailUrl());
+        intent.putExtra("video_url", videoUrl);
+        intent.putExtra("position", currentPosition);
+        intent.putExtra("from_watch_history", true);
+        startActivity(intent);
+    }
+
+    private void deleteWatchHistoryItemLocally(VideoContent videoContent) {
+        if (syncManager != null) {
+            syncManager.deleteWatchHistoryItem(videoContent.getId(), new com.files.codes.utils.sync.WatchHistorySyncManager.SyncCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            android.widget.Toast.makeText(getContext(), "Đã xóa khỏi lịch sử", android.widget.Toast.LENGTH_SHORT).show();
+                            refreshWatchHistorySection();
+                        });
+                    }
+                }
+                @Override
+                public void onError(String error) {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            android.widget.Toast.makeText(getContext(), "Lỗi xóa: " + error, android.widget.Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        } else {
+            android.widget.Toast.makeText(getContext(), "Không thể kết nối đồng bộ", android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private android.app.Dialog buildCustomListDialog(
+            String title, String[] items, int checkedIndex,
+            Runnable[] actions, Runnable onCancel) {
+
+        android.app.Dialog dialog = new android.app.Dialog(getActivity());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        if (onCancel != null) {
+            dialog.setOnCancelListener(d -> onCancel.run());
+        }
+
+        android.widget.LinearLayout root = new android.widget.LinearLayout(getActivity());
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFF1E1E2E);
+        root.setPadding(dp(20), dp(20), dp(20), dp(12));
+
+        if (title != null && !title.isEmpty()) {
+            android.widget.TextView titleView = new android.widget.TextView(getActivity());
+            titleView.setText(title);
+            titleView.setTextColor(0xFFFFFFFF);
+            titleView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
+            titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            titleView.setPadding(dp(4), 0, dp(4), dp(10));
+            root.addView(titleView);
+
+            android.view.View divider = new android.view.View(getActivity());
+            divider.setBackgroundColor(0x55FFFFFF);
+            android.widget.LinearLayout.LayoutParams divLp =
+                    new android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+            divLp.bottomMargin = dp(6);
+            root.addView(divider, divLp);
+        }
+
+        android.widget.ScrollView sv = new android.widget.ScrollView(getActivity());
+        sv.setVerticalScrollBarEnabled(false);
+        android.widget.LinearLayout ll = new android.widget.LinearLayout(getActivity());
+        ll.setOrientation(android.widget.LinearLayout.VERTICAL);
+
+        for (int i = 0; i < items.length; i++) {
+            final int idx = i;
+            boolean isSelected = (checkedIndex >= 0 && i == checkedIndex);
+
+            android.widget.TextView tv = new android.widget.TextView(getActivity());
+            tv.setText(isSelected ? "í  " + items[i] : items[i]);
+            tv.setTextColor(isSelected ? 0xFF64B5F6 : 0xFFDDDDDD);
+            tv.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+            tv.setPadding(dp(10), dp(13), dp(10), dp(13));
+            tv.setFocusable(true);
+            tv.setFocusableInTouchMode(false);
+            tv.setClickable(true);
+            tv.setBackground(null);
+
+            tv.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    v.setBackgroundColor(0x664FC3F7);
+                    ((android.widget.TextView) v).setTextColor(0xFFFFFFFF);
+                } else {
+                    v.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+                    boolean sel = (checkedIndex >= 0 && idx == checkedIndex);
+                    ((android.widget.TextView) v).setTextColor(sel ? 0xFF64B5F6 : 0xFFDDDDDD);
+                }
+            });
+
+            tv.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (actions != null && idx < actions.length && actions[idx] != null) {
+                    actions[idx].run();
+                }
+            });
+
+            ll.addView(tv);
+
+            if (i < items.length - 1) {
+                android.view.View sep = new android.view.View(getActivity());
+                sep.setBackgroundColor(0x22FFFFFF);
+                ll.addView(sep, new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 1));
+            }
+        }
+        sv.addView(ll);
+
+        android.widget.LinearLayout.LayoutParams svLp =
+                new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                        android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        root.addView(sv, svLp);
+
+        dialog.setContentView(root);
+        android.view.Window w = dialog.getWindow();
+        if (w != null) {
+            w.setLayout(dp(480), android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+            w.setGravity(android.view.Gravity.CENTER);
+            w.setBackgroundDrawableResource(android.R.color.transparent);
+        }
+        return dialog;
+    }
+}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/dialog_background">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/update_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cập nhật có sẵn"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- App Icon -->
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/ic_launcher"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Version Info -->
+    <TextView
+        android:id="@+id/update_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Phiên bản: 1.9.7b"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <!-- File Size -->
+    <TextView
+        android:id="@+id/update_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kích thước: 8.1 MB"
+        android:textSize="14sp"
+        android:textColor="@color/light_gray"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Changelog ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/rounded_background_dark"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:id="@+id/update_changelog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Sửa lỗi không chọn được subtitle từ lịch sử xem\n• Cải thiện hiệu suất phát video 4K\n• Tối ưu hóa giao diện Android TV\n• Sửa lỗi crash khi sử dụng TV recommendations"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:lineSpacingExtra="4dp" />
+
+    </ScrollView>
+
+    <!-- Buttons Layout — horizontal row, TV D-pad navigable -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <!-- Later Button -->
+        <Button
+            android:id="@+id/btn_later"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Để sau"
+            android:textColor="@color/btn_ota_text"
+            android:textSize="15sp"
+            android:background="@drawable/btn_ota_secondary"
+            android:layout_marginEnd="8dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:nextFocusRight="@id/btn_update" />
+
+        <!-- Update Button (default focused) -->
+        <Button
+            android:id="@+id/btn_update"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="✓ Cập nhật"
+            android:textColor="@color/btn_ota_text"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:background="@drawable/btn_ota_primary"
+            android:layout_marginStart="8dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:nextFocusLeft="@id/btn_later" />
+
+    </LinearLayout>
+
+</LinearLayout>

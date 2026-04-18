@@ -1,0 +1,73 @@
+<resources>
+    <color name="background_gradient_start">#000000</color>
+    <color name="background_gradient_end">#DDDDDD</color>
+    <color name="fastlane_background">#0096a6</color>
+    <color name="search_opaque">#ffaa3f</color>
+    <color name="search_icon_color">#ED1C24</color>
+    <color name="selected_background">#ffaa3f</color>
+    <color name="default_background">#000000</color>
+
+    <color name="colorPrimary">#FF000000</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#ED1C24</color>
+    
+    <!-- Player Control Colors -->
+    <color name="player_button_focus">#ED1C24</color>
+    <color name="player_button_normal">#66FFFFFF</color>
+    <color name="player_button_border">#FFFFFF</color>
+    <color name="splashScreenColor">#ff000000</color>
+    <color name="spinnerColor">#ffffffff</color>
+
+    <color name="colorButtonFocusedTV">#ED1C24</color>
+    <color name="colorButtonPressedTV">#C9181F</color>
+    <color name="colorButtonSelectedTV">#78909C</color>
+
+    <color name="grey_5">#f2f2f2</color>
+    <color name="grey_20">#cccccc</color>
+    <color name="grey_40">#999999</color>
+    <color name="grey_60">#666666</color>
+    <color name="grey_90">#000000</color>
+
+    <color name="overlay_dark_10">#1A000000</color>
+    <color name="overlay_dark_20">#33000000</color>
+    <color name="overlay_dark_30">#4D000000</color>
+    <color name="overlay_dark_40">#66000000</color>
+    <color name="overlay_dark_90">#E6000000</color>
+    
+    <!-- Watch History Colors -->
+    <color name="background_dark">#000000</color>
+    <color name="card_background">#111111</color>
+    <color name="text_secondary">#AAAAAA</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="placeholder_gray">#444444</color>
+    <color name="progress_background">#444444</color>
+    <color name="black_50">#80000000</color>
+    <color name="black_30">#99000000</color>
+    <color name="grey_transparent">#327C7C7C</color>
+
+
+    <color name="red_600">#E53935</color>
+    <color name="green_500">#4CAF50</color>
+    <color name="blue_grey_300">#90A4AE</color>
+    <color name="red_400">#EF5350</color>
+    <color name="indigo_400">#5C6BC0</color>
+    <color name="light_green_400">#9CCC65</color>
+    <color name="blue_400">#42A5F5</color>
+    <color name="orange_400">#FFA726</color>
+    <color name="blue_grey_400">#78909C</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="light_theme_color">#FFFFFF</color>
+    <color name="badge_background_color">#f44336</color>
+    <color name="rsb_trackSelectedDefaultColor">#fefefe</color>
+
+
+    <color name="settings_card_background">#0277BD</color>
+    <color name="settings_card_background_focussed">#01579B</color>
+    
+    <!-- OTA Update Colors -->
+    <color name="dark_gray">#333333</color>
+    <color name="light_gray">#AAAAAA</color>
+    <color name="yellow">#FFC107</color>
+</resources>

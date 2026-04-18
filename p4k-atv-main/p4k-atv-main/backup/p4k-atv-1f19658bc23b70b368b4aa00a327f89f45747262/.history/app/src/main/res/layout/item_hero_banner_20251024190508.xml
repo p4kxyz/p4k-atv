@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="0dp"
+    android:layout_marginStart="0dp"
+    android:layout_marginEnd="0dp"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
+    android:descendantFocusability="afterDescendants">
+
+    <!-- Background Image (Full Width) -->
+    <ImageView
+        android:id="@+id/hero_background"
+        android:layout_width="match_parent"
+        android:layout_height="1080dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="false"
+        android:contentDescription="Hero Background"
+        tools:src="@drawable/logo" />
+
+    <!-- Left Side Gradient Overlay (darken left side for text readability) -->
+    <View
+        android:id="@+id/left_gradient_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/hero_left_gradient_overlay" />
+
+    <!-- Gradient Overlay (Bottom Fade) -->
+    <View
+        android:id="@+id/gradient_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/hero_gradient_overlay" />
+
+    <!-- Content Container (Left-aligned like Netflix) -->
+    <LinearLayout
+        android:id="@+id/hero_text_arena"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginTop="80dp"
+        android:paddingStart="48dp"
+        android:paddingEnd="@dimen/hero_content_padding_end"
+        android:paddingBottom="@dimen/hero_content_padding_bottom">
+
+        <!-- Title Line 1 (Main Title) - Sci-Fi/Tech Style with Auto-Size -->
+        <TextView
+            android:id="@+id/hero_title"
+            android:layout_width="450dp"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-condensed"
+            android:shadowColor="#000000"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="6"
+            android:letterSpacing="0.02"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="18sp"
+            android:autoSizeMaxTextSize="32sp"
+            android:autoSizeStepGranularity="1sp"
+            android:layout_marginBottom="6dp"
+            tools:text="HÃY LẤY EM ĐI" />
+
+        <!-- Title Line 2 (Secondary Title) - Elegant Thin Style with Auto-Size -->
+        <TextView
+            android:id="@+id/hero_title_line2"
+            android:layout_width="450dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#FFD54F"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4"
+            android:letterSpacing="0.15"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeMaxTextSize="20sp"
+            android:autoSizeStepGranularity="1sp"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"
+            tools:text="T A K E  M E  H O M E" />
+
+        <!-- Metadata Row (IMDb, Year, Quality) - Below Title -->
+        <LinearLayout
+            android:id="@+id/hero_metadata"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="14dp"
+            android:gravity="center_vertical">
+
+            <!-- IMDB Rating Badge -->
+            <LinearLayout
+                android:id="@+id/hero_imdb_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/metadata_imdb_badge"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:gravity="center_vertical"
+                android:elevation="8dp"
+                android:layout_marginEnd="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="IMDb"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFD700"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/hero_imdb_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFD700"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    tools:text="8.5" />
+
+            </LinearLayout>
+
+            <!-- Year Badge -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/metadata_year_modern"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:gravity="center_vertical"
+                android:elevation="8dp">
+
+                <TextView
+                    android:id="@+id/hero_year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    tools:text="2024" />
+
+            </LinearLayout>
+
+            <!-- Quality Badge -->
+            <LinearLayout
+                android:id="@+id/hero_quality_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/metadata_quality_modern"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center_vertical"
+                android:elevation="8dp">
+
+                <TextView
+                    android:id="@+id/hero_quality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    tools:text="4K" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Description - Clean & Readable -->
+        <TextView
+            android:id="@+id/hero_description"
+            android:layout_width="420dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="10sp"
+            android:fontFamily="sans-serif"
+            android:textColor="#E0FFFFFF"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:lineSpacingExtra="2dp"
+            android:lineSpacingMultiplier="1.15"
+            android:layout_marginBottom="8dp"
+            tools:text="Một bộ phim hấp dẫn với cốt truyện lôi cuốn và những tình tiết bất ngờ..." />
+
+        <!-- Action Buttons Container -->
+        <LinearLayout
+            android:id="@+id/hero_buttons_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="12dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:visibility="gone">
+
+            <!-- Play Button (Icon Only - Circle) -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/hero_play_button"
+                style="@style/HeroButtonStyleNoZoom"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="▶"
+                android:textSize="20sp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:background="@drawable/hero_button_play_circle"
+                android:foreground="@null"
+                android:stateListAnimator="@null"
+                android:nextFocusRight="@id/hero_favorite_button"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="0dp"
+                android:gravity="center"
+                android:textAllCaps="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:scaleType="matrix"
+                android:clipToPadding="false"
+                android:clipChildren="false" />
+
+            <!-- Favorite Button (Heart Icon Only - Circle) -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/hero_favorite_button"
+                style="@style/HeroButtonStyleNoZoom"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="❤"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:background="@drawable/hero_button_favorite_circle"
+                android:foreground="@null"
+                android:stateListAnimator="@null"
+                android:nextFocusLeft="@id/hero_play_button"
+                android:nextFocusRight="@id/hero_favorite_button"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:textAllCaps="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:scaleType="matrix"
+                android:clipToPadding="false"
+                android:clipChildren="false" />
+
+        </LinearLayout>
+
+        <!-- Featured Thumbnails Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="48dp"
+            android:layout_marginStart="0dp">
+            
+            <!-- Title with Clear Button Container -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+                
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/hero_thumbnails_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phim Hay Nha Ní"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:shadowColor="#000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="4" />
+                
+                <!-- Clear History Button (invisible by default) -->
+                <Button
+                    android:id="@+id/hero_clear_history_button"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="16dp"
+                    android:text="🗑️"
+                    android:textSize="16sp"
+                    android:background="@drawable/clear_history_button_selector"
+                    android:textColor="@android:color/white"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:clickable="true"
+                    android:visibility="gone"
+                    android:nextFocusUp="@id/hero_favorite_button"
+                    android:nextFocusDown="@id/hero_thumbnails_grid"
+                    android:shadowColor="#000000"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="2" />
+                    
+            </LinearLayout>
+            
+            <!-- Horizontal Thumbnail ScrollView -->
+            <com.files.codes.view.widget.CategorySwitchingHorizontalGridView
+                android:id="@+id/hero_thumbnails_grid"
+                android:layout_width="match_parent"
+                android:layout_height="170dp"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:descendantFocusability="afterDescendants"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Page Indicator Dots (for auto-cycling) -->
+    <LinearLayout
+        android:id="@+id/hero_indicator_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="150dp"
+        android:visibility="gone" />
+
+</FrameLayout>

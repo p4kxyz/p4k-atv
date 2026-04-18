@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OTA Update primary button: focused = yellow, normal = red accent -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- FOCUSED: bright yellow bg + solid white border — impossible to miss on TV -->
+    <item android:state_focused="true">
+        <layer-list>
+            <item>
+                <shape>
+                    <solid android:color="#FFC107" />
+                    <corners android:radius="8dp" />
+                    <stroke android:width="3dp" android:color="#FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- PRESSED -->
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#E6A800" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+    <!-- NORMAL -->
+    <item>
+        <shape>
+            <solid android:color="@color/colorAccent" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+</selector>

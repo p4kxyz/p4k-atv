@@ -1,0 +1,28 @@
+{
+  "app_update": {
+    "version_code": 14,
+    "version_name": "1.9.8",
+    "download_url": "https://phim4k.xyz/downloads/androidtv/Phim4K-v1.9.7.apk",
+    "force_update": false,
+    "changelog": {
+      "vi": [
+        "🎉 Cải thiện chất lượng phát video 4K HDR",
+        "🔧 Sửa lỗi crash khi phát phim dài",
+        "⚡ Tối ưu hiệu năng cho Android TV Box",
+        "🎯 Cải thiện tính năng tìm kiếm phim",
+        "🛠️ Khắc phục lỗi subtitle không hiển thị",
+        "📱 Tối ưu giao diện cho màn hình lớn",
+        "🔄 Cập nhật database phim mới nhất"
+      ],
+      "en": [
+        "🎉 Improved 4K HDR video playback quality",
+        "🔧 Fixed crash when playing long movies",
+        "⚡ Performance optimization for Android TV Box",
+        "🎯 Enhanced movie search functionality", 
+        "🛠️ Fixed subtitle display issues",
+        "📱 UI optimization for large screens",
+        "🔄 Updated latest movie database"
+      ]
+    }
+  }
+}

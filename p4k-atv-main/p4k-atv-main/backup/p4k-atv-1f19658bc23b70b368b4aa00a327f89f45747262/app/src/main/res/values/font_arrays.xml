@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="font_family_names">
+        <item>Default</item>
+        <item>Sans Serif</item>
+        <item>Serif</item>
+        <item>Monospace</item>
+        <item>Vietnamese Font</item>
+    </string-array>
+</resources>

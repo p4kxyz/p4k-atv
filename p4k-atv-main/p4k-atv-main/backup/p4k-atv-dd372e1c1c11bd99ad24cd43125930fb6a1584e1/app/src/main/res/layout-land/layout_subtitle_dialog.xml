@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/ss_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_subtitle"
+        android:textSize="18sp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey_transparent"
+        android:layout_below="@id/ss_tv"
+        android:layout_marginTop="6dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/serverRv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/divider"
+        android:layout_marginTop="5dp"
+        tools:listitem="@layout/layout_server_tv_item">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/speed_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tốc Độ Phát"
+        android:textSize="18sp"
+        android:layout_below="@id/serverRv"
+        android:layout_marginTop="15dp" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/grey_transparent"
+        android:layout_below="@id/speed_tv"
+        android:layout_marginTop="6dp" />
+
+    <LinearLayout
+        android:id="@+id/speed_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/divider2"
+        android:layout_marginTop="10dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/speed_0_5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0.5x"
+            android:background="@drawable/button_focus"
+            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/speed_0_75"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0.75x"
+            android:background="@drawable/button_focus"
+            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/speed_1_0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="1.0x"
+            android:background="@drawable/button_focus"
+            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/speed_1_5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="1.5x"
+            android:background="@drawable/button_focus"
+            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/speed_2_0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2.0x"
+            android:background="@drawable/button_focus"
+            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
+            android:focusable="true" />
+
+        <Button
+            android:id="@+id/speed_3_0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="3.0x"
+            android:background="@drawable/button_focus"
+            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/close_bt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/close"
+        android:background="@drawable/button_focus"
+        android:textColor="@android:color/white"
+        android:layout_below="@id/speed_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp" />
+
+</RelativeLayout>

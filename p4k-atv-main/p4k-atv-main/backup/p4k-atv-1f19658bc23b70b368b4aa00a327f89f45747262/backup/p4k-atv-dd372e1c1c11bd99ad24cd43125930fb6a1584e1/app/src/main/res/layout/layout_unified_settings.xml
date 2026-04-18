@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="500dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_dialog_background"
+    android:padding="10dp">
+
+    <TabHost
+        android:id="@+id/tab_host"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Audio Track Selection -->
+                <LinearLayout
+                    android:id="@+id/tab_audio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Select Audio Track"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="10dp"/>
+
+                    <ListView
+                        android:id="@+id/lv_audio_tracks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:choiceMode="singleChoice" />
+                </LinearLayout>
+
+                <!-- Subtitle Track Selection -->
+                <LinearLayout
+                    android:id="@+id/tab_subtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Select Subtitle Track"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="10dp"/>
+
+                    <ListView
+                        android:id="@+id/lv_subtitle_tracks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:choiceMode="singleChoice" />
+                </LinearLayout>
+
+                <!-- Subtitle Settings -->
+                <LinearLayout
+                    android:id="@+id/tab_subtitle_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <!-- Font Size -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Font Size:"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
+
+                        <Button
+                            android:id="@+id/btn_font_size_minus_new"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="-" />
+
+                        <TextView
+                            android:id="@+id/tv_font_size_new"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:text="20sp"
+                            android:textColor="@android:color/white"
+                            android:gravity="center" />
+
+                        <Button
+                            android:id="@+id/btn_font_size_plus_new"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="+" />
+                    </LinearLayout>
+
+                    <!-- Font -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Font:"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
+
+                        <Spinner
+                            android:id="@+id/spinner_font_new"
+                            android:layout_width="200dp"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/white" />
+                    </LinearLayout>
+
+                    <!-- Vertical Position -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Vertical Position:"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
+
+                        <Button
+                            android:id="@+id/btn_position_down_new"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="↓" />
+
+                        <TextView
+                            android:id="@+id/tv_position_new"
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="Bottom"
+                            android:textColor="@android:color/white"
+                            android:gravity="center" />
+
+                        <Button
+                            android:id="@+id/btn_position_up_new"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="↑" />
+                    </LinearLayout>
+
+                    <!-- Background -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Background:"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp" />
+
+                        <Switch
+                            android:id="@+id/switch_background_new"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btn_apply_new"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply" />
+
+        <Button
+            android:id="@+id/btn_cancel_new"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:layout_marginStart="10dp"/>
+    </LinearLayout>
+
+</LinearLayout>

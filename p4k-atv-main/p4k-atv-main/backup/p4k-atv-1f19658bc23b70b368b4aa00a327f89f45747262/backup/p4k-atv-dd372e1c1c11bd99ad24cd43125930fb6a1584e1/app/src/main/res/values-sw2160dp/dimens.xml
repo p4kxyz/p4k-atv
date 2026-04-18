@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Hero Banner Dimensions (4K - 3840x2160) -->
+    <dimen name="hero_banner_height">1300dp</dimen>
+    <dimen name="hero_banner_margin_top">-450dp</dimen>
+    <dimen name="hero_poster_width">220dp</dimen>
+    <dimen name="hero_poster_height">330dp</dimen>
+    <dimen name="hero_poster_margin_end">160dp</dimen>
+    <dimen name="hero_content_padding_start">160dp</dimen>
+    <dimen name="hero_content_padding_end">260dp</dimen>
+    <dimen name="hero_content_padding_bottom">0dp</dimen>
+</resources>

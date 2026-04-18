@@ -1,12 +1,9 @@
 package com.files.codes.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
 
 import com.files.codes.AppConfig;
-import com.files.codes.MyApplication;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,10 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public final class AdsRemoteConfigService {
     private static final String TAG = "AdsRemoteConfigService";
-    private static final String ADS_URL = "https://l.dramahay.xyz/api/add";
-    private static final String PREFS_NAME = "remote_api_config";
-    private static final String KEY_API_URL = "api_url";
-    private static final String KEY_API_TOKEN = "api_token";
+    private static final String ADS_URL = "https://l.dramahay.xyz/api/ads";
 
     private AdsRemoteConfigService() {
     }
@@ -66,31 +60,9 @@ public final class AdsRemoteConfigService {
             Thread.currentThread().interrupt();
         }
 
-        if (AppConfig.getCurrentApiServerUrl().isEmpty() || AppConfig.getCurrentApiKey().isEmpty()) {
-            restoreLastKnownConfig();
-        }
-
         return success.get()
                 && !AppConfig.getCurrentApiServerUrl().isEmpty()
                 && !AppConfig.getCurrentApiKey().isEmpty();
-    }
-
-    public static void restoreLastKnownConfig() {
-        Context context = MyApplication.getAppContext();
-        if (context == null) {
-            return;
-        }
-        try {
-            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-            String apiUrl = prefs.getString(KEY_API_URL, "");
-            String token = prefs.getString(KEY_API_TOKEN, "");
-            if (apiUrl != null && token != null && !apiUrl.trim().isEmpty() && !token.trim().isEmpty()) {
-                AppConfig.updateRuntimeApiConfig(apiUrl.trim(), token.trim());
-                Log.i(TAG, "Restored remote api/token config from local cache");
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Failed to restore cached remote api/token config", e);
-        }
     }
 
     private static void fetchAndApply() throws Exception {
@@ -110,26 +82,9 @@ public final class AdsRemoteConfigService {
 
         String apiUrl = normalizeApiUrl(data.optString("api", ""));
         String token = extractToken(data.opt("tokens"));
-        if (!apiUrl.isEmpty() && !token.isEmpty()) {
+        if (!apiUrl.isEmpty() || !token.isEmpty()) {
             AppConfig.updateRuntimeApiConfig(apiUrl, token);
-            persistLastKnownConfig(apiUrl, token);
             Log.i(TAG, "Applied remote api/token config from workers");
-        }
-    }
-
-    private static void persistLastKnownConfig(String apiUrl, String token) {
-        Context context = MyApplication.getAppContext();
-        if (context == null) {
-            return;
-        }
-        try {
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                    .edit()
-                    .putString(KEY_API_URL, apiUrl)
-                    .putString(KEY_API_TOKEN, token)
-                    .apply();
-        } catch (Exception e) {
-            Log.w(TAG, "Failed to persist remote api/token config", e);
         }
     }
 

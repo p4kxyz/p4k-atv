@@ -19,7 +19,6 @@ import java.util.Locale;
 public class MyApplication extends Application {
     
     private static final String TAG = "MyApplication";
-    private static volatile Context appContext;
     // Disk cache limit for image thumbnails (20MB is enough for TV browsing)
     private static final long PICASSO_DISK_CACHE_MB = 20 * 1024 * 1024L;
     // Auto-clean app cache if total size exceeds this threshold
@@ -28,18 +27,13 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        appContext = getApplicationContext();
-        AdsRemoteConfigService.restoreLastKnownConfig();
+        AppConfig.clearRuntimeApiConfig();
         AdsRemoteConfigService.refreshAndWait(5000);
         AdsRemoteConfigService.refreshInBackground();
         registerForegroundRefresh();
         setVietnameseLocale();
         configurePicasso();
         cleanupCacheIfNeeded();
-    }
-
-    public static Context getAppContext() {
-        return appContext;
     }
 
     private void registerForegroundRefresh() {

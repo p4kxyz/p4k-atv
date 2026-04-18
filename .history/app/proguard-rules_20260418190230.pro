@@ -3,10 +3,11 @@
 # ============================================================================
 
 # ---- General Settings ----
--dontoptimize
+-optimizationpasses 2
+-allowaccessmodification
 -dontpreverify
 
-# Keep source/line info for better device diagnostics and crash readability.
+# Keep line/file info to avoid device-specific stacktrace/tooling issues.
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 

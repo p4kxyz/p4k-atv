@@ -3,12 +3,16 @@
 # ============================================================================
 
 # ---- General Settings ----
--dontoptimize
+-optimizationpasses 7
+-allowaccessmodification
 -dontpreverify
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+-overloadaggressively
+-adaptclassstrings
 
-# Keep source/line info for better device diagnostics and crash readability.
--keepattributes SourceFile,LineNumberTable
--renamesourcefileattribute SourceFile
+# Hide original source file names to reduce reverse-engineering hints.
+-keepattributes LineNumberTable
+-renamesourcefileattribute ""
 
 # Keep generic signatures (needed for Retrofit, Gson, Room)
 -keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*,Exceptions
@@ -48,10 +52,6 @@
 -keep class com.files.codes.service.OTAUpdateService { *; }
 -keep class com.files.codes.service.OTADownloadManager { *; }
 -keep class com.files.codes.view.OTAUpdateManager { *; }
-
-# ---- Application entry ----
--keep class com.files.codes.MyApplication { *; }
--keep class * extends android.app.Application { *; }
 
 # ---- Native / JNI Methods ----
 -keepclasseswithmembernames class * {
@@ -105,17 +105,12 @@
 # ============================================================================
 
 # ---- AndroidX Leanback ----
--keep class androidx.leanback.** { *; }
 -dontwarn androidx.leanback.**
 
 # ---- ExoPlayer + FFmpeg Extension ----
--keep class com.google.android.exoplayer2.** { *; }
 -dontwarn com.google.android.exoplayer2.**
 
 # ---- Retrofit + OkHttp ----
--keep class retrofit2.** { *; }
--keep interface retrofit2.** { *; }
--keep class okhttp3.** { *; }
 -dontwarn retrofit2.**
 -dontwarn okhttp3.**
 -dontwarn okio.**
@@ -142,8 +137,6 @@
 }
 
 # ---- Firebase ----
--keep class com.google.firebase.** { *; }
--keep class com.firebaseui.** { *; }
 -dontwarn com.google.firebase.**
 -dontwarn com.firebaseui.**
 
@@ -156,7 +149,6 @@
 -dontwarn com.squareup.picasso.**
 
 # ---- RxJava ----
--keep class io.reactivex.** { *; }
 -dontwarn io.reactivex.**
 
 # ---- Guava ----

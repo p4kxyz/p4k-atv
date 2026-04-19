@@ -25,28 +25,19 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class VideoTokenGenerator {
-    static {
-        System.loadLibrary("api_config");
-    }
-
     private static final String TAG = "VideoTokenGenerator";
     private static final String VIDEO_BASE_URL = "https://dmp30.phim4k.lol";
 
     // Legacy secret (old worker secret). Keep empty if you want to force dynamic daily key.
     private static final String HMAC_SECRET = "";
 
-    // Dynamic key seed is sourced from native C++ (XOR-obfuscated).
-    private static volatile String cachedHmacSecret2;
+    // Dynamic key seed (HMAC_SECRET_2 from worker).
+    private static final String HMAC_SECRET_2 = "5e8d1b4f9c2a6e730b1f8d4a92c5e3d1";
 
     private static final int TOKEN_TTL_SECONDS = 300;
 
     private VideoTokenGenerator() {
     }
-
-    // Keep declaration to match native RegisterNatives binding.
-    private static native String nativeGenVideoUrl(String filename);
-
-    private static native String nativeGetHmacSecret2();
 
     public static String extractFilenameFromCdnUrl(String cdnUrl) {
         if (cdnUrl == null) return "";
@@ -61,7 +52,7 @@ public class VideoTokenGenerator {
             throw new IllegalArgumentException("filename is empty");
         }
 
-        String secret = signingSecret(HMAC_SECRET, getHmacSecret2());
+        String secret = signingSecret(HMAC_SECRET, HMAC_SECRET_2);
         if (secret.isEmpty()) {
             throw new IllegalStateException("hmac signing secret is empty");
         }
@@ -73,25 +64,6 @@ public class VideoTokenGenerator {
         String tokenHex = toHex(hmacSha256(secret, message));
 
         return VIDEO_BASE_URL + "/" + filename.trim() + "?token=" + tokenHex + "&ts=" + encTs;
-    }
-
-    private static String getHmacSecret2() {
-        String value = cachedHmacSecret2;
-        if (value != null && !value.isEmpty()) {
-            return value;
-        }
-        try {
-            String fromNative = nativeGetHmacSecret2();
-            if (fromNative != null) {
-                fromNative = fromNative.trim();
-            }
-            cachedHmacSecret2 = fromNative == null ? "" : fromNative;
-            return cachedHmacSecret2;
-        } catch (Throwable t) {
-            Log.e(TAG, "Failed to load HMAC_SECRET_2 from native", t);
-            cachedHmacSecret2 = "";
-            return "";
-        }
     }
 
     public interface StreamUrlCallback {

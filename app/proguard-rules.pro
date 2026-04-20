@@ -3,10 +3,12 @@
 # ============================================================================
 
 # ---- General Settings ----
--dontoptimize
+-optimizationpasses 5
+-allowaccessmodification
 -dontpreverify
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
 
-# Keep source/line info for better device diagnostics and crash readability.
+# Keep source file & line numbers for crash reports
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
@@ -31,6 +33,9 @@
 -keep class com.files.codes.model.** { *; }
 -keep class com.files.codes.database.** { *; }
 
+# ---- App Utils (contains API clients, helpers) ----
+-keep class com.files.codes.utils.** { *; }
+
 # ---- App Activities & Fragments (registered in Manifest) ----
 -keep class com.files.codes.view.** extends android.app.Activity { *; }
 -keep class com.files.codes.view.** extends androidx.fragment.app.FragmentActivity { *; }
@@ -49,26 +54,9 @@
 -keep class com.files.codes.service.OTADownloadManager { *; }
 -keep class com.files.codes.view.OTAUpdateManager { *; }
 
-# ---- Application entry ----
--keep class com.files.codes.MyApplication { *; }
--keep class * extends android.app.Application { *; }
-
 # ---- Native / JNI Methods ----
 -keepclasseswithmembernames class * {
     native <methods>;
-}
-
-# Keep JNI bridge class/methods used by explicit RegisterNatives.
--keep class com.files.codes.AppConfig {
-    public static native java.lang.String getApiServerUrl();
-    public static native java.lang.String getApiKey();
-    public static native java.lang.String getPurchaseCode();
-    public static native java.lang.String getAdsWorkerSecret();
-}
-
--keep class com.files.codes.utils.VideoTokenGenerator {
-    private static native java.lang.String nativeGenVideoUrl(java.lang.String);
-    private static native java.lang.String nativeGetDynamicSecret2();
 }
 
 # ---- Serializable ----
@@ -114,9 +102,8 @@
 
 # ---- Retrofit + OkHttp ----
 -keep class retrofit2.** { *; }
--keep interface retrofit2.** { *; }
--keep class okhttp3.** { *; }
 -dontwarn retrofit2.**
+-keep class okhttp3.** { *; }
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
@@ -143,16 +130,18 @@
 
 # ---- Firebase ----
 -keep class com.google.firebase.** { *; }
--keep class com.firebaseui.** { *; }
 -dontwarn com.google.firebase.**
+-keep class com.firebaseui.** { *; }
 -dontwarn com.firebaseui.**
 
 # ---- Glide ----
+-keep class com.bumptech.glide.** { *; }
 -dontwarn com.bumptech.glide.**
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep class * extends com.bumptech.glide.module.AppGlideModule { <init>(...); }
 
 # ---- Picasso ----
+-keep class com.squareup.picasso.** { *; }
 -dontwarn com.squareup.picasso.**
 
 # ---- RxJava ----

@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
-import com.files.codes.utils.AdsRemoteConfigService;
 
 import java.io.File;
 import java.util.Locale;
@@ -19,7 +17,6 @@ import java.util.Locale;
 public class MyApplication extends Application {
     
     private static final String TAG = "MyApplication";
-    private static volatile Context appContext;
     // Disk cache limit for image thumbnails (20MB is enough for TV browsing)
     private static final long PICASSO_DISK_CACHE_MB = 20 * 1024 * 1024L;
     // Auto-clean app cache if total size exceeds this threshold
@@ -28,55 +25,9 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        appContext = getApplicationContext();
-        AdsRemoteConfigService.restoreLastKnownConfig();
-        AdsRemoteConfigService.refreshAndWait(5000);
-        AdsRemoteConfigService.refreshInBackground();
-        registerForegroundRefresh();
         setVietnameseLocale();
         configurePicasso();
         cleanupCacheIfNeeded();
-    }
-
-    public static Context getAppContext() {
-        return appContext;
-    }
-
-    private void registerForegroundRefresh() {
-        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
-            private int startedCount = 0;
-
-            @Override
-            public void onActivityStarted(android.app.Activity activity) {
-                boolean enteringForeground = startedCount == 0;
-                startedCount++;
-                if (enteringForeground) {
-                    AdsRemoteConfigService.refreshInBackground();
-                }
-            }
-
-            @Override
-            public void onActivityStopped(android.app.Activity activity) {
-                if (startedCount > 0) {
-                    startedCount--;
-                }
-            }
-
-            @Override
-            public void onActivityCreated(android.app.Activity activity, Bundle savedInstanceState) { }
-
-            @Override
-            public void onActivityResumed(android.app.Activity activity) { }
-
-            @Override
-            public void onActivityPaused(android.app.Activity activity) { }
-
-            @Override
-            public void onActivitySaveInstanceState(android.app.Activity activity, Bundle outState) { }
-
-            @Override
-            public void onActivityDestroyed(android.app.Activity activity) { }
-        });
     }
     
     private void configurePicasso() {

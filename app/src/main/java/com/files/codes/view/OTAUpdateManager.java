@@ -156,36 +156,6 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
         return (int) (dpNum * context.getResources().getDisplayMetrics().density + 0.5f);
     }
 
-    private android.graphics.drawable.GradientDrawable createDialogButtonBackground(int fillColor) {
-        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
-        bg.setColor(fillColor);
-        bg.setCornerRadius(dp(8));
-        bg.setStroke(dp(1), 0x00FFFFFF);
-        return bg;
-    }
-
-    private void applyWhiteFocusBorder(Button button) {
-        if (button == null) {
-            return;
-        }
-
-        android.graphics.drawable.Drawable bg = button.getBackground();
-        if (bg instanceof android.graphics.drawable.GradientDrawable) {
-            ((android.graphics.drawable.GradientDrawable) bg).setStroke(dp(1), 0x00FFFFFF);
-        }
-
-        button.setFocusable(true);
-        button.setFocusableInTouchMode(true);
-        button.setOnFocusChangeListener((v, hasFocus) -> {
-            android.graphics.drawable.Drawable buttonBg = v.getBackground();
-            if (buttonBg instanceof android.graphics.drawable.GradientDrawable) {
-                ((android.graphics.drawable.GradientDrawable) buttonBg)
-                        .setStroke(dp(hasFocus ? 2 : 1), hasFocus ? 0xFFFFFFFF : 0x00FFFFFF);
-            }
-        });
-    }
-
     /**
      * Show update available dialog
      */
@@ -201,14 +171,17 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
             // Root container
             android.widget.LinearLayout root = new android.widget.LinearLayout(context);
             root.setOrientation(android.widget.LinearLayout.VERTICAL);
-            root.setPadding(dp(20), dp(20), dp(20), dp(12));
+            root.setPadding(dp(24), dp(24), dp(24), dp(24));
             
             // Background with rounded corners
             android.graphics.drawable.GradientDrawable shape = new android.graphics.drawable.GradientDrawable();
             shape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
             shape.setColor(0xFF1E1E2E);
-                shape.setCornerRadius(dp(16));
+            shape.setCornerRadius(dp(12));
             root.setBackground(shape);
+
+            root.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                    dp(460), android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
 
             // Title
             android.widget.TextView titleView = new android.widget.TextView(context);
@@ -279,32 +252,70 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
             // Buttons Layout
             android.widget.LinearLayout buttonLayout = new android.widget.LinearLayout(context);
             buttonLayout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
-            buttonLayout.setPadding(0, 0, 0, dp(8));
 
             // Later Button
-            Button laterButton = new Button(context);
+            android.widget.TextView laterButton = new android.widget.TextView(context);
             laterButton.setText("Để sau");
             laterButton.setTextColor(0xFFDDDDDD);
             laterButton.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
-            laterButton.setBackground(createDialogButtonBackground(0xFF3A3A4C));
+            laterButton.setGravity(android.view.Gravity.CENTER);
+            laterButton.setPadding(0, dp(14), 0, dp(14));
+            laterButton.setFocusable(true);
+            laterButton.setClickable(true);
+            
+            android.graphics.drawable.GradientDrawable laterShape = new android.graphics.drawable.GradientDrawable();
+            laterShape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            laterShape.setColor(0xFF333344);
+            laterShape.setCornerRadius(dp(6));
+            laterButton.setBackground(laterShape);
 
             android.widget.LinearLayout.LayoutParams laterLp = new android.widget.LinearLayout.LayoutParams(
                     0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
             laterLp.rightMargin = dp(8);
 
             // Update Button
-            Button updateButton = new Button(context);
+            android.widget.TextView updateButton = new android.widget.TextView(context);
             updateButton.setText("✓ Cập nhật");
             updateButton.setTextColor(0xFFFFFFFF);
             updateButton.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
             updateButton.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-            updateButton.setBackground(createDialogButtonBackground(0xFF2E7D32));
+            updateButton.setGravity(android.view.Gravity.CENTER);
+            updateButton.setPadding(0, dp(14), 0, dp(14));
+            updateButton.setFocusable(true);
+            updateButton.setClickable(true);
+            
+            android.graphics.drawable.GradientDrawable updateShape = new android.graphics.drawable.GradientDrawable();
+            updateShape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            updateShape.setColor(0xFF007ACC); 
+            updateShape.setCornerRadius(dp(6));
+            updateButton.setBackground(updateShape);
 
             android.widget.LinearLayout.LayoutParams updateLp = new android.widget.LinearLayout.LayoutParams(
                     0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
             updateLp.leftMargin = dp(8);
-            applyWhiteFocusBorder(laterButton);
-            applyWhiteFocusBorder(updateButton);
+
+            // Focus states
+            View.OnFocusChangeListener focusListener = (v, hasFocus) -> {
+                if (hasFocus) {
+                    if (v == updateButton) {
+                        updateShape.setColor(0xFF64B5F6); // Lighter blue focus
+                        updateButton.setBackground(updateShape);
+                    } else {
+                        laterShape.setColor(0xFF555566); // Lighter grey focus
+                        laterButton.setBackground(laterShape);
+                    }
+                } else {
+                    if (v == updateButton) {
+                        updateShape.setColor(0xFF007ACC);
+                        updateButton.setBackground(updateShape);
+                    } else {
+                        laterShape.setColor(0xFF333344);
+                        laterButton.setBackground(laterShape);
+                    }
+                }
+            };
+            laterButton.setOnFocusChangeListener(focusListener);
+            updateButton.setOnFocusChangeListener(focusListener);
 
             laterButton.setOnClickListener(v -> dialog.dismiss());
             updateButton.setOnClickListener(v -> {
@@ -327,8 +338,6 @@ public class OTAUpdateManager implements OTAUpdateService.OTAUpdateListener, OTA
             if (updateDialog.getWindow() != null) {
                 updateDialog.getWindow().clearFlags(
                     android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-                int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.90f);
-                updateDialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
             }
 
             updateDialog.setOnShowListener(d -> {

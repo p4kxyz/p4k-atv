@@ -1173,7 +1173,7 @@ public class HomeFragment extends RowsSupportFragment {
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
         Call<List<Movie>> call = apiService.getMovieByCountry(
-            AppConfig.getCurrentApiKey(), countryId, page);
+            AppConfig.getApiKey(), countryId, page);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override
@@ -1242,7 +1242,7 @@ public class HomeFragment extends RowsSupportFragment {
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
         Call<List<Movie>> call = apiService.getMovieByGenre(
-            AppConfig.getCurrentApiKey(), genreId, page);
+            AppConfig.getApiKey(), genreId, page);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override
@@ -1367,7 +1367,7 @@ public class HomeFragment extends RowsSupportFragment {
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
         // Use getMovies() API for pagination since there's no specific getLatestMovies() with pagination
-        Call<List<Movie>> call = apiService.getMovies(AppConfig.getCurrentApiKey(), page);
+        Call<List<Movie>> call = apiService.getMovies(AppConfig.getApiKey(), page);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override
@@ -1428,7 +1428,7 @@ public class HomeFragment extends RowsSupportFragment {
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
         // Use getTvSeries() API for pagination since there's no specific getLatestTvSeries() with pagination
-        Call<List<Movie>> call = apiService.getTvSeries(AppConfig.getCurrentApiKey(), page);
+        Call<List<Movie>> call = apiService.getTvSeries(AppConfig.getApiKey(), page);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override
@@ -1528,7 +1528,7 @@ public class HomeFragment extends RowsSupportFragment {
             Retrofit retrofit = RetrofitClient.getRetrofitInstance();
             ApiService apiService = retrofit.create(ApiService.class);
             Call<List<Movie>> call = apiService.getMovieByCountry(
-                AppConfig.getCurrentApiKey(), countryId, 1);
+                AppConfig.getApiKey(), countryId, 1);
             
             call.enqueue(new Callback<List<Movie>>() {
                 @Override
@@ -1602,7 +1602,7 @@ public class HomeFragment extends RowsSupportFragment {
             Retrofit retrofit = RetrofitClient.getRetrofitInstance();
             ApiService apiService = retrofit.create(ApiService.class);
             Call<List<Movie>> call = apiService.getMovieByGenre(
-                AppConfig.getCurrentApiKey(), genreId, 1);
+                AppConfig.getApiKey(), genreId, 1);
             
             call.enqueue(new Callback<List<Movie>>() {
                 @Override
@@ -3864,7 +3864,7 @@ public class HomeFragment extends RowsSupportFragment {
         
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
-        Call<List<Movie>> call = apiService.getMovieByCountry(AppConfig.getCurrentApiKey(), countryId, page);
+        Call<List<Movie>> call = apiService.getMovieByCountry(AppConfig.getApiKey(), countryId, page);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override
@@ -3944,7 +3944,7 @@ public class HomeFragment extends RowsSupportFragment {
         
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
-        Call<List<Movie>> call = apiService.getMovieByGenre(AppConfig.getCurrentApiKey(), genreId, page);
+        Call<List<Movie>> call = apiService.getMovieByGenre(AppConfig.getApiKey(), genreId, page);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override
@@ -4124,7 +4124,7 @@ public class HomeFragment extends RowsSupportFragment {
         
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
-        Call<List<Movie>> call = apiService.getMovies(AppConfig.getCurrentApiKey(), 1);
+        Call<List<Movie>> call = apiService.getMovies(AppConfig.getApiKey(), 1);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override
@@ -4181,7 +4181,7 @@ public class HomeFragment extends RowsSupportFragment {
         
         Retrofit retrofit = RetrofitClient.getRetrofitInstance();
         ApiService apiService = retrofit.create(ApiService.class);
-        Call<List<Movie>> call = apiService.getTvSeries(AppConfig.getCurrentApiKey(), 1);
+        Call<List<Movie>> call = apiService.getTvSeries(AppConfig.getApiKey(), 1);
         
         call.enqueue(new Callback<List<Movie>>() {
             @Override

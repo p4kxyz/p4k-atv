@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_marginEnd="16dp"
+    android:padding="8dp"
+    android:focusable="true"
+    android:clickable="true">
+
+    <!-- Cast Photo (Circular) -->
+    <ImageView
+        android:id="@+id/cast_photo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/circular_image_background"
+        android:contentDescription="Cast Photo"
+        android:duplicateParentState="true"
+        tools:src="@drawable/default_avatar" />
+
+    <!-- Cast Name -->
+    <TextView
+        android:id="@+id/cast_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="11sp"
+        android:textColor="@android:color/white"
+        android:textStyle="normal"
+        android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:maxWidth="70dp"
+        android:shadowColor="@android:color/black"
+        android:shadowRadius="2"
+        tools:text="Leonardo DiCaprio" />
+
+</LinearLayout>

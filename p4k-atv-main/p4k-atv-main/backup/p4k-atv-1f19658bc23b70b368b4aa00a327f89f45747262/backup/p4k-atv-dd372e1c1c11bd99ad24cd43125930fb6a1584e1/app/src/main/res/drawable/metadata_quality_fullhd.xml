@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    
+    <!-- Full HD Quality - Blue -->
+    <gradient
+        android:angle="135"
+        android:startColor="#42A5F5"
+        android:centerColor="#2196F3"
+        android:endColor="#1976D2"
+        android:type="linear" />
+    
+    <!-- Rounded corners -->
+    <corners android:radius="6dp" />
+    
+    <!-- Subtle border -->
+    <stroke
+        android:width="1dp"
+        android:color="#40000000" />
+        
+</shape>

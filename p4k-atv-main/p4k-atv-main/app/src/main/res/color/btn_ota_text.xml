@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Focused state: dark text on yellow background -->
+    <item android:state_focused="true" android:color="#111111" />
+    <!-- Pressed -->
+    <item android:state_pressed="true" android:color="#111111" />
+    <!-- Normal: white -->
+    <item android:color="@color/white" />
+</selector>

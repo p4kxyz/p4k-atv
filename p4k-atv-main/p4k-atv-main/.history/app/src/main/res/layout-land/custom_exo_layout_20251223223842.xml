@@ -1,0 +1,272 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:layoutDirection="ltr"
+    tools:targetApi="28">
+
+    <RelativeLayout
+        android:id="@+id/info_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/poster_image_view"
+            android:layout_width="120dp"
+            android:layout_height="200dp"
+            android:contentDescription="@string/poster" />
+
+        <ImageView
+            android:id="@+id/poster_image_view_for_tv"
+            android:layout_width="200dp"
+            android:layout_height="120dp"
+            android:contentDescription="@string/poster"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/movie_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/poster_image_view"
+            android:textColor="@android:color/white"
+            android:textSize="30sp"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/movie_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/movie_title"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toEndOf="@id/poster_image_view"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            tools:text="Description" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/control_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <ImageButton
+            android:id="@id/exo_play"
+            style="@style/ExoMediaButton.Play"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="8dp"
+            android:contentDescription="Play" />
+
+        <ImageButton
+            android:id="@id/exo_pause"
+            style="@style/ExoMediaButton.Pause"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="12dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="8dp"
+            android:contentDescription="Pause" />
+            
+
+
+        <!-- Previous Episode Button (TV Series only) -->
+        <ImageButton
+            android:id="@+id/btn_previous_episode"
+            style="@style/ExoMediaButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:padding="10dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="6dp"
+            android:src="@drawable/ic_skip_previous_white_24dp"
+            android:visibility="gone"
+            android:contentDescription="Previous Episode" />
+
+        <!-- Next Episode Button (TV Series only) -->
+        <ImageButton
+            android:id="@+id/btn_next_episode"
+            style="@style/ExoMediaButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:padding="10dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="6dp"
+            android:src="@drawable/ic_skip_next_white_24dp"
+            android:visibility="gone"
+            android:contentDescription="Next Episode" />
+
+
+        <ImageButton
+            android:id="@+id/img_server"
+            style="@style/ExoMediaButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/player_button_modern"
+            android:padding="8dp"
+            android:elevation="4dp"
+            android:src="@drawable/ic_server_white_24dp"
+            android:contentDescription="Server Settings" />
+
+        <ImageButton
+            android:id="@+id/img_subtitle"
+            style="@style/ExoMediaButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="10dp"
+            android:padding="8dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="4dp"
+            android:src="@drawable/ic_subtitles_white_24dp"
+            android:contentDescription="Subtitles" />
+
+        <ImageButton
+            android:id="@+id/img_subtitle_settings"
+            style="@style/ExoMediaButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="10dp"
+            android:padding="8dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="4dp"
+            android:src="@drawable/ic_settings_white"
+            android:contentDescription="Subtitle Settings" />
+
+        <ImageButton
+            android:id="@+id/img_audio"
+            style="@style/ExoMediaButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="10dp"
+            android:padding="8dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="4dp"
+            android:src="@drawable/ic_audiotrack_white_24dp"
+            android:contentDescription="Audio Settings" />
+
+        <ImageButton
+            android:id="@+id/img_aspect_ratio"
+            style="@style/ExoMediaButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="16dp"
+            android:padding="8dp"
+            android:background="@drawable/player_button_modern"
+            android:elevation="4dp"
+            android:src="@drawable/ic_aspect_ratio_white_24dp"
+            android:contentDescription="Aspect Ratio" />
+
+        <TextView
+            android:id="@+id/live_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/live"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:drawableStart="@drawable/ic_fiber_manual_record_red" />
+
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/seekbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/control_layout"
+        android:layout_marginBottom="0dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+            android:id="@id/exo_progress"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/exo_play_pause"
+            android:nextFocusDown="@id/exo_position"
+            tools:ignore="NestedWeights"
+            app:played_color="#FF1976D2"
+            app:scrubber_color="#FFFFFF"
+            app:unplayed_color="#40FFFFFF"
+            app:buffered_color="#80E3F2FD"
+            app:bar_height="6dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/exo_progress"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@id/exo_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:background="@drawable/time_badge_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                tools:text="25:00" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@id/exo_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:background="@drawable/time_badge_background"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                tools:text="1:00:00" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

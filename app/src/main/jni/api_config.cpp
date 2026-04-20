@@ -19,35 +19,26 @@ namespace {
 constexpr uint8_t kXorKey = 0x5A;
 constexpr uint8_t kJniNameKey = 0x37;
 
-const uint8_t SECRET_XOR[] = {
-        99, 60, 105, 57, 104, 59, 109, 63, 108, 56, 107, 62, 110, 57, 98, 60,
-        59, 104, 63, 99, 109, 62, 111, 56, 106, 57, 105, 59, 110, 107, 60, 98
+const uint8_t HMAC_SECRET_2_PART_1_XOR[] = {
+    111, 63, 98, 62, 107, 56, 110, 60
 };
 
-const uint8_t HMAC_SECRET_2_XOR[] = {
-    111, 63, 98, 62, 107, 56, 110, 60, 99, 57, 104, 59, 108, 63, 109, 105,
-    106, 56, 107, 60, 98, 62, 110, 59, 99, 104, 57, 111, 63, 105, 62, 107
+const uint8_t HMAC_SECRET_2_PART_2_XOR[] = {
+    99, 57, 104, 59, 108, 63, 109, 105
 };
 
-const uint8_t BASE_URL_XOR[] = {
-        50, 46, 46, 42, 41, 96, 117, 117, 62, 55, 42, 105,
-        106, 116, 42, 50, 51, 55, 110, 49, 116, 54, 53, 54
+const uint8_t HMAC_SECRET_2_PART_3_XOR[] = {
+    106, 56, 107, 60, 98, 62, 110, 59
+};
+
+const uint8_t HMAC_SECRET_2_PART_4_XOR[] = {
+    99, 104, 57, 111, 63, 105, 62, 107
 };
 
 const uint8_t VTG_CLASS_XOR[] = {
     84, 88, 90, 24, 81, 94, 91, 82, 68, 24, 84, 88, 83, 82, 68, 24, 66, 67,
     94, 91, 68, 24, 97, 94, 83, 82, 88, 99, 88, 92, 82, 89, 112, 82, 89, 82,
     69, 86, 67, 88, 69
-};
-
-const uint8_t VTG_METHOD_XOR[] = {
-    89, 86, 67, 94, 65, 82, 112, 82, 89, 97, 94, 83, 82, 88, 98, 69, 91
-};
-
-const uint8_t VTG_SIG_XOR[] = {
-    31, 123, 93, 86, 65, 86, 24, 91, 86, 89, 80, 24, 100, 67, 69, 94, 89, 80,
-    12, 30, 123, 93, 86, 65, 86, 24, 91, 86, 89, 80, 24, 100, 67, 69, 94, 89,
-    80, 12
 };
 
 const uint8_t APP_CLASS_XOR[] = {
@@ -285,6 +276,26 @@ std::array<uint8_t, 32> hmacSha256(const std::string &key, const std::string &me
     return digest;
 }
 
+std::string buildHmacSecret2() {
+    std::string p1 = decodeMaskedString(HMAC_SECRET_2_PART_1_XOR, sizeof(HMAC_SECRET_2_PART_1_XOR), kXorKey);
+    std::string p2 = decodeMaskedString(HMAC_SECRET_2_PART_2_XOR, sizeof(HMAC_SECRET_2_PART_2_XOR), kXorKey);
+    std::string p3 = decodeMaskedString(HMAC_SECRET_2_PART_3_XOR, sizeof(HMAC_SECRET_2_PART_3_XOR), kXorKey);
+    std::string p4 = decodeMaskedString(HMAC_SECRET_2_PART_4_XOR, sizeof(HMAC_SECRET_2_PART_4_XOR), kXorKey);
+
+    std::string secret;
+    secret.reserve(p1.size() + p2.size() + p3.size() + p4.size());
+    secret.append(p1);
+    secret.append(p2);
+    secret.append(p3);
+    secret.append(p4);
+
+    secureClearString(p1);
+    secureClearString(p2);
+    secureClearString(p3);
+    secureClearString(p4);
+    return secret;
+}
+
 std::string bytesToHex(const uint8_t *bytes, size_t len) {
     static const char hex[] = "0123456789abcdef";
     std::string output;
@@ -294,14 +305,6 @@ std::string bytesToHex(const uint8_t *bytes, size_t len) {
         output.push_back(hex[bytes[i] & 0x0f]);
     }
     return output;
-}
-
-std::string buildVideoSecret() {
-    return decodeMaskedString(SECRET_XOR, sizeof(SECRET_XOR), kXorKey);
-}
-
-std::string buildVideoBaseUrl() {
-    return decodeMaskedString(BASE_URL_XOR, sizeof(BASE_URL_XOR), kXorKey);
 }
 
 void throwJavaException(JNIEnv *env, const char *className, const std::string &message) {
@@ -350,78 +353,6 @@ jstring getPurchaseCodeImpl(JNIEnv *env, jclass clazz) {
     return env->NewStringUTF(PURCHASE_CODE.c_str());
 }
 
-jstring nativeGenVideoUrlImpl(JNIEnv *env, jclass clazz, jstring filename_) {
-    (void) clazz;
-
-    if (isHostileRuntime()) {
-        throwJavaException(env, "java/lang/SecurityException", "environment not supported");
-        return nullptr;
-    }
-
-    if (filename_ == nullptr) {
-        throwJavaException(env, "java/lang/IllegalArgumentException", "filename is empty");
-        return nullptr;
-    }
-
-    ScopedUtfChars filenameChars(env, filename_);
-    if (filenameChars.get() == nullptr) {
-        return nullptr;
-    }
-
-    std::string filename(filenameChars.get());
-    if (filename.empty()) {
-        throwJavaException(env, "java/lang/IllegalArgumentException", "filename is empty");
-        return nullptr;
-    }
-
-    try {
-        std::string secret = buildVideoSecret();
-        std::string baseUrl = buildVideoBaseUrl();
-        const auto now = std::chrono::system_clock::now();
-        const auto ts = static_cast<uint32_t>(
-                std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count()
-        );
-
-        const auto mask = hmacSha256(secret, "otp-ts-mask");
-        uint8_t tsBytes[4] = {
-                static_cast<uint8_t>((ts >> 24) & 0xff),
-                static_cast<uint8_t>((ts >> 16) & 0xff),
-                static_cast<uint8_t>((ts >> 8) & 0xff),
-                static_cast<uint8_t>(ts & 0xff)
-        };
-
-        uint8_t encBytes[4] = {
-                static_cast<uint8_t>(tsBytes[0] ^ mask[0]),
-                static_cast<uint8_t>(tsBytes[1] ^ mask[1]),
-                static_cast<uint8_t>(tsBytes[2] ^ mask[2]),
-                static_cast<uint8_t>(tsBytes[3] ^ mask[3])
-        };
-
-        std::string encTs = bytesToHex(encBytes, 4);
-        std::string message = filename + ":" + std::to_string(ts);
-        const auto token = hmacSha256(secret, message);
-        const std::string signedUrl = baseUrl + "/" + filename + "?token=" + bytesToHex(token.data(), token.size()) + "&ts=" + encTs;
-
-        secureZero(tsBytes, sizeof(tsBytes));
-        secureZero(encBytes, sizeof(encBytes));
-        secureClearString(secret);
-        secureClearString(baseUrl);
-        secureClearString(message);
-        secureClearString(encTs);
-        secureClearString(filename);
-
-        return env->NewStringUTF(signedUrl.c_str());
-    } catch (const std::exception &exception) {
-        secureClearString(filename);
-        throwJavaException(env, "java/lang/RuntimeException", exception.what());
-        return nullptr;
-    } catch (...) {
-        secureClearString(filename);
-        throwJavaException(env, "java/lang/RuntimeException", "native signing failed");
-        return nullptr;
-    }
-}
-
 jstring nativeGetHmacSecret2Impl(JNIEnv *env, jclass clazz) {
     (void) clazz;
 
@@ -430,9 +361,8 @@ jstring nativeGetHmacSecret2Impl(JNIEnv *env, jclass clazz) {
         return nullptr;
     }
 
-    std::string secret2 = decodeMaskedString(HMAC_SECRET_2_XOR, sizeof(HMAC_SECRET_2_XOR), kXorKey);
+    std::string secret2 = buildHmacSecret2();
     auto digest = sha256(reinterpret_cast<const uint8_t *>(secret2.data()), secret2.size());
-    // Touch SHA-256 so secret usage path is not raw-only and stays consistent with hardened flow.
     volatile uint8_t marker = digest[0];
     (void) marker;
     jstring result = env->NewStringUTF(secret2.c_str());
@@ -443,34 +373,23 @@ jstring nativeGetHmacSecret2Impl(JNIEnv *env, jclass clazz) {
 
 bool registerVideoTokenGenerator(JNIEnv *env) {
     std::string className = decodeMaskedString(VTG_CLASS_XOR, sizeof(VTG_CLASS_XOR), kJniNameKey);
-    std::string methodName = decodeMaskedString(VTG_METHOD_XOR, sizeof(VTG_METHOD_XOR), kJniNameKey);
-    std::string methodSig = decodeMaskedString(VTG_SIG_XOR, sizeof(VTG_SIG_XOR), kJniNameKey);
 
     jclass clazz = env->FindClass(className.c_str());
     if (clazz == nullptr) {
         secureClearString(className);
-        secureClearString(methodName);
-        secureClearString(methodSig);
         return false;
     }
 
     const JNINativeMethod methods[] = {
             {
-                    const_cast<char *>(methodName.c_str()),
-                    const_cast<char *>(methodSig.c_str()),
-                    reinterpret_cast<void *>(nativeGenVideoUrlImpl)
-            },
-            {
-                const_cast<char *>("nativeGetHmacSecret2"),
-                const_cast<char *>("()Ljava/lang/String;"),
-                reinterpret_cast<void *>(nativeGetHmacSecret2Impl)
+                    const_cast<char *>("nativeGetHmacSecret2"),
+                    const_cast<char *>("()Ljava/lang/String;"),
+                    reinterpret_cast<void *>(nativeGetHmacSecret2Impl)
             }
     };
 
     const bool ok = env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(methods[0])) == JNI_OK;
     secureClearString(className);
-    secureClearString(methodName);
-    secureClearString(methodSig);
     return ok;
 }
 

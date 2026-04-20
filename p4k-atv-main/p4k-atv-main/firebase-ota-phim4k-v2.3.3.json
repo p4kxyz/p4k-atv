@@ -1,0 +1,12 @@
+{
+  "version_code": 43,
+  "version_name": "2.3.3",
+  "download_url": "https://phim4k.xyz/downloads/androidtv/Phim4K-v2.3.3.apk",
+  "force_update": false,
+  "file_size": 0,
+  "checksum": "",
+  "changelog": {
+    "vi": "🔧 Sửa lỗi subtitle phim bộ không hiện sub VTT\n⚡ Cải thiện hiệu năng load phim",
+    "en": "🔧 Fixed VTT subtitle not showing for TV series\n⚡ Improved video load performance"
+  }
+}

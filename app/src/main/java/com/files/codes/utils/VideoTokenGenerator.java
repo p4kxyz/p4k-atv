@@ -32,19 +32,11 @@ public class VideoTokenGenerator {
     private static final String TAG = "VideoTokenGenerator";
     private static final String VIDEO_BASE_URL = "https://dmp30.phim4k.lol";
 
-    // Legacy secret (old worker secret). Keep empty if you want to force dynamic daily key.
-    private static final String HMAC_SECRET = "";
-
     // Dynamic key seed is sourced from native C++ (XOR-obfuscated).
     private static volatile String cachedHmacSecret2;
 
-    private static final int TOKEN_TTL_SECONDS = 300;
-
     private VideoTokenGenerator() {
     }
-
-    // Keep declaration to match native RegisterNatives binding.
-    private static native String nativeGenVideoUrl(String filename);
 
     private static native String nativeGetHmacSecret2();
 
@@ -61,7 +53,7 @@ public class VideoTokenGenerator {
             throw new IllegalArgumentException("filename is empty");
         }
 
-        String secret = signingSecret(HMAC_SECRET, getHmacSecret2());
+        String secret = signingSecret(getHmacSecret2());
         if (secret.isEmpty()) {
             throw new IllegalStateException("hmac signing secret is empty");
         }
@@ -139,10 +131,7 @@ public class VideoTokenGenerator {
         }).start();
     }
 
-    private static String signingSecret(String hmacSecret, String hmacSecret2) throws Exception {
-        if (hmacSecret != null && !hmacSecret.isEmpty()) {
-            return hmacSecret;
-        }
+    private static String signingSecret(String hmacSecret2) throws Exception {
         if (hmacSecret2 != null && !hmacSecret2.isEmpty()) {
             return deriveDailySecretV2(hmacSecret2, formatDateUtc(0));
         }

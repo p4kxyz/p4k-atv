@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="#1a1a1a">
+
+    <!-- Left Side: TV-Optimized Filter Panel -->
+    <LinearLayout
+        android:id="@+id/filter_panel"
+        android:layout_width="160dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/header_gradient_bg"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="56dp"
+        android:elevation="4dp"
+        android:gravity="top|center_horizontal">
+
+        <!-- Filter Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="BỘ LỌC"
+            android:textSize="13sp"
+            android:textColor="#888888"
+            android:textStyle="bold"
+            android:letterSpacing="0.15"
+            android:gravity="center"
+            android:paddingBottom="12dp"/>
+
+        <!-- Genre Filter Button -->
+        <Button
+            android:id="@+id/btn_filter_genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thể Loại\nTất cả"
+            android:textSize="13sp"
+            android:textColor="#EEEEEE"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:background="@drawable/tv_filter_panel_button_bg"
+            android:gravity="center"
+            android:padding="10dp"
+            android:minHeight="56dp"
+            android:layout_marginBottom="8dp"
+            android:focusable="true"
+            android:nextFocusRight="@+id/search_edit_text"
+            android:nextFocusDown="@+id/btn_filter_country"/>
+
+        <!-- Country Filter Button -->
+        <Button
+            android:id="@+id/btn_filter_country"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quốc Gia\nTất cả"
+            android:textSize="13sp"
+            android:textColor="#EEEEEE"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:background="@drawable/tv_filter_panel_button_bg"
+            android:gravity="center"
+            android:padding="10dp"
+            android:minHeight="56dp"
+            android:layout_marginBottom="8dp"
+            android:focusable="true"
+            android:nextFocusRight="@+id/search_edit_text"
+            android:nextFocusUp="@+id/btn_filter_genre"
+            android:nextFocusDown="@+id/btn_filter_year"/>
+
+        <!-- Year Filter Button -->
+        <Button
+            android:id="@+id/btn_filter_year"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Năm\nTất cả"
+            android:textSize="13sp"
+            android:textColor="#EEEEEE"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:background="@drawable/tv_filter_panel_button_bg"
+            android:gravity="center"
+            android:padding="10dp"
+            android:minHeight="56dp"
+            android:layout_marginBottom="16dp"
+            android:focusable="true"
+            android:nextFocusRight="@+id/search_edit_text"
+            android:nextFocusUp="@+id/btn_filter_country"
+            android:nextFocusDown="@+id/btn_filter_clear"/>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="80dp"
+            android:layout_height="1dp"
+            android:background="#444444"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Clear All Button -->
+        <Button
+            android:id="@+id/btn_filter_clear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Xóa Lọc"
+            android:textSize="12sp"
+            android:textColor="#EEEEEE"
+            android:textAllCaps="false"
+            android:background="@drawable/tv_filter_clear_button_bg"
+            android:gravity="center"
+            android:padding="8dp"
+            android:minHeight="44dp"
+            android:focusable="true"
+            android:nextFocusRight="@+id/search_edit_text"
+            android:nextFocusUp="@+id/btn_filter_year"/>
+
+        <!-- Active Filters Summary -->
+        <TextView
+            android:id="@+id/tv_active_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#FFC107"
+            android:gravity="center"
+            android:padding="6dp"
+            android:layout_marginTop="10dp"
+            android:maxLines="4"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <!-- Right Side: Search Bar + Results -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Search Bar Container -->
+        <LinearLayout
+            android:id="@+id/search_bar_container"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/search_bar_focus_bg"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:marginStart="12dp"
+            android:marginEnd="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusLeft="@id/btn_filter_genre"
+            android:nextFocusDown="@+id/results_container"
+            android:descendantFocusability="blocksDescendants">
+
+            <!-- Search Icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_search"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="Tìm kiếm"/>
+
+            <!-- Search EditText -->
+            <EditText
+                android:id="@+id/search_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:hint="Tìm kiếm phim..."
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="@null"
+                android:singleLine="true"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"/>
+
+            <!-- Clear text button -->
+            <ImageView
+                android:id="@+id/btn_clear_search"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_close"
+                android:layout_marginStart="8dp"
+                android:visibility="gone"
+                android:contentDescription="Xóa"/>
+        </LinearLayout>
+
+        <!-- Results Fragment Container -->
+        <FrameLayout
+            android:id="@+id/results_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</LinearLayout>

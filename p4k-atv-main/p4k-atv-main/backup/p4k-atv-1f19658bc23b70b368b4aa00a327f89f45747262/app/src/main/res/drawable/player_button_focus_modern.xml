@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    
+    <!-- Modern Gradient Background for Focus -->
+    <gradient
+        android:startColor="#FF1976D2"
+        android:endColor="#FF0D47A1"
+        android:angle="135"
+        android:type="linear" />
+    
+    <!-- Rounded Modern Corners -->
+    <corners android:radius="16dp" />
+    
+    <!-- Premium Glow Border -->
+    <stroke 
+        android:width="2dp"
+        android:color="#80FFFFFF" />
+        
+    <!-- Standard Button Size -->
+    <size 
+        android:width="48dp"
+        android:height="48dp" />
+
+</shape>

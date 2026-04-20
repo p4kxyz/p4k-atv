@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OTA secondary button: focused = yellow, normal = transparent with border -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- FOCUSED: yellow bg + white border -->
+    <item android:state_focused="true">
+        <layer-list>
+            <item>
+                <shape>
+                    <solid android:color="#FFC107" />
+                    <corners android:radius="8dp" />
+                    <stroke android:width="3dp" android:color="#FFFFFF" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <!-- PRESSED -->
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#CCFFC107" />
+            <corners android:radius="8dp" />
+            <stroke android:width="2dp" android:color="#FFC107" />
+        </shape>
+    </item>
+
+    <!-- NORMAL -->
+    <item>
+        <shape>
+            <solid android:color="#33FFFFFF" />
+            <corners android:radius="8dp" />
+            <stroke android:width="2dp" android:color="#88FFFFFF" />
+        </shape>
+    </item>
+
+</selector>

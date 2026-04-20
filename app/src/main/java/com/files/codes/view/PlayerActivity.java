@@ -149,6 +149,10 @@ import java.util.Map;
 public class PlayerActivity extends Activity {
     private static final String TAG = "PlayerActivity";
     private static final String PLAYER_LOGO_URL = "https://raw.githubusercontent.com/p4kxyz/p4k/main/lg_player.png";
+    private static final float PLAYER_LOGO_ALPHA = 0.5f;
+    private static final String PLAYER_PREFS = "player_settings";
+    private static final String PREF_AUDIO_LANG = "pref_audio_lang";
+    private static final String PREF_SUBTITLE_LANG = "pref_subtitle_lang";
     private boolean useSoftwareAudioDecoder = false; // Flag to force software decoding
     private int audioMode = 1; // 0: HW, 1: SW, 2: Passthrough
     private static final String CLASS_NAME = "com.oxoo.spagreen.ui.activity.PlayerActivity";
@@ -172,6 +176,10 @@ public class PlayerActivity extends Activity {
     private String url = "";
     private boolean hasRetriedWithHLS = false;
     private boolean hasHandledAudioCodecError = false; // Prevent infinite audio codec error loops // Track HLS retry attempts
+    private String lastAudioCodecErrorMessage = "";
+    private String lastAudioCodecErrorDetails = "";
+    private String lastVideoCodecError = "";
+    private String lastVideoCodecDetails = "";
     private boolean hasPlayerError = false; // Track if there was a player error to prevent auto-next on error
     private long lastErrorTime = 0; // Track when the last error occurred
     private String videoType = "";
@@ -209,6 +217,19 @@ public class PlayerActivity extends Activity {
     private boolean holdSeekResumePending = false;
     private static final long SEEK_BATCH_INTERVAL_MS = 120L;
     private static final long SEEK_DECODER_SETTLE_MS = 120L;
+    private static final long SEEK_ERROR_GRACE_MS = 5000L;
+    private static final long SEEK_RECOVERY_COOLDOWN_MS = 8000L;
+    private static final int MAX_SEEK_RECOVERY_ATTEMPTS = 2;
+    private static final long TRACK_SWITCH_ERROR_GRACE_MS = 6000L;
+    private static final long PLAYBACK_ERROR_WINDOW_MS = 12000L;
+    private static final int POPUP_ERROR_THRESHOLD = 3;
+    private long lastSeekActionTimeMs = 0L;
+    private long lastSeekRecoveryTimeMs = 0L;
+    private int seekRecoveryAttempts = 0;
+    private long playbackErrorWindowStartMs = 0L;
+    private int playbackErrorCountInWindow = 0;
+    private long lastTrackSwitchTimeMs = 0L;
+    private boolean trackSwitchInProgress = false;
     private final Handler safeSeekHandler = new Handler();
     private final Runnable clearSeekingFlagRunnable = new Runnable() {
         @Override
@@ -222,6 +243,12 @@ public class PlayerActivity extends Activity {
             applyPendingSeek();
         }
     };
+    private final Runnable clearTrackSwitchFlagRunnable = new Runnable() {
+        @Override
+        public void run() {
+            trackSwitchInProgress = false;
+        }
+    };
     private final Handler timeBarFocusLockHandler = new Handler();
     private final Handler logoBurnInHandler = new Handler();
     private boolean roundedSubtitleBackgroundEnabled = false;
@@ -229,6 +256,11 @@ public class PlayerActivity extends Activity {
     private int subtitleStrokeTextColor = Color.WHITE;
     private int subtitleStrokeOutlineColor = Color.BLACK;
     private float subtitleStrokeWidthPx = 0f;
+    private int subtitleVerticalOffset = 0;
+    private int subtitleTextColor = Color.WHITE;
+    private int subtitleOutlineColor = Color.BLACK;
+    private float subtitleOutlineWidthPx = 2f;
+    private boolean useCustomSubtitleOutline = true;
     private boolean roundedSubtitleCueRendererAttached = false;
     private final Player.Listener roundedSubtitleCueListener = new Player.Listener() {
         @Override
@@ -305,6 +337,9 @@ public class PlayerActivity extends Activity {
         useSoftwareAudioDecoder = (audioMode == 1);
         
         Log.d(TAG, "🔊 Audio Mode Initialized: " + audioMode + " (1:SW, 0:HW, 2:PASSTROUGH)");
+        
+        // Diagnostic: Check FFmpeg extension availability (silent check in background)
+        checkFFmpegExtensionAvailability();
 
         mChannelId = getIntent().getLongExtra(VideoPlaybackActivity.EXTRA_CHANNEL_ID, -1L);
         mStartingPosition = getIntent().getLongExtra(VideoPlaybackActivity.EXTRA_POSITION, -1L);
@@ -2165,6 +2200,7 @@ public class PlayerActivity extends Activity {
 
                 if ("off".equals(url)) {
                     if (trackSelector != null) {
+                        markTrackSwitchTransition("subtitle-off");
                         trackSelector.setParameters(
                             trackSelector.buildUponParameters()
                                 .setRendererDisabled(C.TRACK_TYPE_TEXT, true)
@@ -2179,6 +2215,7 @@ public class PlayerActivity extends Activity {
                         int trackIndex = Integer.parseInt(parts[3]);
                         
                         if (trackSelector != null) {
+                            markTrackSwitchTransition("subtitle-embedded");
                             MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
                             if (mappedTrackInfo != null) {
                                 TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
@@ -2198,6 +2235,7 @@ public class PlayerActivity extends Activity {
                 } else {
                     // External API subtitle
                     if (url != null && !url.isEmpty()) {
+                        markTrackSwitchTransition("subtitle-external");
                         loadExternalSubtitle(url, subtitle.getLanguage());
                     }
                     dialog.dismiss();
@@ -2249,7 +2287,8 @@ public class PlayerActivity extends Activity {
                     .build();
 
             DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(PlayerActivity.this,
-                    Util.getUserAgent(PlayerActivity.this, CLASS_NAME), new DefaultBandwidthMeter());
+                    Util.getUserAgent(PlayerActivity.this, CLASS_NAME),
+                    new DefaultBandwidthMeter.Builder(PlayerActivity.this).build());
 
 
             MediaItem.SubtitleConfiguration subtitleConfig = new MediaItem.SubtitleConfiguration.Builder(subtitleUri)
@@ -2410,9 +2449,34 @@ public class PlayerActivity extends Activity {
             }
             @Override
             public void onAudioCodecError(EventTime eventTime, Exception audioCodecError) {
-                Log.e("PlayerActivity", "🎧 Audio Codec Error: " + audioCodecError.getMessage());
-                 runOnUiThread(() -> {
-                     new ToastMsg(PlayerActivity.this).toastIconError("Lỗi Codec: " + audioCodecError.getMessage());
+                String errorMsg = audioCodecError.getMessage();
+                Log.e("PlayerActivity", "🎧 Audio Codec Error: " + errorMsg);
+                
+                // Capture error details for user dialog
+                lastAudioCodecErrorMessage = errorMsg;
+                
+                // Extract codec details from stack trace
+                StringBuilder details = new StringBuilder();
+                if (audioCodecError.getCause() != null) {
+                    Throwable cause = audioCodecError.getCause();
+                    details.append("Chi tiết lỗi:\n");
+                    details.append(cause.getClass().getSimpleName()).append(": ");
+                    details.append(cause.getMessage()).append("\n");
+                    
+                    // Try to extract codec name from error
+                    String causeMsg = cause.getMessage() != null ? cause.getMessage() : "";
+                    if (causeMsg.contains("ac3") || causeMsg.contains("eac3") || causeMsg.contains("AC3") || causeMsg.contains("EAC3")) {
+                        details.append("(Codec: AC3/EAC3)\n");
+                    } else if (causeMsg.contains("dts") || causeMsg.contains("DTS")) {
+                        details.append("(Codec: DTS)\n");
+                    } else if (causeMsg.contains("aac") || causeMsg.contains("AAC")) {
+                        details.append("(Codec: AAC)\n");
+                    }
+                }
+                lastAudioCodecErrorDetails = details.toString();
+                
+                runOnUiThread(() -> {
+                     new ToastMsg(PlayerActivity.this).toastIconError("Lỗi Codec: " + errorMsg);
                 });
             }
         });
@@ -2621,6 +2685,9 @@ public class PlayerActivity extends Activity {
                 } else if (playbackState == Player.STATE_READY) {
                     isPlaying = false;
                     progressBar.setVisibility(View.GONE);
+                    seekRecoveryAttempts = 0;
+                    playbackErrorCountInWindow = 0;
+                    playbackErrorWindowStartMs = 0L;
                     //add watch next card
                     long position = player.getCurrentPosition();
                     long duration = player.getDuration();
@@ -2697,6 +2764,7 @@ public class PlayerActivity extends Activity {
                     if (diff > 2000) {
                         Log.d("PlayerActivity", "🎯 Detected user seek: " + (oldPos/1000) + "s → " + (newPos/1000) + "s");
                         isUserSeeking = true;
+                        lastSeekActionTimeMs = System.currentTimeMillis();
                         
                         // Clear flag after delay
                         new Handler().postDelayed(() -> {
@@ -2711,6 +2779,28 @@ public class PlayerActivity extends Activity {
             public void onPlayerError(com.google.android.exoplayer2.PlaybackException error) {
                 Log.e("PlayerActivity", "🎬 ExoPlayer Error: " + error.getMessage());
                 progressBar.setVisibility(View.GONE);
+
+                // Ignore transient decoder glitches that can happen right after user seek.
+                long nowMs = System.currentTimeMillis();
+                if (isLikelySeekTransientError(error, nowMs) || isLikelyTrackSwitchTransientError(error, nowMs)) {
+                    Log.w("PlayerActivity", "⏭️ Transition-window decoder error detected, attempting quick recovery");
+                    if (recoverFromSeekWindowError(nowMs)) {
+                        hasPlayerError = false;
+                        lastErrorTime = 0;
+                        return;
+                    }
+                    Log.w("PlayerActivity", "⚠️ Seek recovery failed, falling back to normal error handling");
+                }
+
+                // Old-version-like behavior: silently recover decoder glitches first, show popup only on repeated failures.
+                if (isLikelyDecoderPipelineError(error) && shouldDelayPlaybackErrorPopup(nowMs)) {
+                    Log.w("PlayerActivity", "🔁 Decoder error suppressed (silent recovery mode)");
+                    if (recoverFromSeekWindowError(nowMs)) {
+                        hasPlayerError = false;
+                        lastErrorTime = 0;
+                    }
+                    return;
+                }
                 
                 // Check if this is EOFException (normal at end of file)
                 boolean isEOFException = error.getCause() instanceof java.io.EOFException;
@@ -2815,6 +2905,12 @@ public class PlayerActivity extends Activity {
                          errorMessage != null && errorMessage.contains("audio"))) {
                         isAudioCodecError = true;
                         Log.e("PlayerActivity", "🔊 Audio codec error detected: " + errorMessage);
+                        
+                        // Save error details for user dialog
+                        lastAudioCodecErrorMessage = errorMessage != null ? errorMessage : "Unknown audio codec error";
+                        if (causeMessage != null) {
+                            lastAudioCodecErrorDetails = "Cause: " + causeMessage.substring(0, Math.min(100, causeMessage.length()));
+                        }
                     }
                     
                     // Check for video codec errors (H.264, H.265, AVC, etc.)
@@ -2824,11 +2920,56 @@ public class PlayerActivity extends Activity {
                         causeMessage.contains("DynamicANWBuffer failed") ||
                         causeMessage.contains("OMX.google.h264.decoder") ||
                         causeMessage.contains("OMX.google.h265.decoder") ||
+                        causeMessage.contains("OMX.google.hevc.decoder") ||
                         causeMessage.contains("video codec") ||
                         causeMessage.contains("VideoTrack") ||
-                        causeMessage.contains("ACodec"))) {
+                        causeMessage.contains("ACodec") ||
+                        causeMessage.contains("MediaCodecVideoDecoderException") ||
+                        causeMessage.contains("dequeueOutputBuffer") ||
+                        causeMessage.contains("decoder init failed") ||
+                        causeMessage.contains("NO_EXCEEDS_CAPABILITIES") ||
+                        causeMessage.contains("format_supported=NO"))) {
                         isVideoCodecError = true;
                         Log.e("PlayerActivity", "🎬 Video codec error detected: " + causeMessage);
+                        
+                        // Capture video error details for user dialog
+                        lastVideoCodecError = errorMessage != null ? errorMessage : "Video codec error";
+                        
+                        // Extract codec name from error
+                        StringBuilder videoDetails = new StringBuilder();
+                        if (errorMessage != null) {
+                            // Try to extract codec from format string
+                            if (errorMessage.contains("dolby-vision")) {
+                                videoDetails.append("Codec: Dolby Vision (H.265)\n");
+                                videoDetails.append("Resolution: 4K\n");
+                            } else if (errorMessage.contains("hev1") || errorMessage.contains("hevc")) {
+                                videoDetails.append("Codec: H.265/HEVC\n");
+                            } else if (errorMessage.contains("avc") || errorMessage.contains("h264")) {
+                                videoDetails.append("Codec: H.264/AVC\n");
+                            } else if (errorMessage.contains("vp8")) {
+                                videoDetails.append("Codec: VP8\n");
+                            } else if (errorMessage.contains("vp9")) {
+                                videoDetails.append("Codec: VP9\n");
+                            } else if (errorMessage.contains("av1")) {
+                                videoDetails.append("Codec: AV1\n");
+                            } else {
+                                videoDetails.append("Codec: Unknown\n");
+                            }
+                            
+                            // Check for resolution
+                            if (errorMessage.contains("3840") || errorMessage.contains("2160")) {
+                                videoDetails.append("Resolution: 4K (3840x2160)\n");
+                            } else if (errorMessage.contains("1920") || errorMessage.contains("1080")) {
+                                videoDetails.append("Resolution: Full HD (1920x1080)\n");
+                            } else if (errorMessage.contains("1280") || errorMessage.contains("720")) {
+                                videoDetails.append("Resolution: HD (1280x720)\n");
+                            }
+                        }
+                        
+                        if (causeMessage != null) {
+                            videoDetails.append("Lỗi: ").append(causeMessage.substring(0, Math.min(100, causeMessage.length())));
+                        }
+                        lastVideoCodecDetails = videoDetails.toString();
                     }
                     
                     // FALLBACK FOR HARDWARE MODE:
@@ -2878,8 +3019,27 @@ public class PlayerActivity extends Activity {
                     Log.e("PlayerActivity", "❌ Network connection failed");
                     showErrorDialog("Lỗi kết nối mạng", "Không thể kết nối đến server. Vui lòng kiểm tra kết nối internet.");
                 } else {
-                    Log.e("PlayerActivity", "❌ General playback error: " + error.getMessage());
-                    showErrorDialog("Lỗi phát video", "Không thể phát video này. Vui lòng thử lại sau.");
+                    // Check if this is a video-related error that wasn't caught before
+                    String errorMsg = error.getMessage() != null ? error.getMessage() : "";
+                    String errorCauseMsg = error.getCause() != null && error.getCause().getMessage() != null ? error.getCause().getMessage() : "";
+                    String fullErrorStr = errorMsg + " " + errorCauseMsg;
+                    
+                    if (fullErrorStr.toLowerCase().contains("video") || 
+                        fullErrorStr.contains("Renderer") ||
+                        fullErrorStr.contains("MediaCodec") ||
+                        fullErrorStr.contains("Decoder") ||
+                        fullErrorStr.contains("decoder") ||
+                        fullErrorStr.contains("renderer")) {
+                        
+                        // This is a video error - show detailed info
+                        Log.e("PlayerActivity", "🎬 General video error detected");
+                        lastVideoCodecError = errorMsg;
+                        lastVideoCodecDetails = "Error type: " + (error.getCause() != null ? error.getCause().getClass().getSimpleName() : "Unknown");
+                        handleVideoCodecError();
+                    } else {
+                        Log.e("PlayerActivity", "❌ General playback error: " + error.getMessage());
+                        showErrorDialog("Lỗi phát video", "Không thể phát video này. Vui lòng thử lại sau.");
+                    }
                 }
             }
         });
@@ -2955,6 +3115,7 @@ public class PlayerActivity extends Activity {
                     @Override
                     public void onScrubStart(com.google.android.exoplayer2.ui.TimeBar timeBar, long position) {
                         isUserSeeking = true;
+                        lastSeekActionTimeMs = System.currentTimeMillis();
                         Log.d("PlayerActivity", "🎯 User started manual seek at: " + (position / 1000) + "s");
                     }
 
@@ -3086,53 +3247,162 @@ public class PlayerActivity extends Activity {
         if (audioTrackButton != null) audioTrackButton.setVisibility(hasAudio ? View.VISIBLE : View.GONE);
     }
 
-    // Auto-select Vietnamese audio/subtitle tracks when available (run once per session)
+    // Auto-select audio/subtitle tracks based on quick settings language preference (run once per session)
     private void applyPreferredLanguageTracks() {
         if (preferredTracksApplied || trackSelector == null) return;
         MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
         if (mappedTrackInfo == null) return;
 
-        // Helper to match Vietnamese language codes/labels
-        java.util.function.Predicate<Format> isVietnamese = (format) -> {
-            if (format == null) return false;
-            if (format.language != null) {
-                String lang = format.language.toLowerCase();
-                if (lang.equals("vi") || lang.equals("vie") || lang.contains("vn") || lang.contains("vietnam")) return true;
-            }
-            if (format.label != null) {
-                String label = format.label.toLowerCase();
-                if (label.contains("viet") || label.contains("vie")) return true;
-            }
-            return false;
-        };
+        SharedPreferences playerPrefs = getSharedPreferences(PLAYER_PREFS, MODE_PRIVATE);
+        String preferredAudioLang = playerPrefs.getString(PREF_AUDIO_LANG, "");
+        String preferredSubtitleLang = playerPrefs.getString(PREF_SUBTITLE_LANG, "");
 
-        // Iterate renderers and pick audio/text tracks matching Vietnamese
+        DefaultTrackSelector.Parameters.Builder paramsBuilder = trackSelector.buildUponParameters();
+        boolean hasChanges = false;
+
+        // Iterate renderers and pick tracks matching user preference from quick settings
         for (int rendererIndex = 0; rendererIndex < mappedTrackInfo.getRendererCount(); rendererIndex++) {
             int rendererType = mappedTrackInfo.getRendererType(rendererIndex);
             TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(rendererIndex);
             if (trackGroups == null) continue;
 
+            if (rendererType == C.TRACK_TYPE_TEXT && "off".equalsIgnoreCase(preferredSubtitleLang)) {
+                paramsBuilder.clearSelectionOverrides(rendererIndex);
+                paramsBuilder.setRendererDisabled(rendererIndex, true);
+                hasChanges = true;
+                continue;
+            }
+
+            String targetLang = null;
+            if (rendererType == C.TRACK_TYPE_AUDIO) {
+                targetLang = preferredAudioLang;
+            } else if (rendererType == C.TRACK_TYPE_TEXT) {
+                targetLang = preferredSubtitleLang;
+            }
+
+            if (targetLang == null || targetLang.trim().isEmpty()) {
+                continue;
+            }
+
+            boolean matched = false;
+
             for (int groupIndex = 0; groupIndex < trackGroups.length; groupIndex++) {
                 TrackGroup group = trackGroups.get(groupIndex);
                 for (int trackIndex = 0; trackIndex < group.length; trackIndex++) {
                     Format format = group.getFormat(trackIndex);
-                    if (isVietnamese.test(format)) {
-                        if (rendererType == C.TRACK_TYPE_AUDIO || rendererType == C.TRACK_TYPE_TEXT) {
-                            // apply selection override for this renderer
-                            trackSelector.setParameters(
-                                trackSelector.buildUponParameters().setSelectionOverride(
-                                    rendererIndex,
-                                    trackGroups,
-                                    new DefaultTrackSelector.SelectionOverride(groupIndex, trackIndex)
-                                )
-                            );
-                        }
+                    if (isFormatMatchingPreferredLanguage(format, targetLang)) {
+                        paramsBuilder.setRendererDisabled(rendererIndex, false);
+                        paramsBuilder.setSelectionOverride(
+                                rendererIndex,
+                                trackGroups,
+                                new DefaultTrackSelector.SelectionOverride(groupIndex, trackIndex)
+                        );
+                        hasChanges = true;
+                        matched = true;
+                        break;
                     }
                 }
+                if (matched) break;
             }
         }
 
+        if (hasChanges) {
+            trackSelector.setParameters(paramsBuilder);
+        }
+
         preferredTracksApplied = true;
+    }
+
+    private boolean isFormatMatchingPreferredLanguage(Format format, String preferredLanguage) {
+        if (format == null || preferredLanguage == null) return false;
+
+        String target = preferredLanguage.trim().toLowerCase(Locale.US);
+        if (target.isEmpty()) return false;
+
+        String normalizedTarget;
+        if (target.startsWith("vi")) normalizedTarget = "vi";
+        else if (target.startsWith("en")) normalizedTarget = "en";
+        else if (target.startsWith("ja")) normalizedTarget = "ja";
+        else if (target.startsWith("zh")) normalizedTarget = "zh";
+        else if (target.startsWith("ko")) normalizedTarget = "ko";
+        else normalizedTarget = target;
+
+        String lang = format.language != null ? format.language.toLowerCase(Locale.US) : "";
+        String label = format.label != null ? format.label.toLowerCase(Locale.US) : "";
+
+        if (normalizedTarget.equals("vi")) {
+            return lang.equals("vi") || lang.equals("vie") || lang.startsWith("vi-") ||
+                    lang.contains("vn") || lang.contains("vietnam") ||
+                    label.contains("viet") || label.contains("tiếng việt") || label.contains("tieng viet");
+        }
+        if (normalizedTarget.equals("en")) {
+            return lang.equals("en") || lang.startsWith("en-") ||
+                    label.contains("english") || label.contains("tiếng anh") || label.contains("tieng anh");
+        }
+        if (normalizedTarget.equals("ja")) {
+            return lang.equals("ja") || lang.equals("jpn") || lang.startsWith("ja-") ||
+                    label.contains("japanese") || label.contains("tiếng nhật") || label.contains("tieng nhat");
+        }
+        if (normalizedTarget.equals("zh")) {
+            return lang.equals("zh") || lang.equals("zho") || lang.equals("chi") || lang.startsWith("zh-") ||
+                    label.contains("chinese") || label.contains("tiếng trung") || label.contains("tieng trung");
+        }
+        if (normalizedTarget.equals("ko")) {
+            return lang.equals("ko") || lang.equals("kor") || lang.startsWith("ko-") ||
+                    label.contains("korean") || label.contains("tiếng hàn") || label.contains("tieng han");
+        }
+        if (normalizedTarget.equals("th")) {
+            return lang.equals("th") || lang.equals("tha") || lang.startsWith("th-") ||
+                label.contains("thai") || label.contains("tiếng thái") || label.contains("tieng thai");
+        }
+        if (normalizedTarget.equals("id")) {
+            return lang.equals("id") || lang.equals("ind") || lang.startsWith("id-") ||
+                label.contains("indonesian") || label.contains("bahasa") ||
+                label.contains("tiếng indonesia") || label.contains("tieng indonesia");
+        }
+        if (normalizedTarget.equals("es")) {
+            return lang.equals("es") || lang.equals("spa") || lang.startsWith("es-") ||
+                label.contains("spanish") || label.contains("español") ||
+                label.contains("tiếng tây ban nha") || label.contains("tieng tay ban nha");
+        }
+        if (normalizedTarget.equals("fr")) {
+            return lang.equals("fr") || lang.equals("fra") || lang.equals("fre") || lang.startsWith("fr-") ||
+                label.contains("french") || label.contains("français") ||
+                label.contains("tiếng pháp") || label.contains("tieng phap");
+        }
+        if (normalizedTarget.equals("de")) {
+            return lang.equals("de") || lang.equals("deu") || lang.equals("ger") || lang.startsWith("de-") ||
+                label.contains("german") || label.contains("deutsch") ||
+                label.contains("tiếng đức") || label.contains("tieng duc");
+        }
+        if (normalizedTarget.equals("it")) {
+            return lang.equals("it") || lang.equals("ita") || lang.startsWith("it-") ||
+                label.contains("italian") || label.contains("italiano") ||
+                label.contains("tiếng ý") || label.contains("tieng y");
+        }
+        if (normalizedTarget.equals("pt")) {
+            return lang.equals("pt") || lang.equals("por") || lang.startsWith("pt-") ||
+                label.contains("portuguese") || label.contains("português") ||
+                label.contains("tiếng bồ") || label.contains("tieng bo");
+        }
+        if (normalizedTarget.equals("ru")) {
+            return lang.equals("ru") || lang.equals("rus") || lang.startsWith("ru-") ||
+                label.contains("russian") || label.contains("рус") ||
+                label.contains("tiếng nga") || label.contains("tieng nga");
+        }
+        if (normalizedTarget.equals("ar")) {
+            return lang.equals("ar") || lang.equals("ara") || lang.startsWith("ar-") ||
+                label.contains("arabic") || label.contains("العربية") ||
+                label.contains("tiếng ả rập") || label.contains("tieng a rap");
+        }
+        if (normalizedTarget.equals("hi")) {
+            return lang.equals("hi") || lang.equals("hin") || lang.startsWith("hi-") ||
+                label.contains("hindi") || label.contains("हिंदी") ||
+                label.contains("tiếng hindi") || label.contains("tieng hindi");
+        }
+
+        return lang.equals(normalizedTarget) || lang.startsWith(normalizedTarget + "-") ||
+                label.contains(normalizedTarget);
     }
 
     // Log mapped track info once for debugging (shows format, language, mime for embedded tracks)
@@ -3205,6 +3475,7 @@ public class PlayerActivity extends Activity {
     private void enqueueSeekDelta(long deltaMs) {
         pendingSeekDeltaMs += deltaMs;
         isUserSeeking = true;
+        lastSeekActionTimeMs = System.currentTimeMillis();
         safeSeekHandler.removeCallbacks(clearSeekingFlagRunnable);
 
         // Start processing immediately on first key event.
@@ -3212,6 +3483,128 @@ public class PlayerActivity extends Activity {
         if (!safeSeekInProgress) {
             safeSeekHandler.removeCallbacks(applyPendingSeekRunnable);
             safeSeekHandler.post(applyPendingSeekRunnable);
+        }
+    }
+
+    private boolean isLikelySeekTransientError(com.google.android.exoplayer2.PlaybackException error, long nowMs) {
+        boolean inSeekWindow = isUserSeeking || safeSeekInProgress || (nowMs - lastSeekActionTimeMs) <= SEEK_ERROR_GRACE_MS;
+        if (!inSeekWindow || error == null) {
+            return false;
+        }
+
+        String message = error.getMessage() != null ? error.getMessage() : "";
+        String causeMessage = (error.getCause() != null && error.getCause().getMessage() != null)
+                ? error.getCause().getMessage() : "";
+        String causeClass = (error.getCause() != null) ? error.getCause().getClass().getSimpleName() : "";
+        String full = (message + " " + causeMessage + " " + causeClass).toLowerCase();
+
+        return full.contains("mediacodec")
+                || full.contains("renderer")
+                || full.contains("decoder")
+                || full.contains("dequeueoutputbuffer")
+                || full.contains("illegalstateexception")
+                || full.contains("format_supported=no");
+    }
+
+    private boolean isLikelyTrackSwitchTransientError(com.google.android.exoplayer2.PlaybackException error, long nowMs) {
+        boolean inTrackWindow = trackSwitchInProgress || (nowMs - lastTrackSwitchTimeMs) <= TRACK_SWITCH_ERROR_GRACE_MS;
+        if (!inTrackWindow || error == null) {
+            return false;
+        }
+
+        String message = error.getMessage() != null ? error.getMessage() : "";
+        String causeMessage = (error.getCause() != null && error.getCause().getMessage() != null)
+                ? error.getCause().getMessage() : "";
+        String causeClass = (error.getCause() != null) ? error.getCause().getClass().getSimpleName() : "";
+        String full = (message + " " + causeMessage + " " + causeClass).toLowerCase();
+
+        return full.contains("mediacodec")
+                || full.contains("renderer")
+                || full.contains("decoder")
+                || full.contains("dequeueoutputbuffer")
+                || full.contains("illegalstateexception")
+                || full.contains("format_supported=no");
+    }
+
+    private void markTrackSwitchTransition(String reason) {
+        trackSwitchInProgress = true;
+        lastTrackSwitchTimeMs = System.currentTimeMillis();
+        safeSeekHandler.removeCallbacks(clearTrackSwitchFlagRunnable);
+        safeSeekHandler.postDelayed(clearTrackSwitchFlagRunnable, TRACK_SWITCH_ERROR_GRACE_MS);
+        Log.d("PlayerActivity", "🎚️ Track switch transition: " + reason);
+    }
+
+    private boolean isLikelyDecoderPipelineError(com.google.android.exoplayer2.PlaybackException error) {
+        if (error == null) {
+            return false;
+        }
+
+        String message = error.getMessage() != null ? error.getMessage() : "";
+        String causeMessage = (error.getCause() != null && error.getCause().getMessage() != null)
+                ? error.getCause().getMessage() : "";
+        String causeClass = (error.getCause() != null) ? error.getCause().getClass().getSimpleName() : "";
+        String full = (message + " " + causeMessage + " " + causeClass).toLowerCase();
+
+        return full.contains("mediacodec")
+                || full.contains("renderer")
+                || full.contains("decoder")
+                || full.contains("illegalstateexception")
+                || full.contains("dequeueoutputbuffer")
+                || full.contains("format_supported=no")
+                || full.contains("omx.google");
+    }
+
+    private boolean shouldDelayPlaybackErrorPopup(long nowMs) {
+        if (playbackErrorWindowStartMs == 0L || (nowMs - playbackErrorWindowStartMs) > PLAYBACK_ERROR_WINDOW_MS) {
+            playbackErrorWindowStartMs = nowMs;
+            playbackErrorCountInWindow = 1;
+        } else {
+            playbackErrorCountInWindow++;
+        }
+
+        Log.w("PlayerActivity", "🎛️ Playback error count in window: " + playbackErrorCountInWindow);
+        return playbackErrorCountInWindow < POPUP_ERROR_THRESHOLD;
+    }
+
+    private boolean recoverFromSeekWindowError(long nowMs) {
+        if (player == null || url == null || url.isEmpty()) {
+            return false;
+        }
+
+        if ((nowMs - lastSeekRecoveryTimeMs) > SEEK_RECOVERY_COOLDOWN_MS) {
+            seekRecoveryAttempts = 0;
+        }
+        if (seekRecoveryAttempts >= MAX_SEEK_RECOVERY_ATTEMPTS) {
+            return false;
+        }
+
+        try {
+            long resumePos = Math.max(0L, player.getCurrentPosition() - 600L);
+            Uri uri = Uri.parse(url);
+            com.google.android.exoplayer2.source.MediaSource source = createMediaSourceForUrl(uri, videoType);
+            if (source == null) {
+                return false;
+            }
+
+            seekRecoveryAttempts++;
+            lastSeekRecoveryTimeMs = nowMs;
+
+            pendingSeekDeltaMs = 0L;
+            safeSeekInProgress = false;
+            isUserSeeking = false;
+            safeSeekHandler.removeCallbacks(applyPendingSeekRunnable);
+            safeSeekHandler.removeCallbacks(clearSeekingFlagRunnable);
+
+            player.setMediaSource(source, true);
+            player.prepare();
+            player.seekTo(resumePos);
+            player.setPlayWhenReady(true);
+
+            Log.w("PlayerActivity", "🔄 Recovered playback after seek error at " + (resumePos / 1000) + "s (attempt " + seekRecoveryAttempts + ")");
+            return true;
+        } catch (Exception e) {
+            Log.e("PlayerActivity", "Failed to recover from seek-window error", e);
+            return false;
         }
     }
 
@@ -4119,8 +4512,10 @@ public class PlayerActivity extends Activity {
                 boolean wasPlaying = player.getPlayWhenReady();
                 try {
                     if (pair[0] == -1) {
+                        markTrackSwitchTransition("subtitle-toggle-off");
                         trackSelector.setParameters(trackSelector.buildUponParameters().setRendererDisabled(renderer, true));
                     } else {
+                        markTrackSwitchTransition("subtitle-track-switch");
                         int group = pair[0];
                         int track = pair[1];
                         trackSelector.setParameters(
@@ -4136,7 +4531,32 @@ public class PlayerActivity extends Activity {
                 }
             };
         }
-        buildCustomListDialog("Chọn phụ đề (" + totalTracks + " có sẵn)", labels.toArray(new String[0]), -1, actions, null).show();
+
+        int checkedIndex = -1;
+        try {
+            DefaultTrackSelector.Parameters params = trackSelector.getParameters();
+            boolean textRendererDisabled = params.getRendererDisabled(renderer);
+            if (textRendererDisabled) {
+                checkedIndex = 0;
+            } else {
+                DefaultTrackSelector.SelectionOverride override =
+                        params.getSelectionOverride(renderer, trackGroups);
+                if (override != null && override.tracks != null && override.tracks.length > 0) {
+                    for (int i = 1; i < selectionPairs.size(); i++) {
+                        int[] pair = selectionPairs.get(i);
+                        if (pair[0] == override.groupIndex && pair[1] == override.tracks[0]) {
+                            checkedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Could not determine current subtitle selection", e);
+        }
+
+        buildCustomListDialog("Chọn phụ đề (" + totalTracks + " có sẵn)",
+                labels.toArray(new String[0]), checkedIndex, actions, null).show();
     }
 
     // Show dialog to select audio track (display language/label where available)
@@ -4146,6 +4566,8 @@ public class PlayerActivity extends Activity {
         
         final List<String> labels = new ArrayList<>();
         final List<int[]> selectionPairs = new ArrayList<>(); // {rendererIndex, groupIndex, trackIndex}
+        final TrackSelectionArray currentSelections = (player != null) ? player.getCurrentTrackSelections() : null;
+        final int[] checkedIndexHolder = new int[]{-1};
 
         // Iterate through ALL renderers to find all audio tracks
         Log.d("PlayerActivity", "🔊 Populating Audio Selection Dialog...");
@@ -4168,6 +4590,12 @@ public class PlayerActivity extends Activity {
                         if (format.channelCount > 0) {
                             label += " (" + format.channelCount + "ch)";
                         }
+
+                        boolean isCurrent = isAudioTrackCurrentlySelected(currentSelections, i, group, trackIndex);
+                        if (isCurrent) {
+                            label = "✓ " + label;
+                            checkedIndexHolder[0] = labels.size();
+                        }
                         
                         Log.d("PlayerActivity", "     OPTION: " + label + " [Mime: " + format.sampleMimeType + "]");
 
@@ -4187,7 +4615,6 @@ public class PlayerActivity extends Activity {
         int checkedIndex = -1;
         try {
             DefaultTrackSelector.Parameters params = trackSelector.getParameters();
-            TrackSelectionArray currentSelections = player != null ? player.getCurrentTrackSelections() : null;
             for (int i = 0; i < selectionPairs.size(); i++) {
                 int[] pair = selectionPairs.get(i);
                 int rendererIndex = pair[0];
@@ -4236,6 +4663,7 @@ public class PlayerActivity extends Activity {
                 long currentPosition = player.getCurrentPosition();
                 boolean wasPlaying = player.getPlayWhenReady();
                 try {
+                    markTrackSwitchTransition("audio-track-switch");
                     com.google.android.exoplayer2.trackselection.DefaultTrackSelector.Parameters.Builder parametersBuilder = trackSelector.buildUponParameters();
                     for (int j = 0; j < mappedTrackInfo.getRendererCount(); j++) {
                         if (mappedTrackInfo.getRendererType(j) == com.google.android.exoplayer2.C.TRACK_TYPE_AUDIO) {
@@ -4252,7 +4680,44 @@ public class PlayerActivity extends Activity {
                 }
             };
         }
-        buildCustomListDialog("Chọn âm thanh (" + labels.size() + " có sẵn)", labels.toArray(new String[0]), checkedIndex, actions, null).show();
+        buildCustomListDialog(
+                "Chọn âm thanh (" + labels.size() + " có sẵn)",
+                labels.toArray(new String[0]),
+                checkedIndexHolder[0],
+                actions,
+                null
+        ).show();
+    }
+
+    private boolean isAudioTrackCurrentlySelected(
+            TrackSelectionArray currentSelections,
+            int rendererIndex,
+            TrackGroup optionGroup,
+            int optionTrackIndex) {
+        if (currentSelections == null || rendererIndex < 0 || rendererIndex >= currentSelections.length) {
+            return false;
+        }
+
+        TrackSelection selection = currentSelections.get(rendererIndex);
+        if (selection == null) {
+            return false;
+        }
+
+        for (int i = 0; i < selection.length(); i++) {
+            Format selectedFormat = selection.getFormat(i);
+            if (selectedFormat == null) {
+                continue;
+            }
+
+            if (optionTrackIndex >= 0 && optionTrackIndex < optionGroup.length) {
+                Format optionFormat = optionGroup.getFormat(optionTrackIndex);
+                if (optionFormat != null && selectedFormat == optionFormat) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void openSubtitleSettingsDialog() {
@@ -4266,7 +4731,8 @@ public class PlayerActivity extends Activity {
         SharedPreferences prefs = getSharedPreferences("subtitle_settings", MODE_PRIVATE);
         int fontSize = prefs.getInt("font_size", 20);
         int verticalOffset = prefs.getInt("vertical_offset", 0);
-        int fontType = prefs.getInt("font_type", 4); // Default to Vietnamese (index 4)
+        subtitleVerticalOffset = verticalOffset;
+        int fontType = prefs.getInt("font_type", 4); // Default to phimmoi (index 4)
         boolean background = prefs.getBoolean("background", false);
         roundedSubtitleBackgroundEnabled = background;
         int[] backgroundColorValues = {0xB3000000, 0xB3282828, 0xB33B2F2F, 0xB3202D4A, 0xB31F4A3A};
@@ -4279,6 +4745,20 @@ public class PlayerActivity extends Activity {
         int textColorIndex = prefs.getInt("text_color", 0);
         int outlineColorIndex = prefs.getInt("outline_color", 0);
         int outlineThicknessPt = prefs.getInt("outline_thickness_pt", -1);
+        if (outlineThicknessPt < 0) {
+            outlineThicknessPt = Math.max(0, Math.min(8, prefs.getInt("outline_thickness", 2)));
+            prefs.edit().putInt("outline_thickness_pt", outlineThicknessPt).apply();
+        }
+        if (outlineThicknessPt < 0 || outlineThicknessPt > 8) {
+            outlineThicknessPt = 2;
+            prefs.edit().putInt("outline_thickness_pt", outlineThicknessPt).apply();
+        }
+
+        float outlineThicknessPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_PT,
+            outlineThicknessPt,
+            getResources().getDisplayMetrics()
+        );
 
         // Define color arrays
         int[] colorValues = {Color.WHITE, Color.YELLOW, Color.RED, Color.GREEN, 
@@ -4308,14 +4788,13 @@ public class PlayerActivity extends Activity {
         
         // Get outline color from array
         outlineColor = outlineColorValues[outlineColorIndex];
-
+        subtitleTextColor = textColor;
+        subtitleOutlineColor = outlineColor;
         subtitleStrokeTextColor = textColor;
         subtitleStrokeOutlineColor = outlineColor;
-        subtitleStrokeWidthPx = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_PT,
-                outlineThicknessPt,
-                getResources().getDisplayMetrics()
-        );
+        subtitleStrokeWidthPx = outlineThicknessPx;
+        subtitleOutlineWidthPx = outlineThicknessPx;
+        useCustomSubtitleOutline = subtitleStrokeWidthPx > 0f && subtitleStrokeOutlineColor != Color.TRANSPARENT;
 
         // Get typeface
         Typeface typeface = Typeface.DEFAULT;
@@ -4323,6 +4802,14 @@ public class PlayerActivity extends Activity {
         else if (fontType == 2) typeface = Typeface.SERIF;
         else if (fontType == 3) typeface = Typeface.MONOSPACE;
         else if (fontType == 4) {
+            try {
+                typeface = Typeface.createFromAsset(getAssets(), "fonts/fontphimmoi.ttf");
+            } catch (Exception e) {
+                Log.e("PlayerActivity", "Failed to load phimmoi font", e);
+                typeface = Typeface.DEFAULT;
+            }
+        }
+        else if (fontType == 5) {
             try {
                 typeface = Typeface.createFromAsset(getAssets(), "fonts/uvnhonghahep-b.ttf");
             } catch (Exception e) {
@@ -4394,7 +4881,16 @@ public class PlayerActivity extends Activity {
             }
 
             CharSequence styledText = applyStyledSubtitleToText(cue.text);
-            styledCues.add(cue.buildUpon().setText(styledText).build());
+
+            // Force global subtitle settings (font size/position) to apply consistently,
+            // especially for external VTT cues that may carry their own cue-level layout.
+            Cue.Builder builder = cue.buildUpon().setText(styledText);
+            builder.setLine(Cue.DIMEN_UNSET, Cue.LINE_TYPE_FRACTION);
+            builder.setPosition(Cue.DIMEN_UNSET);
+            builder.setSize(Cue.DIMEN_UNSET);
+            builder.setTextSize(Cue.DIMEN_UNSET, Cue.TEXT_SIZE_TYPE_FRACTIONAL);
+
+            styledCues.add(builder.build());
         }
         return styledCues;
     }
@@ -4509,6 +5005,51 @@ public class PlayerActivity extends Activity {
             paint.setStrokeWidth(previousStrokeWidth);
             paint.setStrokeJoin(previousJoin);
             paint.setStrokeMiter(previousMiter);
+        }
+    }
+
+    private static final class OutlineTextSpan extends ReplacementSpan {
+        private final int textColor;
+        private final int outlineColor;
+        private final float outlineWidthPx;
+
+        private OutlineTextSpan(int textColor, int outlineColor, float outlineWidthPx) {
+            this.textColor = textColor;
+            this.outlineColor = outlineColor;
+            this.outlineWidthPx = outlineWidthPx;
+        }
+
+        @Override
+        public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) {
+            float baseWidth = paint.measureText(text, start, end);
+            return (int) Math.ceil(baseWidth + (outlineWidthPx * 2f));
+        }
+
+        @Override
+        public void draw(Canvas canvas, CharSequence text, int start, int end, float x,
+                         int top, int y, int bottom, Paint paint) {
+            int previousColor = paint.getColor();
+            Paint.Style previousStyle = paint.getStyle();
+            float previousStrokeWidth = paint.getStrokeWidth();
+            Paint.Join previousJoin = paint.getStrokeJoin();
+
+            float drawX = x + outlineWidthPx;
+
+            paint.setAntiAlias(true);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setStrokeWidth(outlineWidthPx);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(outlineColor);
+            canvas.drawText(text, start, end, drawX, y, paint);
+
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(textColor);
+            canvas.drawText(text, start, end, drawX, y, paint);
+
+            paint.setColor(previousColor);
+            paint.setStyle(previousStyle);
+            paint.setStrokeWidth(previousStrokeWidth);
+            paint.setStrokeJoin(previousJoin);
         }
     }
 
@@ -4719,11 +5260,11 @@ public class PlayerActivity extends Activity {
         TextView fontTypeTV = new TextView(this);
         fontTypeTV.setTextColor(0xFFFFFFFF);
         
-        String[] fontNames = {"Mặc định", "Sans Serif", "Serif", "Monospace", "Tiếng Việt"};
-        int currentFontType = prefs.getInt("font_type", 4); // Default to Vietnamese
+        String[] fontNames = {"Mặc định", "Sans Serif", "Serif", "Monospace", "phimmoi", "Tiếng Việt"};
+        int currentFontType = prefs.getInt("font_type", 4); // Default to phimmoi
         // Bounds checking to prevent crash
         if (currentFontType >= fontNames.length) {
-            currentFontType = 4; // Default to Vietnamese
+            currentFontType = 4; // Default to phimmoi
             prefs.edit().putInt("font_type", currentFontType).apply();
         }
         fontTypeTV.setText(fontNames[currentFontType]);
@@ -5240,7 +5781,7 @@ public class PlayerActivity extends Activity {
         resetBtn.setOnClickListener(v -> {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt("font_size", 20);
-            editor.putInt("font_type", 4); // Default to Vietnamese
+            editor.putInt("font_type", 4); // Default to phimmoi
             editor.putInt("vertical_offset", 0);
             editor.putBoolean("background", false);
             editor.putInt("background_color", 0); // Black
@@ -5252,7 +5793,7 @@ public class PlayerActivity extends Activity {
             editor.apply();
             
             fontSizeTV.setText("20sp");
-            fontTypeTV.setText(fontNames[4]); // Default to Vietnamese
+            fontTypeTV.setText(fontNames[4]); // Default to phimmoi
             positionTV.setText("Giữa");
             backgroundSwitch.setChecked(false);
             backgroundColorTV.setText(backgroundColorNames[0]);
@@ -5506,6 +6047,7 @@ public class PlayerActivity extends Activity {
             return;
         }
 
+        logo4kOverlay.setAlpha(PLAYER_LOGO_ALPHA);
         logo4kOverlay.setVisibility(View.VISIBLE);
         loadPlayerLogoFromRemote();
 
@@ -5528,6 +6070,7 @@ public class PlayerActivity extends Activity {
             .into(logo4kOverlay, new com.squareup.picasso.Callback() {
                     @Override
                     public void onSuccess() {
+                        logo4kOverlay.setAlpha(PLAYER_LOGO_ALPHA);
                         Log.d(TAG, "Loaded player logo from remote URL");
                     }
 
@@ -5833,6 +6376,13 @@ public class PlayerActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                // User preference: do not block playback flow with "cannot play" popups.
+                if ((title != null && title.contains("Lỗi phát video"))
+                        || (message != null && message.contains("Không thể phát video"))) {
+                    Toast.makeText(PlayerActivity.this, "Không thể phát video này", Toast.LENGTH_SHORT).show();
+                    Log.w("PlayerActivity", "Suppressed playback popup: " + title + " | " + message);
+                    return;
+                }
                 buildCustomAlertDialog(
                     title, message,
                     "OK", null,
@@ -6048,100 +6598,21 @@ public class PlayerActivity extends Activity {
     }
 
     /**
-     * ERROR HANDLING: Show audio codec error dialog
+     * ERROR HANDLING: Show audio codec error dialog with detailed info
      */
-        private void showAudioCodecErrorDialog() {
-        buildCustomAlertDialog(
-            "Lỗi âm thanh",
-            "Định dạng âm thanh không được hỗ trợ trên thiết bị này. Video sẽ phát không có tiếng hoặc với âm thanh thay thế.\n\nBạn có muốn tiếp tục không?",
-            "Tiếp tục", () -> {
-                Log.d("PlayerActivity", "User chose to continue with audio codec issues");
-            },
-            "Quay lại", () -> finish(),
-            null, null
-        ).show();
+    private void showAudioCodecErrorDialog() {
+        Toast.makeText(this, "Lỗi âm thanh, đang thử tự khắc phục", Toast.LENGTH_SHORT).show();
+        Log.w("PlayerActivity", "Suppressed audio codec dialog. lastAudioCodecErrorMessage=" + lastAudioCodecErrorMessage);
     }
 
     /**
      * ERROR HANDLING: Handle video codec errors (H.264, H.265, AVC, etc.)
      */
     private void handleVideoCodecError() {
-        Log.d("PlayerActivity", "🎬 Handling video codec error - configuring video renderer for compatibility");
-        
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (trackSelector == null || player == null) {
-                        Log.e("PlayerActivity", "TrackSelector or Player is null, cannot handle video codec error");
-                        showErrorDialog("Lỗi video", "Không thể khởi tạo video renderer. Thử chọn chất lượng khác.");
-                        return;
-                    }
+        Log.d("PlayerActivity", "🎬 Handling video codec error - showing detailed error info");
 
-                    // Configure track selector to be more lenient with video formats
-                    trackSelector.setParameters(
-                        trackSelector.buildUponParameters()
-                            .setExceedVideoConstraintsIfNecessary(true)
-                            .setExceedRendererCapabilitiesIfNecessary(true)
-                            .setForceLowestBitrate(true) // Force lower quality for compatibility
-                            .setTunnelingEnabled(false) // Disable video tunneling which can cause codec issues
-                    );
-                    
-                    Log.d("PlayerActivity", "✅ Applied video codec error handling - track selector configured");
-                    
-                    // Try to restart playback with new video settings
-                    if (player != null && url != null) {
-                        Log.d("PlayerActivity", "🔄 Restarting playback with video codec fallback settings");
-                        
-                        // Store current playback position
-                        long currentPosition = player.getCurrentPosition();
-                        
-                        // Restart the media source with video fallback
-                        Uri uri = Uri.parse(url);
-                        com.google.android.exoplayer2.source.MediaSource mediaSource = createMediaSourceForUrl(uri, videoType);
-                        
-                        if (mediaSource != null) {
-                            player.setMediaSource(mediaSource);
-                            player.prepare();
-                            player.seekTo(currentPosition); // Resume from where it failed
-                            player.setPlayWhenReady(true);
-                            
-                            Log.d("PlayerActivity", "✅ Playback restarted with video fallback at position: " + currentPosition);
-                        } else {
-                            Log.e("PlayerActivity", "Failed to create media source for video codec fallback");
-                            showVideoCodecErrorDialog();
-                        }
-                    }
-                    
-                } catch (Exception e) {
-                    Log.e("PlayerActivity", "Error handling video codec error", e);
-                    showVideoCodecErrorDialog();
-                }
-            }
-        });
-    }
-
-    /**
-     * ERROR HANDLING: Show video codec error dialog
-     */
-        private void showVideoCodecErrorDialog() {
-        buildCustomAlertDialog(
-            "Lỗi video codec",
-            "Định dạng video không được hỗ trợ đầy đủ trên thiết bị này. Video có thể phát chậm hoặc có lỗi hiển thị.\n\nBạn có muốn thử chất lượng thấp hơn không?",
-            "Thử chất lượng thấp", () -> {
-                Log.d("PlayerActivity", "User chose to try lower quality for video codec issues");
-                if (trackSelector != null) {
-                    trackSelector.setParameters(
-                        trackSelector.buildUponParameters()
-                            .setForceLowestBitrate(true)
-                            .setMaxVideoSize(854, 480)
-                            .setExceedVideoConstraintsIfNecessary(true)
-                    );
-                }
-            },
-            "Quay lại", () -> finish(),
-            null, null
-        ).show();
+        Toast.makeText(this, "Lỗi codec video, đang thử phát tiếp", Toast.LENGTH_SHORT).show();
+        Log.w("PlayerActivity", "Suppressed video codec dialog. lastVideoCodecError=" + lastVideoCodecError);
     }
 
     /**
@@ -6305,6 +6776,7 @@ public class PlayerActivity extends Activity {
             // Save current state
             long currentPosition = player.getCurrentPosition();
             boolean wasPlaying = player.isPlaying();
+            markTrackSwitchTransition("external-subtitle-load");
             
             // Create subtitle MediaItem with SubtitleConfiguration
             MediaItem.SubtitleConfiguration subtitleConfig = new MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitleUrl))
@@ -6871,5 +7343,136 @@ public class PlayerActivity extends Activity {
             w.setBackgroundDrawableResource(android.R.color.transparent);
         }
         return dialog;
+    }
+
+    /**
+     * DIAGNOSTIC: Check if FFmpeg extension is available on this device
+     */
+    private void checkFFmpegExtensionAvailability() {
+        try {
+            StringBuilder diagnosticInfo = new StringBuilder();
+            diagnosticInfo.append("🔍 FFmpeg Extension Diagnosis:\n\n");
+            
+            Log.d("PlayerActivity", "🔍 Checking FFmpeg Extension Availability...");
+            
+            // Check 1: Try to find FFmpeg extension class
+            boolean ffmpegClassFound = false;
+            try {
+                Class.forName("com.google.android.exoplayer2.ext.ffmpeg.FfmpegAudioRenderer");
+                Log.e("PlayerActivity", "✅ FFmpeg class found in classpath!");
+                diagnosticInfo.append("✅ FFmpeg Class: FOUND\n");
+                ffmpegClassFound = true;
+            } catch (ClassNotFoundException e) {
+                Log.w("PlayerActivity", "⚠️ FFmpeg class NOT found: " + e.getMessage());
+                diagnosticInfo.append("❌ FFmpeg Class: NOT FOUND\n");
+                diagnosticInfo.append("   (AAR might not be included)\n\n");
+                ffmpegClassFound = false;
+            }
+            
+            // Check 2: Log device architecture (ABI)
+            String[] abis = android.os.Build.SUPPORTED_ABIS;
+            Log.d("PlayerActivity", "📱 Device Supported ABIs: " + java.util.Arrays.toString(abis));
+            diagnosticInfo.append("📱 Device ABIs: ");
+            diagnosticInfo.append(java.util.Arrays.toString(abis)).append("\n\n");
+            
+            // Check 3: List native libraries in app path
+            boolean hasFFmpegLib = false;
+            java.io.File nativeLibDir = new java.io.File(getApplicationInfo().nativeLibraryDir);
+            if (nativeLibDir.exists()) {
+                String[] libs = nativeLibDir.list();
+                if (libs != null && libs.length > 0) {
+                    Log.d("PlayerActivity", "📦 Native libraries found: " + java.util.Arrays.toString(libs));
+                    diagnosticInfo.append("📦 Native Libraries: FOUND\n");
+                    
+                    // Check specifically for FFmpeg library
+                    for (String lib : libs) {
+                        if (lib.contains("ffmpeg") || lib.contains("exoplayer")) {
+                            Log.d("PlayerActivity", "   ✅ " + lib);
+                            hasFFmpegLib = true;
+                            break;
+                        }
+                    }
+                    if (!hasFFmpegLib) {
+                        Log.w("PlayerActivity", "⚠️ No FFmpeg native libraries (*.so) found");
+                        diagnosticInfo.append("   ⚠️ No FFmpeg *.so files\n\n");
+                    } else {
+                        diagnosticInfo.append("   ✅ FFmpeg *.so Found\n\n");
+                    }
+                } else {
+                    Log.w("PlayerActivity", "⚠️ Native library directory is empty");
+                    diagnosticInfo.append("📦 Native Libraries: EMPTY\n\n");
+                }
+            } else {
+                Log.w("PlayerActivity", "⚠️ Native library directory does not exist");
+                diagnosticInfo.append("📦 Native Libraries: NOT FOUND\n\n");
+            }
+            
+            // Check 4: Summary & Recommendation
+            diagnosticInfo.append("🎯 SUMMARY:\n");
+            if (ffmpegClassFound && hasFFmpegLib) {
+                diagnosticInfo.append("✅ FFmpeg is properly installed\n");
+                diagnosticInfo.append("Software decoder should work.\n");
+                Log.d("PlayerActivity", "✅ FFmpeg Extension: READY");
+            } else if (ffmpegClassFound && !hasFFmpegLib) {
+                diagnosticInfo.append("⚠️ FFmpeg class found but *.so missing\n");
+                diagnosticInfo.append("Will fallback to hardware decoder.\n");
+                Log.d("PlayerActivity", "⚠️ FFmpeg: Class OK but native libs missing");
+            } else {
+                diagnosticInfo.append("❌ FFmpeg not installed\n");
+                diagnosticInfo.append("Using hardware MediaCodec decoder only.\n");
+                Log.d("PlayerActivity", "❌ FFmpeg Extension: NOT INSTALLED");
+            }
+            
+            // Store diagnostic for later display if needed
+            lastFFmpegDiagnostic = diagnosticInfo.toString();
+            
+            // Show dialog after UI is ready
+            runOnUiThread(() -> showFFmpegDiagnosticDialog(diagnosticInfo.toString()));
+            
+        } catch (Exception e) {
+            Log.e("PlayerActivity", "❌ Error checking FFmpeg availability: " + e.getMessage(), e);
+        }
+    }
+    
+    private String lastFFmpegDiagnostic = "";
+    
+    /**
+     * Show diagnostic dialog to user (only once on app startup)
+     */
+    private void showFFmpegDiagnosticDialog(String diagnosticText) {
+        try {
+            // Only show once per session (check if dialog already shown)
+            SharedPreferences prefs = getSharedPreferences("app_session", MODE_PRIVATE);
+            boolean alreadyShown = prefs.getBoolean("ffmpeg_diagnostic_shown", false);
+            
+            if (alreadyShown) {
+                Log.d("PlayerActivity", "FFmpeg diagnostic dialog already shown this session");
+                return;
+            }
+            
+            // Check if player activity is ready
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
+            
+            // Build dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(PlayerActivity.this);
+            builder.setTitle("⚙️ Audio Decoder Status")
+                    .setMessage(diagnosticText)
+                    .setPositiveButton("OK", (dialog, which) -> {
+                        dialog.dismiss();
+                        // Mark as shown
+                        getSharedPreferences("app_session", MODE_PRIVATE).edit()
+                            .putBoolean("ffmpeg_diagnostic_shown", true)
+                            .apply();
+                    })
+                    .setCancelable(false);
+            
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            
+        } catch (Exception e) {
+            Log.e("PlayerActivity", "Error showing FFmpeg diagnostic: " + e.getMessage());
+        }
     }
 }

@@ -1,0 +1,11 @@
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://repo.jellyfin.org/releases/server/android/maven" }
+    }
+}
+rootProject.name = "OXOO-TV"
+include ':app'

@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background Poster Image -->
+    <ImageView
+        android:id="@+id/background_poster"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.6"
+        android:contentDescription="Movie Poster Background" />
+
+    <!-- Dark overlay for better text readability -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_gradient_overlay" />
+
+    <!-- Fixed Header Area (Always Visible) -->
+    <LinearLayout
+        android:id="@+id/fixed_header_area"
+        android:layout_width="480dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="60dp"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Movie Logo (if available) -->
+        <ImageView
+            android:id="@+id/hero_movie_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginBottom="4dp"
+            android:scaleType="fitStart"
+            android:adjustViewBounds="true"
+            android:maxWidth="400dp"
+            android:visibility="gone"
+            android:contentDescription="Movie Logo" />
+
+        <!-- Movie Title -->
+        <TextView
+            android:id="@+id/movie_title"
+            android:layout_width="420dp"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-condensed"
+            android:shadowColor="#000000"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="6"
+            android:letterSpacing="0.02"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="20sp"
+            android:autoSizeMaxTextSize="32sp"
+            android:autoSizeStepGranularity="1sp"
+            tools:text="Movie Title" />
+
+    </LinearLayout>
+
+    <!-- Scrollable Content Area -->
+    <ScrollView
+        android:id="@+id/text_area_scroll"
+        android:layout_width="480dp"
+        android:layout_height="match_parent"
+        android:layout_below="@id/fixed_header_area"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="-50dp"
+        android:scrollbars="none"
+        android:fillViewport="false">
+
+    <LinearLayout
+        android:id="@+id/text_area_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="100dp">
+
+        <!-- Hideable Content Container (Movie Info + Description + Buttons + Cast) -->
+        <LinearLayout
+            android:id="@+id/hideable_content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <!-- Movie Info Row: Year, Rating, Quality -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Year -->
+            <TextView
+                android:id="@+id/hero_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/metadata_year_badge"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:shadowColor="@android:color/black"
+                android:shadowRadius="2"
+                tools:text="2024" />
+
+            <!-- TMDB Rating -->
+            <TextView
+                android:id="@+id/hero_imdb_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/metadata_imdb_badge"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:shadowColor="@android:color/black"
+                android:shadowRadius="2"
+                android:gravity="center_vertical"
+                tools:text="8.5" />
+
+            <!-- Quality -->
+            <TextView
+                android:id="@+id/hero_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/metadata_quality_badge"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:shadowColor="@android:color/black"
+                android:shadowRadius="2"
+                tools:text="HD" />
+
+        </LinearLayout>
+
+        <!-- Genre Tags -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/genre_tags_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:listitem="@layout/item_genre_tag" />
+
+        <!-- Movie Description -->
+        <TextView
+            android:id="@+id/movie_description_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="2"
+            android:lineSpacingExtra="4dp"
+            android:maxLines="4"
+            android:ellipsize="end"
+            tools:text="Movie description goes here..." />
+
+        <!-- Action Buttons Container -->
+        <LinearLayout
+            android:id="@+id/action_buttons_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Play Button -->
+            <Button
+                android:id="@+id/play_button"
+                android:layout_width="120dp"
+                android:layout_height="45dp"
+                android:text="▶ Play"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:background="@drawable/bg_button_play"
+                android:layout_marginEnd="12dp"
+                android:focusable="true"
+                android:nextFocusRight="@+id/favorite_button" />
+
+            <!-- Favorite Button -->
+            <Button
+                android:id="@+id/favorite_button"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:text="❤"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/bg_button_favorite"
+                android:focusable="true"
+                android:nextFocusLeft="@+id/play_button" />
+
+        </LinearLayout>
+
+        <!-- Cast & Crew Images (Part of hideable content) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/cast_crew_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:nextFocusDown="@+id/season_selector_button"
+            tools:listitem="@layout/item_cast_member" />
+
+        </LinearLayout>
+
+        <!-- Season Selector (TV Series Only) -->
+        <LinearLayout
+            android:id="@+id/season_selector_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mùa:"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_marginEnd="12dp" />
+
+            <Button
+                android:id="@+id/season_selector_button"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:minWidth="120dp"
+                android:text="Mùa 1"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/bg_button_season_selector"
+                android:padding="8dp"
+                android:focusable="true"
+                android:nextFocusUp="@id/cast_crew_recycler"
+                android:nextFocusDown="@id/episodes_recycler" />
+
+        </LinearLayout>
+
+        <!-- Episodes List (TV Series Only) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/episodes_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            android:nestedScrollingEnabled="false"
+            android:nextFocusUp="@id/season_selector_button"
+            android:nextFocusDown="@id/episodes_prev_button"
+            tools:listitem="@layout/item_episode_list" />
+
+        <!-- Episodes Pagination (TV Series Only) -->
+        <LinearLayout
+            android:id="@+id/episodes_pagination_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/episodes_prev_button"
+                android:layout_width="80dp"
+                android:layout_height="35dp"
+                android:text="← Trước"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/bg_button_pagination"
+                android:layout_marginEnd="16dp"
+                android:focusable="true"
+                android:nextFocusUp="@id/play_button" />
+
+            <TextView
+                android:id="@+id/episodes_page_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 / 3"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:layout_marginHorizontal="16dp" />
+
+            <Button
+                android:id="@+id/episodes_next_button"
+                android:layout_width="80dp"
+                android:layout_height="35dp"
+                android:text="Sau →"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/bg_button_pagination"
+                android:layout_marginStart="16dp"
+                android:focusable="true"
+                android:nextFocusUp="@id/play_button" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

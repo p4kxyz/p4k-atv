@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- pressed -->
+    <item android:state_pressed="true"
+        android:drawable="@drawable/player_button_focus_modern" />
+    <!-- focused -->
+    <item android:state_focused="true"
+        android:drawable="@drawable/player_button_focus_modern" />
+    <!-- selected -->
+    <item android:state_selected="true"
+        android:drawable="@drawable/player_button_focus_modern" />
+    <!-- default -->
+    <item android:drawable="@drawable/player_button_normal_modern" />
+
+</selector>

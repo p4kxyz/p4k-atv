@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1a1a1a"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Filter Bar - Fixed at top -->
+    <LinearLayout
+        android:id="@+id/filter_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#2196F3"
+        android:paddingStart="12dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="4dp"
+        android:elevation="4dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tv_filter_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BỘ LỌC:"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btn_filter_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Thể Loại"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:background="#4CAF50"
+            android:layout_marginEnd="6dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <Button
+            android:id="@+id/btn_filter_country"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Quốc Gia"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:background="#4CAF50"
+            android:layout_marginEnd="6dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <Button
+            android:id="@+id/btn_filter_year"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Năm"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:background="#4CAF50"
+            android:layout_marginEnd="6dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <Button
+            android:id="@+id/btn_clear_filters"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Xóa Lọc"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:background="#E53935"
+            android:minWidth="70dp"
+            android:layout_marginStart="8dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <TextView
+            android:id="@+id/tv_active_filters"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:layout_marginStart="12dp"
+            android:gravity="end|center_vertical" />
+    </LinearLayout>
+
+    <!-- VerticalGridView directly - not using GridFragment's view -->
+    <androidx.leanback.widget.VerticalGridView
+        android:id="@+id/browse_grid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="16dp"
+        android:paddingStart="48dp"
+        android:paddingEnd="48dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+</LinearLayout>

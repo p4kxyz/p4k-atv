@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="135dp"
+    android:layout_height="203dp"
+    android:minWidth="135dp"
+    android:minHeight="203dp"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:padding="1dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:background="@drawable/thumbnail_focus_selector">
+
+    <!-- Thumbnail Image -->
+    <ImageView
+        android:id="@+id/thumbnail_image"
+        android:layout_width="133dp"
+        android:layout_height="201dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="false" />
+
+</FrameLayout>

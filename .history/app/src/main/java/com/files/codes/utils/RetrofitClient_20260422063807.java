@@ -33,6 +33,25 @@ public class RetrofitClient {
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request request = chain.request();
+                    HttpUrl url = request.url();
+                    String path = url.encodedPath();
+
+                    // Force-redirect legacy genre filter endpoint to /movies.
+                    if (path.endsWith("/content_by_genre_id")) {
+                        HttpUrl.Builder builder = url.newBuilder();
+                        String id = url.queryParameter("id");
+
+                        builder.encodedPath(path.replace("/content_by_genre_id", "/movies"));
+                        builder.removeAllQueryParameters("id");
+
+                        if (id != null && !id.trim().isEmpty()) {
+                            builder.addQueryParameter("genre_id", id);
+                        }
+
+                        HttpUrl rewrittenUrl = builder.build();
+                        request = request.newBuilder().url(rewrittenUrl).build();
+                    }
+
                     return chain.proceed(request);
                 })
             .addInterceptor(new BasicAuthInterceptor(API_USER_NAME, API_PASSWORD))

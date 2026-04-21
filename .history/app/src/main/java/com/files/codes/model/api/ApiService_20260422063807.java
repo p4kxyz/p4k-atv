@@ -75,15 +75,15 @@ public interface ApiService {
     Single<List<Movie>> getMoviesSingle(@Header("API-KEY") String apiKey,
                                         @Query("page") int page);
 
-    @GET("content_by_genre_id")
+    @GET("movies")
     Call<List<Movie>> getMovieByGenre(@Header("API-KEY") String apiKey,
-                                      @Query("id") String id,
+                                      @Query("genre_id") String id,
                                       @Query("page") int page_num);
 
 
     @GET("content_by_country_id")
     Call<List<Movie>> getMovieByCountry(@Header("API-KEY") String apiKey,
-                                        @Query("id") String id,
+                                        @Query("country_id") String id,
                                         @Query("page") int page_number);
 
     @GET("latest_movies")

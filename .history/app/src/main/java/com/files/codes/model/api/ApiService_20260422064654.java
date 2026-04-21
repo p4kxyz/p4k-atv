@@ -77,7 +77,7 @@ public interface ApiService {
 
     @GET("content_by_genre_id")
     Call<List<Movie>> getMovieByGenre(@Header("API-KEY") String apiKey,
-                                      @Query("id") String id,
+                                      @Query("genre_id") String id,
                                       @Query("page") int page_num);
 
 

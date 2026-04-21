@@ -198,7 +198,7 @@
             android:padding="8dp"
             android:background="@drawable/player_button_modern"
             android:elevation="4dp"
-            android:src="@drawable/ic_secondary_translate_white_24dp"
+            android:src="@drawable/ic_audio_settings_white_24dp"
             android:contentDescription="Secondary Subtitle Settings" />
 
         <ImageButton

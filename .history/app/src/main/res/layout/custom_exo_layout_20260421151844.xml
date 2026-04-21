@@ -7,9 +7,9 @@
     android:layout_marginEnd="20dp"
     android:layoutDirection="ltr"
     tools:targetApi="28">
+<View android:id="@+id/exo_controls_background" android:layout_width="0dp" android:layout_height="0dp"/>
+<View android:id="@+id/exo_bottom_bar" android:layout_width="0dp" android:layout_height="0dp"/>
 
-    <View android:id="@+id/exo_controls_background" android:layout_width="0dp" android:layout_height="0dp"/>
-    <View android:id="@+id/exo_bottom_bar" android:layout_width="0dp" android:layout_height="0dp"/>
 
     <RelativeLayout
         android:id="@+id/info_layout"
@@ -22,27 +22,20 @@
 
         <ImageView
             android:id="@+id/poster_image_view"
-            android:layout_width="120dp"
-            android:layout_height="200dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
             android:contentDescription="@string/poster" />
-
-        <ImageView
-            android:id="@+id/poster_image_view_for_tv"
-            android:layout_width="200dp"
-            android:layout_height="120dp"
-            android:contentDescription="@string/poster"
-            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/movie_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/poster_image_view"
             android:textColor="@android:color/white"
             android:textSize="30sp"
-            android:fontFamily="sans-serif-condensed"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"
             tools:text="Title" />
 
         <TextView
@@ -52,11 +45,10 @@
             android:layout_below="@id/movie_title"
             android:layout_marginStart="10dp"
             android:layout_marginTop="-5dp"
-            android:layout_toEndOf="@id/poster_image_view"
+            android:textColor="#B3FFFFFF"
+            android:textSize="16sp"
             android:fontFamily="sans-serif-light"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            tools:text="Description" />
+            tools:text="Filename.mkv" />
     </RelativeLayout>
 
     <View
@@ -83,7 +75,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
             android:padding="10dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="6dp"
             android:src="@drawable/ic_fast_rewind_white_24dp"
             android:contentDescription="Rewind 10s" />
@@ -95,7 +87,7 @@
             android:layout_height="56dp"
             android:padding="12dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="8dp"
             android:contentDescription="Play" />
 
@@ -106,7 +98,7 @@
             android:layout_height="56dp"
             android:padding="12dp"
             android:layout_marginEnd="24dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="8dp"
             android:contentDescription="Pause" />
 
@@ -117,13 +109,11 @@
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
             android:padding="10dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="6dp"
             android:src="@drawable/ic_fast_forward_white_24dp"
             android:contentDescription="Forward 10s" />
             
-
-
         <!-- Previous Episode Button (TV Series only) -->
         <ImageButton
             android:id="@+id/btn_previous_episode"
@@ -132,9 +122,9 @@
             android:layout_height="48dp"
             android:layout_marginEnd="12dp"
             android:padding="10dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="6dp"
-            android:src="@drawable/ic_skip_previous_white_24dp"
+            android:src="@drawable/ic_fast_rewind_white_24dp"
             android:visibility="gone"
             android:contentDescription="Previous Episode" />
 
@@ -146,9 +136,9 @@
             android:layout_height="48dp"
             android:layout_marginEnd="16dp"
             android:padding="10dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="6dp"
-            android:src="@drawable/ic_skip_next_white_24dp"
+            android:src="@drawable/ic_fast_forward_white_24dp"
             android:visibility="gone"
             android:contentDescription="Next Episode" />
 
@@ -159,7 +149,7 @@
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:padding="8dp"
             android:elevation="4dp"
             android:src="@drawable/ic_server_white_24dp"
@@ -172,7 +162,7 @@
             android:layout_height="44dp"
             android:layout_marginEnd="10dp"
             android:padding="8dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="4dp"
             android:src="@drawable/ic_subtitles_white_24dp"
             android:contentDescription="Subtitles" />
@@ -184,7 +174,7 @@
             android:layout_height="44dp"
             android:layout_marginEnd="10dp"
             android:padding="8dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="4dp"
             android:src="@drawable/ic_settings_white"
             android:contentDescription="Subtitle Settings" />
@@ -196,9 +186,9 @@
             android:layout_height="44dp"
             android:layout_marginEnd="10dp"
             android:padding="8dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="4dp"
-            android:src="@drawable/ic_secondary_translate_white_24dp"
+            android:src="@drawable/ic_audio_settings_white_24dp"
             android:contentDescription="Secondary Subtitle Settings" />
 
         <ImageButton
@@ -208,7 +198,7 @@
             android:layout_height="44dp"
             android:layout_marginEnd="10dp"
             android:padding="8dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="4dp"
             android:src="@drawable/ic_audiotrack_white_24dp"
             android:contentDescription="Audio Settings" />
@@ -220,7 +210,7 @@
             android:layout_height="44dp"
             android:layout_marginEnd="16dp"
             android:padding="8dp"
-            android:background="@drawable/player_button_modern"
+            android:background="@drawable/button_focus"
             android:elevation="4dp"
             android:src="@drawable/ic_aspect_ratio_white_24dp"
             android:contentDescription="Aspect Ratio" />

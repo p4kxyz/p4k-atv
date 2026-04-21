@@ -163,14 +163,8 @@ public class PlayerActivity extends Activity {
         private static final String PREF_SECONDARY_SUBTITLE_URL = "secondary_subtitle_url";
         private static final String PREF_SECONDARY_SUBTITLE_LABEL = "secondary_subtitle_label";
         private static final String PREF_SECONDARY_FONT_SIZE = "secondary_font_size";
-        private static final String PREF_SECONDARY_FONT_TYPE = "secondary_font_type";
         private static final String PREF_SECONDARY_TEXT_COLOR = "secondary_text_color";
         private static final String PREF_SECONDARY_VERTICAL_OFFSET = "secondary_vertical_offset";
-        private static final String PREF_SECONDARY_BACKGROUND = "secondary_background";
-        private static final String PREF_SECONDARY_BACKGROUND_COLOR = "secondary_background_color";
-        private static final String PREF_SECONDARY_OUTLINE_COLOR = "secondary_outline_color";
-        private static final String PREF_SECONDARY_OUTLINE_THICKNESS_PT = "secondary_outline_thickness_pt";
-        private static final String PREF_SECONDARY_BOUND_SOURCE_KEY = "secondary_bound_source_key";
         private static final long SECONDARY_SUBTITLE_TICK_MS = 200L;
         private static final String[] SUBTITLE_COLOR_NAMES = {"Trắng", "Vàng", "Đỏ", "Xanh lá", "Xanh dương", "Cam", "Hồng", "Xanh lơ"};
         private static final int[] SUBTITLE_COLOR_VALUES = {Color.WHITE, Color.YELLOW, Color.RED, Color.GREEN,
@@ -2302,6 +2296,21 @@ public class PlayerActivity extends Activity {
 
         Button closeBt = view.findViewById(R.id.close_bt);
         closeBt.setOnClickListener(v -> dialog.dismiss());
+        
+        // Playback speed buttons
+        Button speed05 = view.findViewById(R.id.speed_0_5);
+        Button speed075 = view.findViewById(R.id.speed_0_75);
+        Button speed10 = view.findViewById(R.id.speed_1_0);
+        Button speed15 = view.findViewById(R.id.speed_1_5);
+        Button speed20 = view.findViewById(R.id.speed_2_0);
+        Button speed30 = view.findViewById(R.id.speed_3_0);
+
+        speed05.setOnClickListener(v -> setPlaybackSpeed(0.5f));
+        speed075.setOnClickListener(v -> setPlaybackSpeed(0.75f));
+        speed10.setOnClickListener(v -> setPlaybackSpeed(1.0f));
+        speed15.setOnClickListener(v -> setPlaybackSpeed(1.5f));
+        speed20.setOnClickListener(v -> setPlaybackSpeed(2.0f));
+        speed30.setOnClickListener(v -> setPlaybackSpeed(3.0f));
 
         dialog.show();
     }
@@ -2359,7 +2368,6 @@ public class PlayerActivity extends Activity {
         
         // Store current video URL for subtitle loading
         this.url = url;
-        resetSecondarySubtitleStateForPlayback(url);
 
         progressBar.setVisibility(VISIBLE);
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(PlayerActivity.this).build();
@@ -4913,11 +4921,13 @@ public class PlayerActivity extends Activity {
         }
 
         secondarySubtitleView = new TextView(this);
+        secondarySubtitleView.setTextColor(Color.YELLOW);
+        secondarySubtitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         secondarySubtitleView.setGravity(Gravity.CENTER);
+        secondarySubtitleView.setShadowLayer(3f, 0f, 0f, Color.BLACK);
         secondarySubtitleView.setVisibility(View.GONE);
         secondarySubtitleView.setFocusable(false);
         secondarySubtitleView.setClickable(false);
-        secondarySubtitleView.setIncludeFontPadding(false);
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -4935,27 +4945,8 @@ public class PlayerActivity extends Activity {
         }
 
         int secondaryFontSize = prefs.getInt(PREF_SECONDARY_FONT_SIZE, 18);
-        int secondaryFontType = prefs.getInt(PREF_SECONDARY_FONT_TYPE, 4);
         int secondaryColorIndex = prefs.getInt(PREF_SECONDARY_TEXT_COLOR, 1);
         int secondaryOffset = prefs.getInt(PREF_SECONDARY_VERTICAL_OFFSET, -8);
-        boolean secondaryBackgroundEnabled = prefs.getBoolean(PREF_SECONDARY_BACKGROUND, false);
-        int[] secondaryBackgroundColorValues = {0xB3000000, 0xB3282828, 0xB33B2F2F, 0xB3202D4A, 0xB31F4A3A};
-        int secondaryBackgroundColorIndex = prefs.getInt(PREF_SECONDARY_BACKGROUND_COLOR, 0);
-        if (secondaryBackgroundColorIndex < 0 || secondaryBackgroundColorIndex >= secondaryBackgroundColorValues.length) {
-            secondaryBackgroundColorIndex = 0;
-            prefs.edit().putInt(PREF_SECONDARY_BACKGROUND_COLOR, secondaryBackgroundColorIndex).apply();
-        }
-        int[] secondaryOutlineColorValues = {Color.TRANSPARENT, Color.BLACK, Color.WHITE, Color.RED, Color.BLUE, Color.YELLOW};
-        int secondaryOutlineColorIndex = prefs.getInt(PREF_SECONDARY_OUTLINE_COLOR, 1);
-        if (secondaryOutlineColorIndex < 0 || secondaryOutlineColorIndex >= secondaryOutlineColorValues.length) {
-            secondaryOutlineColorIndex = 1;
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_COLOR, secondaryOutlineColorIndex).apply();
-        }
-        int secondaryOutlineThicknessPt = prefs.getInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, -1);
-        if (secondaryOutlineThicknessPt < 0) {
-            secondaryOutlineThicknessPt = 2;
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, secondaryOutlineThicknessPt).apply();
-        }
 
         if (secondaryColorIndex < 0 || secondaryColorIndex >= SUBTITLE_COLOR_VALUES.length) {
             secondaryColorIndex = 1;
@@ -4964,46 +4955,6 @@ public class PlayerActivity extends Activity {
 
         secondarySubtitleView.setTextColor(SUBTITLE_COLOR_VALUES[secondaryColorIndex]);
         secondarySubtitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, secondaryFontSize);
-
-        Typeface secondaryTypeface = Typeface.DEFAULT;
-        if (secondaryFontType == 1) secondaryTypeface = Typeface.SANS_SERIF;
-        else if (secondaryFontType == 2) secondaryTypeface = Typeface.SERIF;
-        else if (secondaryFontType == 3) secondaryTypeface = Typeface.MONOSPACE;
-        else if (secondaryFontType == 4) {
-            try {
-                secondaryTypeface = Typeface.createFromAsset(getAssets(), "fonts/fontphimmoi.ttf");
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to load secondary phimmoi font", e);
-                secondaryTypeface = Typeface.DEFAULT;
-            }
-        } else if (secondaryFontType == 5) {
-            try {
-                secondaryTypeface = Typeface.createFromAsset(getAssets(), "fonts/uvnhonghahep-b.ttf");
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to load secondary custom font", e);
-                secondaryTypeface = Typeface.DEFAULT;
-            }
-        }
-        secondarySubtitleView.setTypeface(secondaryTypeface);
-
-        float secondaryOutlineWidthPx = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_PT,
-                secondaryOutlineThicknessPt,
-                getResources().getDisplayMetrics()
-        );
-
-        if (secondaryOutlineThicknessPt > 0 && secondaryOutlineColorValues[secondaryOutlineColorIndex] != Color.TRANSPARENT) {
-            secondarySubtitleView.setShadowLayer(secondaryOutlineWidthPx, 0f, 0f, secondaryOutlineColorValues[secondaryOutlineColorIndex]);
-        } else {
-            secondarySubtitleView.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT);
-        }
-
-        android.graphics.drawable.GradientDrawable secondaryBackground = new android.graphics.drawable.GradientDrawable();
-        secondaryBackground.setCornerRadius(dp(10));
-        secondaryBackground.setColor(secondaryBackgroundEnabled ? secondaryBackgroundColorValues[secondaryBackgroundColorIndex] : Color.TRANSPARENT);
-        secondarySubtitleView.setBackground(secondaryBackground);
-        secondarySubtitleView.setPadding(dp(14), dp(8), dp(14), dp(8));
-        secondarySubtitleView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) secondarySubtitleView.getLayoutParams();
         if (params == null) {
@@ -5022,33 +4973,6 @@ public class PlayerActivity extends Activity {
         params.setMargins(dp(28), dp(8), dp(28), bottomMargin);
         secondarySubtitleView.setLayoutParams(params);
         secondarySubtitleView.bringToFront();
-    }
-
-    private void resetSecondarySubtitleStateForPlayback(String playbackSourceKey) {
-        if (isNullOrEmpty(playbackSourceKey)) {
-            return;
-        }
-
-        SharedPreferences prefs = getSharedPreferences("subtitle_settings", MODE_PRIVATE);
-        String savedSourceKey = prefs.getString(PREF_SECONDARY_BOUND_SOURCE_KEY, "");
-        if (playbackSourceKey.equals(savedSourceKey)) {
-            return;
-        }
-
-        prefs.edit()
-                .putString(PREF_SECONDARY_BOUND_SOURCE_KEY, playbackSourceKey)
-                .putBoolean(PREF_BILINGUAL_ENABLED, false)
-                .putString(PREF_SECONDARY_SUBTITLE_URL, "")
-                .putString(PREF_SECONDARY_SUBTITLE_LABEL, "Chưa chọn")
-                .apply();
-
-        bilingualSubtitleEnabled = false;
-        selectedSecondarySubtitleUrl = "";
-        loadedSecondarySubtitleUrl = "";
-        secondarySubtitleEntries.clear();
-        currentSecondarySubtitleIndex = -1;
-        clearSecondarySubtitleDisplay();
-        stopSecondarySubtitleTicker();
     }
 
     private void ensureSecondarySubtitleLoaded(boolean showLoadingToast) {
@@ -6137,12 +6061,6 @@ public class PlayerActivity extends Activity {
         speed10.setTextSize(12);
         speed10.setTextColor(0xFFFFFFFF);
         speed10.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        Button speed125 = new Button(this);
-        speed125.setText("1.25x");
-        speed125.setTextSize(12);
-        speed125.setTextColor(0xFFFFFFFF);
-        speed125.setBackground(createDialogButtonBackground(0xFF3A3A4C));
         
         Button speed15 = new Button(this);
         speed15.setText("1.5x");
@@ -6165,7 +6083,6 @@ public class PlayerActivity extends Activity {
         setDialogButtonSelected(speed05, currentSpeed == 0.5f);
         setDialogButtonSelected(speed075, currentSpeed == 0.75f);
         setDialogButtonSelected(speed10, currentSpeed == 1.0f);
-        setDialogButtonSelected(speed125, currentSpeed == 1.25f);
         setDialogButtonSelected(speed15, currentSpeed == 1.5f);
         setDialogButtonSelected(speed20, currentSpeed == 2.0f);
         setDialogButtonSelected(speed30, currentSpeed == 3.0f);
@@ -6173,7 +6090,6 @@ public class PlayerActivity extends Activity {
         playbackSpeedLayout.addView(speed05);
         playbackSpeedLayout.addView(speed075);
         playbackSpeedLayout.addView(speed10);
-        playbackSpeedLayout.addView(speed125);
         playbackSpeedLayout.addView(speed15);
         playbackSpeedLayout.addView(speed20);
         playbackSpeedLayout.addView(speed30);
@@ -6206,7 +6122,6 @@ public class PlayerActivity extends Activity {
         applyWhiteFocusBorder(speed05);
         applyWhiteFocusBorder(speed075);
         applyWhiteFocusBorder(speed10);
-        applyWhiteFocusBorder(speed125);
         applyWhiteFocusBorder(speed15);
         applyWhiteFocusBorder(speed20);
         applyWhiteFocusBorder(speed30);
@@ -6459,7 +6374,6 @@ public class PlayerActivity extends Activity {
             if (v == speed05) speed = 0.5f;
             else if (v == speed075) speed = 0.75f;
             else if (v == speed10) speed = 1.0f;
-            else if (v == speed125) speed = 1.25f;
             else if (v == speed15) speed = 1.5f;
             else if (v == speed20) speed = 2.0f;
             else if (v == speed30) speed = 3.0f;
@@ -6468,7 +6382,6 @@ public class PlayerActivity extends Activity {
             setDialogButtonSelected(speed05, v == speed05);
             setDialogButtonSelected(speed075, v == speed075);
             setDialogButtonSelected(speed10, v == speed10);
-            setDialogButtonSelected(speed125, v == speed125);
             setDialogButtonSelected(speed15, v == speed15);
             setDialogButtonSelected(speed20, v == speed20);
             setDialogButtonSelected(speed30, v == speed30);
@@ -6481,7 +6394,6 @@ public class PlayerActivity extends Activity {
         speed05.setOnClickListener(speedClickListener);
         speed075.setOnClickListener(speedClickListener);
         speed10.setOnClickListener(speedClickListener);
-        speed125.setOnClickListener(speedClickListener);
         speed15.setOnClickListener(speedClickListener);
         speed20.setOnClickListener(speedClickListener);
         speed30.setOnClickListener(speedClickListener);
@@ -6708,166 +6620,6 @@ public class PlayerActivity extends Activity {
         secondaryPositionLayout.addView(secondaryPositionTV);
         secondaryPositionLayout.addView(secondaryPositionDownBtn);
 
-        String[] secondaryFontNames = {"Mặc định", "Sans", "Serif", "Monospace", "Phimmoi", "UVN Hồng Hà"};
-        int currentSecondaryFontType = prefs.getInt(PREF_SECONDARY_FONT_TYPE, 4);
-        if (currentSecondaryFontType < 0 || currentSecondaryFontType >= secondaryFontNames.length) {
-            currentSecondaryFontType = 4;
-            prefs.edit().putInt(PREF_SECONDARY_FONT_TYPE, currentSecondaryFontType).apply();
-        }
-
-        TextView secondaryFontTypeLabel = new TextView(this);
-        secondaryFontTypeLabel.setTextColor(0xFFFFFFFF);
-        secondaryFontTypeLabel.setText("Kiểu chữ phụ đề 2:");
-        secondaryFontTypeLabel.setTextSize(16);
-        secondaryFontTypeLabel.setPadding(0, 20, 0, 10);
-
-        LinearLayout secondaryFontTypeLayout = new LinearLayout(this);
-        secondaryFontTypeLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        Button secondaryFontTypePrevBtn = new Button(this);
-        secondaryFontTypePrevBtn.setText("◀");
-        secondaryFontTypePrevBtn.setTextColor(0xFFFFFFFF);
-        secondaryFontTypePrevBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        Button secondaryFontTypeNextBtn = new Button(this);
-        secondaryFontTypeNextBtn.setText("▶");
-        secondaryFontTypeNextBtn.setTextColor(0xFFFFFFFF);
-        secondaryFontTypeNextBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        TextView secondaryFontTypeTV = new TextView(this);
-        secondaryFontTypeTV.setTextColor(0xFFFFFFFF);
-        secondaryFontTypeTV.setText(secondaryFontNames[currentSecondaryFontType]);
-        secondaryFontTypeTV.setGravity(Gravity.CENTER);
-        secondaryFontTypeTV.setPadding(20, 0, 20, 0);
-
-        secondaryFontTypeLayout.addView(secondaryFontTypePrevBtn);
-        secondaryFontTypeLayout.addView(secondaryFontTypeTV);
-        secondaryFontTypeLayout.addView(secondaryFontTypeNextBtn);
-
-        LinearLayout secondaryBackgroundLayout = new LinearLayout(this);
-        secondaryBackgroundLayout.setOrientation(LinearLayout.HORIZONTAL);
-        secondaryBackgroundLayout.setPadding(0, 20, 0, 10);
-
-        TextView secondaryBackgroundLabel = new TextView(this);
-        secondaryBackgroundLabel.setTextColor(0xFFFFFFFF);
-        secondaryBackgroundLabel.setText("Nền phụ đề 2:");
-        secondaryBackgroundLabel.setTextSize(16);
-
-        Switch secondaryBackgroundSwitch = new Switch(this);
-        secondaryBackgroundSwitch.setTextColor(0xFFFFFFFF);
-        secondaryBackgroundSwitch.setChecked(prefs.getBoolean(PREF_SECONDARY_BACKGROUND, false));
-
-        secondaryBackgroundLayout.addView(secondaryBackgroundLabel);
-        secondaryBackgroundLayout.addView(secondaryBackgroundSwitch);
-
-        String[] secondaryBackgroundNames = {"Đen", "Xám đậm", "Nâu đậm", "Xanh đậm", "Xanh rêu"};
-        int[] secondaryBackgroundPreviewValues = {0xFF000000, 0xFF282828, 0xFF3B2F2F, 0xFF20304A, 0xFF1F4A3A};
-        int currentSecondaryBackgroundColor = prefs.getInt(PREF_SECONDARY_BACKGROUND_COLOR, 0);
-        if (currentSecondaryBackgroundColor < 0 || currentSecondaryBackgroundColor >= secondaryBackgroundNames.length) {
-            currentSecondaryBackgroundColor = 0;
-            prefs.edit().putInt(PREF_SECONDARY_BACKGROUND_COLOR, currentSecondaryBackgroundColor).apply();
-        }
-
-        TextView secondaryBackgroundColorLabel = new TextView(this);
-        secondaryBackgroundColorLabel.setTextColor(0xFFFFFFFF);
-        secondaryBackgroundColorLabel.setText("Màu nền phụ đề 2:");
-        secondaryBackgroundColorLabel.setTextSize(16);
-        secondaryBackgroundColorLabel.setPadding(0, 10, 0, 10);
-
-        LinearLayout secondaryBackgroundColorLayout = new LinearLayout(this);
-        secondaryBackgroundColorLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        Button secondaryBackgroundColorPrevBtn = new Button(this);
-        secondaryBackgroundColorPrevBtn.setText("◀");
-        secondaryBackgroundColorPrevBtn.setTextColor(0xFFFFFFFF);
-        secondaryBackgroundColorPrevBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        Button secondaryBackgroundColorNextBtn = new Button(this);
-        secondaryBackgroundColorNextBtn.setText("▶");
-        secondaryBackgroundColorNextBtn.setTextColor(0xFFFFFFFF);
-        secondaryBackgroundColorNextBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        TextView secondaryBackgroundColorTV = new TextView(this);
-        secondaryBackgroundColorTV.setText(secondaryBackgroundNames[currentSecondaryBackgroundColor]);
-        secondaryBackgroundColorTV.setTextColor(secondaryBackgroundPreviewValues[currentSecondaryBackgroundColor]);
-        secondaryBackgroundColorTV.setGravity(Gravity.CENTER);
-        secondaryBackgroundColorTV.setPadding(20, 0, 20, 0);
-
-        secondaryBackgroundColorLayout.addView(secondaryBackgroundColorPrevBtn);
-        secondaryBackgroundColorLayout.addView(secondaryBackgroundColorTV);
-        secondaryBackgroundColorLayout.addView(secondaryBackgroundColorNextBtn);
-
-        TextView secondaryOutlineColorLabel = new TextView(this);
-        secondaryOutlineColorLabel.setTextColor(0xFFFFFFFF);
-        secondaryOutlineColorLabel.setText("Màu viền phụ đề 2:");
-        secondaryOutlineColorLabel.setTextSize(16);
-        secondaryOutlineColorLabel.setPadding(0, 20, 0, 10);
-
-        LinearLayout secondaryOutlineColorLayout = new LinearLayout(this);
-        secondaryOutlineColorLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        Button secondaryOutlineColorPrevBtn = new Button(this);
-        secondaryOutlineColorPrevBtn.setText("◀");
-        secondaryOutlineColorPrevBtn.setTextColor(0xFFFFFFFF);
-        secondaryOutlineColorPrevBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        Button secondaryOutlineColorNextBtn = new Button(this);
-        secondaryOutlineColorNextBtn.setText("▶");
-        secondaryOutlineColorNextBtn.setTextColor(0xFFFFFFFF);
-        secondaryOutlineColorNextBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        String[] secondaryOutlineColorNames = {"Trong suốt", "Đen", "Trắng", "Đỏ", "Xanh dương", "Vàng"};
-        int[] secondaryOutlineColorValues = {Color.TRANSPARENT, Color.BLACK, Color.WHITE, Color.RED, Color.BLUE, Color.YELLOW};
-        int currentSecondaryOutlineColor = prefs.getInt(PREF_SECONDARY_OUTLINE_COLOR, 1);
-        if (currentSecondaryOutlineColor < 0 || currentSecondaryOutlineColor >= secondaryOutlineColorNames.length) {
-            currentSecondaryOutlineColor = 1;
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_COLOR, currentSecondaryOutlineColor).apply();
-        }
-
-        TextView secondaryOutlineColorTV = new TextView(this);
-        secondaryOutlineColorTV.setText(secondaryOutlineColorNames[currentSecondaryOutlineColor]);
-        secondaryOutlineColorTV.setTextColor(currentSecondaryOutlineColor == 0 ? Color.GRAY : secondaryOutlineColorValues[currentSecondaryOutlineColor]);
-        secondaryOutlineColorTV.setGravity(Gravity.CENTER);
-        secondaryOutlineColorTV.setPadding(20, 0, 20, 0);
-
-        secondaryOutlineColorLayout.addView(secondaryOutlineColorPrevBtn);
-        secondaryOutlineColorLayout.addView(secondaryOutlineColorTV);
-        secondaryOutlineColorLayout.addView(secondaryOutlineColorNextBtn);
-
-        TextView secondaryOutlineThicknessLabel = new TextView(this);
-        secondaryOutlineThicknessLabel.setTextColor(0xFFFFFFFF);
-        secondaryOutlineThicknessLabel.setText("Độ dày viền phụ đề 2:");
-        secondaryOutlineThicknessLabel.setTextSize(16);
-        secondaryOutlineThicknessLabel.setPadding(0, 20, 0, 10);
-
-        LinearLayout secondaryOutlineThicknessLayout = new LinearLayout(this);
-        secondaryOutlineThicknessLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        Button secondaryOutlineThicknessPrevBtn = new Button(this);
-        secondaryOutlineThicknessPrevBtn.setText("◀");
-        secondaryOutlineThicknessPrevBtn.setTextColor(0xFFFFFFFF);
-        secondaryOutlineThicknessPrevBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        Button secondaryOutlineThicknessNextBtn = new Button(this);
-        secondaryOutlineThicknessNextBtn.setText("▶");
-        secondaryOutlineThicknessNextBtn.setTextColor(0xFFFFFFFF);
-        secondaryOutlineThicknessNextBtn.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        TextView secondaryOutlineThicknessTV = new TextView(this);
-        secondaryOutlineThicknessTV.setTextColor(0xFFFFFFFF);
-        int currentSecondaryOutlineThicknessPt = prefs.getInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, 2);
-        if (currentSecondaryOutlineThicknessPt < 0 || currentSecondaryOutlineThicknessPt > 8) {
-            currentSecondaryOutlineThicknessPt = 2;
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, currentSecondaryOutlineThicknessPt).apply();
-        }
-        secondaryOutlineThicknessTV.setText(currentSecondaryOutlineThicknessPt + "pt");
-        secondaryOutlineThicknessTV.setGravity(Gravity.CENTER);
-        secondaryOutlineThicknessTV.setPadding(20, 0, 20, 0);
-
-        secondaryOutlineThicknessLayout.addView(secondaryOutlineThicknessPrevBtn);
-        secondaryOutlineThicknessLayout.addView(secondaryOutlineThicknessTV);
-        secondaryOutlineThicknessLayout.addView(secondaryOutlineThicknessNextBtn);
-
         Button resetSecondaryBtn = new Button(this);
         resetSecondaryBtn.setText("Khôi phục phụ đề 2 mặc định");
         resetSecondaryBtn.setTextColor(0xFFFFFFFF);
@@ -6876,18 +6628,10 @@ public class PlayerActivity extends Activity {
         applyWhiteFocusBorder(chooseSecondarySubtitleBtn);
         applyWhiteFocusBorder(secondaryFontSizeMinusBtn);
         applyWhiteFocusBorder(secondaryFontSizePlusBtn);
-        applyWhiteFocusBorder(secondaryFontTypePrevBtn);
-        applyWhiteFocusBorder(secondaryFontTypeNextBtn);
         applyWhiteFocusBorder(secondaryColorPrevBtn);
         applyWhiteFocusBorder(secondaryColorNextBtn);
         applyWhiteFocusBorder(secondaryPositionUpBtn);
         applyWhiteFocusBorder(secondaryPositionDownBtn);
-        applyWhiteFocusBorder(secondaryBackgroundColorPrevBtn);
-        applyWhiteFocusBorder(secondaryBackgroundColorNextBtn);
-        applyWhiteFocusBorder(secondaryOutlineColorPrevBtn);
-        applyWhiteFocusBorder(secondaryOutlineColorNextBtn);
-        applyWhiteFocusBorder(secondaryOutlineThicknessPrevBtn);
-        applyWhiteFocusBorder(secondaryOutlineThicknessNextBtn);
         applyWhiteFocusBorder(resetSecondaryBtn);
 
         layout.addView(bilingualLayout);
@@ -6895,17 +6639,8 @@ public class PlayerActivity extends Activity {
         layout.addView(secondarySubtitlePickerLayout);
         layout.addView(secondaryFontSizeLabel);
         layout.addView(secondaryFontSizeLayout);
-        layout.addView(secondaryFontTypeLabel);
-        layout.addView(secondaryFontTypeLayout);
         layout.addView(secondaryTextColorLabel);
         layout.addView(secondaryTextColorLayout);
-        layout.addView(secondaryBackgroundLayout);
-        layout.addView(secondaryBackgroundColorLabel);
-        layout.addView(secondaryBackgroundColorLayout);
-        layout.addView(secondaryOutlineColorLabel);
-        layout.addView(secondaryOutlineColorLayout);
-        layout.addView(secondaryOutlineThicknessLabel);
-        layout.addView(secondaryOutlineThicknessLayout);
         layout.addView(secondaryPositionLabel);
         layout.addView(secondaryPositionLayout);
         layout.addView(resetSecondaryBtn);
@@ -6915,28 +6650,14 @@ public class PlayerActivity extends Activity {
             chooseSecondarySubtitleBtn.setEnabled(enabled);
             secondaryFontSizeMinusBtn.setEnabled(enabled);
             secondaryFontSizePlusBtn.setEnabled(enabled);
-            secondaryFontTypePrevBtn.setEnabled(enabled);
-            secondaryFontTypeNextBtn.setEnabled(enabled);
             secondaryColorPrevBtn.setEnabled(enabled);
             secondaryColorNextBtn.setEnabled(enabled);
-            secondaryBackgroundSwitch.setEnabled(enabled);
-            secondaryBackgroundColorPrevBtn.setEnabled(enabled);
-            secondaryBackgroundColorNextBtn.setEnabled(enabled);
-            secondaryOutlineColorPrevBtn.setEnabled(enabled);
-            secondaryOutlineColorNextBtn.setEnabled(enabled);
-            secondaryOutlineThicknessPrevBtn.setEnabled(enabled);
-            secondaryOutlineThicknessNextBtn.setEnabled(enabled);
             secondaryPositionUpBtn.setEnabled(enabled);
             secondaryPositionDownBtn.setEnabled(enabled);
             float alpha = enabled ? 1f : 0.45f;
             secondarySubtitlePickerLayout.setAlpha(alpha);
             secondaryFontSizeLayout.setAlpha(alpha);
-            secondaryFontTypeLayout.setAlpha(alpha);
             secondaryTextColorLayout.setAlpha(alpha);
-            secondaryBackgroundLayout.setAlpha(alpha);
-            secondaryBackgroundColorLayout.setAlpha(alpha);
-            secondaryOutlineColorLayout.setAlpha(alpha);
-            secondaryOutlineThicknessLayout.setAlpha(alpha);
             secondaryPositionLayout.setAlpha(alpha);
         };
 
@@ -6970,22 +6691,6 @@ public class PlayerActivity extends Activity {
             }
         });
 
-        secondaryFontTypePrevBtn.setOnClickListener(v -> {
-            int currentType = prefs.getInt(PREF_SECONDARY_FONT_TYPE, 4);
-            currentType = (currentType - 1 + secondaryFontNames.length) % secondaryFontNames.length;
-            prefs.edit().putInt(PREF_SECONDARY_FONT_TYPE, currentType).apply();
-            secondaryFontTypeTV.setText(secondaryFontNames[currentType]);
-            applySubtitleSettings();
-        });
-
-        secondaryFontTypeNextBtn.setOnClickListener(v -> {
-            int currentType = prefs.getInt(PREF_SECONDARY_FONT_TYPE, 4);
-            currentType = (currentType + 1) % secondaryFontNames.length;
-            prefs.edit().putInt(PREF_SECONDARY_FONT_TYPE, currentType).apply();
-            secondaryFontTypeTV.setText(secondaryFontNames[currentType]);
-            applySubtitleSettings();
-        });
-
         secondaryColorPrevBtn.setOnClickListener(v -> {
             int index = (prefs.getInt(PREF_SECONDARY_TEXT_COLOR, 1) - 1 + SUBTITLE_COLOR_NAMES.length) % SUBTITLE_COLOR_NAMES.length;
             prefs.edit().putInt(PREF_SECONDARY_TEXT_COLOR, index).apply();
@@ -7016,86 +6721,22 @@ public class PlayerActivity extends Activity {
             saveAndApplySubtitleSetting(PREF_SECONDARY_VERTICAL_OFFSET, offset);
         });
 
-        secondaryBackgroundSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            saveAndApplySubtitleSetting(PREF_SECONDARY_BACKGROUND, isChecked);
-        });
-
-        secondaryBackgroundColorPrevBtn.setOnClickListener(v -> {
-            int index = (prefs.getInt(PREF_SECONDARY_BACKGROUND_COLOR, 0) - 1 + secondaryBackgroundNames.length) % secondaryBackgroundNames.length;
-            prefs.edit().putInt(PREF_SECONDARY_BACKGROUND_COLOR, index).apply();
-            secondaryBackgroundColorTV.setText(secondaryBackgroundNames[index]);
-            secondaryBackgroundColorTV.setTextColor(secondaryBackgroundPreviewValues[index]);
-            applySubtitleSettings();
-        });
-
-        secondaryBackgroundColorNextBtn.setOnClickListener(v -> {
-            int index = (prefs.getInt(PREF_SECONDARY_BACKGROUND_COLOR, 0) + 1) % secondaryBackgroundNames.length;
-            prefs.edit().putInt(PREF_SECONDARY_BACKGROUND_COLOR, index).apply();
-            secondaryBackgroundColorTV.setText(secondaryBackgroundNames[index]);
-            secondaryBackgroundColorTV.setTextColor(secondaryBackgroundPreviewValues[index]);
-            applySubtitleSettings();
-        });
-
-        secondaryOutlineColorPrevBtn.setOnClickListener(v -> {
-            int index = (prefs.getInt(PREF_SECONDARY_OUTLINE_COLOR, 1) - 1 + secondaryOutlineColorNames.length) % secondaryOutlineColorNames.length;
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_COLOR, index).apply();
-            secondaryOutlineColorTV.setText(secondaryOutlineColorNames[index]);
-            secondaryOutlineColorTV.setTextColor(index == 0 ? Color.GRAY : secondaryOutlineColorValues[index]);
-            applySubtitleSettings();
-        });
-
-        secondaryOutlineColorNextBtn.setOnClickListener(v -> {
-            int index = (prefs.getInt(PREF_SECONDARY_OUTLINE_COLOR, 1) + 1) % secondaryOutlineColorNames.length;
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_COLOR, index).apply();
-            secondaryOutlineColorTV.setText(secondaryOutlineColorNames[index]);
-            secondaryOutlineColorTV.setTextColor(index == 0 ? Color.GRAY : secondaryOutlineColorValues[index]);
-            applySubtitleSettings();
-        });
-
-        secondaryOutlineThicknessPrevBtn.setOnClickListener(v -> {
-            int pt = prefs.getInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, 2);
-            pt = Math.max(0, pt - 1);
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, pt).apply();
-            secondaryOutlineThicknessTV.setText(pt + "pt");
-            applySubtitleSettings();
-        });
-
-        secondaryOutlineThicknessNextBtn.setOnClickListener(v -> {
-            int pt = prefs.getInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, 2);
-            pt = Math.min(8, pt + 1);
-            prefs.edit().putInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, pt).apply();
-            secondaryOutlineThicknessTV.setText(pt + "pt");
-            applySubtitleSettings();
-        });
-
         resetSecondaryBtn.setOnClickListener(v -> {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean(PREF_BILINGUAL_ENABLED, false);
             editor.putString(PREF_SECONDARY_SUBTITLE_URL, "");
             editor.putString(PREF_SECONDARY_SUBTITLE_LABEL, "Chưa chọn");
             editor.putInt(PREF_SECONDARY_FONT_SIZE, 18);
-            editor.putInt(PREF_SECONDARY_FONT_TYPE, 4);
             editor.putInt(PREF_SECONDARY_TEXT_COLOR, 1);
             editor.putInt(PREF_SECONDARY_VERTICAL_OFFSET, -8);
-            editor.putBoolean(PREF_SECONDARY_BACKGROUND, false);
-            editor.putInt(PREF_SECONDARY_BACKGROUND_COLOR, 0);
-            editor.putInt(PREF_SECONDARY_OUTLINE_COLOR, 1);
-            editor.putInt(PREF_SECONDARY_OUTLINE_THICKNESS_PT, 2);
             editor.apply();
 
             bilingualSwitch.setChecked(false);
             secondarySubtitleTV.setText("Chưa chọn");
             secondaryFontSizeTV.setText("18sp");
-            secondaryFontTypeTV.setText(secondaryFontNames[4]);
             secondaryColorTV.setText(SUBTITLE_COLOR_NAMES[1]);
             secondaryColorTV.setTextColor(SUBTITLE_COLOR_VALUES[1]);
             secondaryPositionTV.setText("-8%");
-            secondaryBackgroundSwitch.setChecked(false);
-            secondaryBackgroundColorTV.setText(secondaryBackgroundNames[0]);
-            secondaryBackgroundColorTV.setTextColor(secondaryBackgroundPreviewValues[0]);
-            secondaryOutlineColorTV.setText(secondaryOutlineColorNames[1]);
-            secondaryOutlineColorTV.setTextColor(secondaryOutlineColorValues[1]);
-            secondaryOutlineThicknessTV.setText("2pt");
             updateSecondaryControlsState.run();
 
             Toast.makeText(PlayerActivity.this, "Đã reset cài đặt phụ đề 2", Toast.LENGTH_SHORT).show();
@@ -7196,7 +6837,7 @@ public class PlayerActivity extends Activity {
 
                 if (labels.size() == 1) {
                     if (result != null && !isNullOrEmpty(result.queuedReason)) {
-                        new ToastMsg(this).toastIconSuccess("Máy chủ đang tạo phụ đề, vui lòng chờ 1-2 phút");
+                        new ToastMsg(this).toastIconSuccess("Worker đang tạo phụ đề, vui lòng thử lại sau");
                     } else {
                         new ToastMsg(this).toastIconError("Không có phụ đề thứ 2 từ Worker");
                     }

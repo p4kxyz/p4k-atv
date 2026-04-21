@@ -7196,7 +7196,7 @@ public class PlayerActivity extends Activity {
 
                 if (labels.size() == 1) {
                     if (result != null && !isNullOrEmpty(result.queuedReason)) {
-                        new ToastMsg(this).toastIconSuccess("Máy chủ đang tạo phụ đề, vui lòng chờ 1-2 phút");
+                        new ToastMsg(this).toastIconSuccess("Worker đang tạo phụ đề, vui lòng thử lại sau");
                     } else {
                         new ToastMsg(this).toastIconError("Không có phụ đề thứ 2 từ Worker");
                     }

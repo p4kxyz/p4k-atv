@@ -2302,6 +2302,25 @@ public class PlayerActivity extends Activity {
 
         Button closeBt = view.findViewById(R.id.close_bt);
         closeBt.setOnClickListener(v -> dialog.dismiss());
+        
+        // Playback speed buttons
+        Button speed05 = view.findViewById(R.id.speed_0_5);
+        Button speed075 = view.findViewById(R.id.speed_0_75);
+        Button speed10 = view.findViewById(R.id.speed_1_0);
+        Button speed125 = view.findViewById(R.id.speed_1_25);
+        Button speed15 = view.findViewById(R.id.speed_1_5);
+        Button speed20 = view.findViewById(R.id.speed_2_0);
+        Button speed30 = view.findViewById(R.id.speed_3_0);
+
+        speed05.setOnClickListener(v -> setPlaybackSpeed(0.5f));
+        speed075.setOnClickListener(v -> setPlaybackSpeed(0.75f));
+        speed10.setOnClickListener(v -> setPlaybackSpeed(1.0f));
+        if (speed125 != null) {
+            speed125.setOnClickListener(v -> setPlaybackSpeed(1.25f));
+        }
+        speed15.setOnClickListener(v -> setPlaybackSpeed(1.5f));
+        speed20.setOnClickListener(v -> setPlaybackSpeed(2.0f));
+        speed30.setOnClickListener(v -> setPlaybackSpeed(3.0f));
 
         dialog.show();
     }
@@ -6137,12 +6156,6 @@ public class PlayerActivity extends Activity {
         speed10.setTextSize(12);
         speed10.setTextColor(0xFFFFFFFF);
         speed10.setBackground(createDialogButtonBackground(0xFF3A3A4C));
-
-        Button speed125 = new Button(this);
-        speed125.setText("1.25x");
-        speed125.setTextSize(12);
-        speed125.setTextColor(0xFFFFFFFF);
-        speed125.setBackground(createDialogButtonBackground(0xFF3A3A4C));
         
         Button speed15 = new Button(this);
         speed15.setText("1.5x");
@@ -6165,7 +6178,6 @@ public class PlayerActivity extends Activity {
         setDialogButtonSelected(speed05, currentSpeed == 0.5f);
         setDialogButtonSelected(speed075, currentSpeed == 0.75f);
         setDialogButtonSelected(speed10, currentSpeed == 1.0f);
-        setDialogButtonSelected(speed125, currentSpeed == 1.25f);
         setDialogButtonSelected(speed15, currentSpeed == 1.5f);
         setDialogButtonSelected(speed20, currentSpeed == 2.0f);
         setDialogButtonSelected(speed30, currentSpeed == 3.0f);
@@ -6173,7 +6185,6 @@ public class PlayerActivity extends Activity {
         playbackSpeedLayout.addView(speed05);
         playbackSpeedLayout.addView(speed075);
         playbackSpeedLayout.addView(speed10);
-        playbackSpeedLayout.addView(speed125);
         playbackSpeedLayout.addView(speed15);
         playbackSpeedLayout.addView(speed20);
         playbackSpeedLayout.addView(speed30);
@@ -6206,7 +6217,6 @@ public class PlayerActivity extends Activity {
         applyWhiteFocusBorder(speed05);
         applyWhiteFocusBorder(speed075);
         applyWhiteFocusBorder(speed10);
-        applyWhiteFocusBorder(speed125);
         applyWhiteFocusBorder(speed15);
         applyWhiteFocusBorder(speed20);
         applyWhiteFocusBorder(speed30);
@@ -6459,7 +6469,6 @@ public class PlayerActivity extends Activity {
             if (v == speed05) speed = 0.5f;
             else if (v == speed075) speed = 0.75f;
             else if (v == speed10) speed = 1.0f;
-            else if (v == speed125) speed = 1.25f;
             else if (v == speed15) speed = 1.5f;
             else if (v == speed20) speed = 2.0f;
             else if (v == speed30) speed = 3.0f;
@@ -6468,7 +6477,6 @@ public class PlayerActivity extends Activity {
             setDialogButtonSelected(speed05, v == speed05);
             setDialogButtonSelected(speed075, v == speed075);
             setDialogButtonSelected(speed10, v == speed10);
-            setDialogButtonSelected(speed125, v == speed125);
             setDialogButtonSelected(speed15, v == speed15);
             setDialogButtonSelected(speed20, v == speed20);
             setDialogButtonSelected(speed30, v == speed30);
@@ -6481,7 +6489,6 @@ public class PlayerActivity extends Activity {
         speed05.setOnClickListener(speedClickListener);
         speed075.setOnClickListener(speedClickListener);
         speed10.setOnClickListener(speedClickListener);
-        speed125.setOnClickListener(speedClickListener);
         speed15.setOnClickListener(speedClickListener);
         speed20.setOnClickListener(speedClickListener);
         speed30.setOnClickListener(speedClickListener);
@@ -7196,7 +7203,7 @@ public class PlayerActivity extends Activity {
 
                 if (labels.size() == 1) {
                     if (result != null && !isNullOrEmpty(result.queuedReason)) {
-                        new ToastMsg(this).toastIconSuccess("Máy chủ đang tạo phụ đề, vui lòng chờ 1-2 phút");
+                        new ToastMsg(this).toastIconSuccess("Worker đang tạo phụ đề, vui lòng thử lại sau");
                     } else {
                         new ToastMsg(this).toastIconError("Không có phụ đề thứ 2 từ Worker");
                     }

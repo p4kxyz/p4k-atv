@@ -2302,6 +2302,25 @@ public class PlayerActivity extends Activity {
 
         Button closeBt = view.findViewById(R.id.close_bt);
         closeBt.setOnClickListener(v -> dialog.dismiss());
+        
+        // Playback speed buttons
+        Button speed05 = view.findViewById(R.id.speed_0_5);
+        Button speed075 = view.findViewById(R.id.speed_0_75);
+        Button speed10 = view.findViewById(R.id.speed_1_0);
+        Button speed125 = view.findViewById(R.id.speed_1_25);
+        Button speed15 = view.findViewById(R.id.speed_1_5);
+        Button speed20 = view.findViewById(R.id.speed_2_0);
+        Button speed30 = view.findViewById(R.id.speed_3_0);
+
+        speed05.setOnClickListener(v -> setPlaybackSpeed(0.5f));
+        speed075.setOnClickListener(v -> setPlaybackSpeed(0.75f));
+        speed10.setOnClickListener(v -> setPlaybackSpeed(1.0f));
+        if (speed125 != null) {
+            speed125.setOnClickListener(v -> setPlaybackSpeed(1.25f));
+        }
+        speed15.setOnClickListener(v -> setPlaybackSpeed(1.5f));
+        speed20.setOnClickListener(v -> setPlaybackSpeed(2.0f));
+        speed30.setOnClickListener(v -> setPlaybackSpeed(3.0f));
 
         dialog.show();
     }
@@ -7196,7 +7215,7 @@ public class PlayerActivity extends Activity {
 
                 if (labels.size() == 1) {
                     if (result != null && !isNullOrEmpty(result.queuedReason)) {
-                        new ToastMsg(this).toastIconSuccess("Máy chủ đang tạo phụ đề, vui lòng chờ 1-2 phút");
+                        new ToastMsg(this).toastIconSuccess("Worker đang tạo phụ đề, vui lòng thử lại sau");
                     } else {
                         new ToastMsg(this).toastIconError("Không có phụ đề thứ 2 từ Worker");
                     }

@@ -74,6 +74,7 @@ public class VerticalCardPresenter extends Presenter {
         
         public LinearLayout llDuration;
         public TextView tvDuration;
+        public TextView tvSource;
         public TextView tvQuality;
         public TextView tvYear;
         public TextView tvImdb;
@@ -88,6 +89,7 @@ public class VerticalCardPresenter extends Presenter {
             
             llDuration = view.findViewById(R.id.ll_duration);
             tvDuration = view.findViewById(R.id.tv_duration);
+            tvSource = view.findViewById(R.id.tv_source);
             tvQuality = view.findViewById(R.id.tv_quality);
             tvYear = view.findViewById(R.id.tv_year);
             tvImdb = view.findViewById(R.id.tv_imdb);
@@ -260,13 +262,13 @@ public class VerticalCardPresenter extends Presenter {
             }
         }
         
-
         private void hideAllTags() {
             llDuration.setVisibility(View.GONE);
             tvQuality.setVisibility(View.GONE);
             tvYear.setVisibility(View.GONE);
             tvImdb.setVisibility(View.GONE);
         }
+
         private void loadImage(String primaryUrl, String fallbackUrl) {
             String url = (primaryUrl != null && !primaryUrl.trim().isEmpty()) ? primaryUrl : fallbackUrl;
             if (url == null || url.trim().isEmpty()) {

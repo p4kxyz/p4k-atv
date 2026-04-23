@@ -3855,6 +3855,7 @@ public class PlayerActivity extends Activity {
         // Debug log for watch history save attempt
         Log.d(TAG, "🎬 saveWatchHistoryWithData called - MovieID: " + model.getMovieId() + 
                    ", Category: " + model.getCategory() + 
+                   ", Source: " + model.getMovieSource() + 
                    ", Pos: " + currentPosition + "ms, Dur: " + duration + "ms");
 
         if (!isWatchHistorySupportedContent()) {
@@ -4125,8 +4126,7 @@ public class PlayerActivity extends Activity {
         }
 
         String category = model.getCategory();
-        // Only skip live TV streams (category exactly "tv"), not TV series ("tvseries")
-        if (category != null && category.toLowerCase(Locale.US).equals("tv")) {
+        if (category != null && category.toLowerCase(Locale.US).contains("tv")) {
             return false;
         }
 

@@ -113,6 +113,9 @@ public class WatchHistoryAdapter extends RecyclerView.Adapter<WatchHistoryAdapte
         String totalTime = formatTime(item.getDuration());
         holder.tvDuration.setText(currentTime + " / " + totalTime);
 
+        // Set source tag using explicit mapping
+        bindSourceTag(holder, item);
+
         // Click listeners
         holder.cardView.setOnClickListener(v -> {
             if (clickListener != null) {
@@ -149,6 +152,44 @@ public class WatchHistoryAdapter extends RecyclerView.Adapter<WatchHistoryAdapte
         }
     }
 
+    private void bindSourceTag(ViewHolder holder, WatchHistorySyncItem.WatchHistoryItem item) {
+        String source = resolveSourceTag(item);
+        holder.tvSourceTag.setText(source);
+
+        if ("Premium".equals(source)) {
+            holder.tvSourceTag.setBackgroundResource(R.drawable.bg_tag_yellow);
+            holder.tvSourceTag.setTextColor(0xFF000000);
+        } else if ("Free 1".equals(source)) {
+            holder.tvSourceTag.setBackgroundResource(R.drawable.bg_tag_blue);
+            holder.tvSourceTag.setTextColor(0xFFFFFFFF);
+        } else {
+            holder.tvSourceTag.setBackgroundResource(R.drawable.bg_tag_green);
+            holder.tvSourceTag.setTextColor(0xFF000000);
+        }
+    }
+
+    private String resolveSourceTag(WatchHistorySyncItem.WatchHistoryItem item) {
+        String videoId = item.getVideoId() != null ? item.getVideoId().toLowerCase() : "";
+        String videoUrl = item.getVideoUrl() != null ? item.getVideoUrl().toLowerCase() : "";
+        String isPaid = item.getIsPaid() != null ? item.getIsPaid().trim() : "";
+
+        // Priority mapping requested by user:
+        // oxoo -> Premium, kkphim4k -> Free 2, phim4k -> Free 1
+        if (videoId.contains("oxoo") || videoUrl.contains("oxoo") || "1".equals(isPaid)) {
+            return "Premium";
+        }
+
+        if (videoId.contains("kkphim4k") || videoUrl.contains("kkphim4k") || videoId.contains("kkphim") || videoUrl.contains("kkphim")) {
+            return "Free 2";
+        }
+
+        if (videoId.contains("phim4k") || videoUrl.contains("phim4k") || "0".equals(isPaid)) {
+            return "Free 1";
+        }
+
+        return "Premium";
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         ImageView imgPoster;
@@ -156,6 +197,7 @@ public class WatchHistoryAdapter extends RecyclerView.Adapter<WatchHistoryAdapte
         TextView tvProgress;
         TextView tvDuration;
         TextView tvTitle;
+        TextView tvSourceTag;
         ImageView btnRemove;
 
         public ViewHolder(@NonNull View itemView) {
@@ -166,6 +208,7 @@ public class WatchHistoryAdapter extends RecyclerView.Adapter<WatchHistoryAdapte
             tvProgress = itemView.findViewById(R.id.tv_progress);
             tvDuration = itemView.findViewById(R.id.tv_duration);
             tvTitle = itemView.findViewById(R.id.tv_title);
+            tvSourceTag = itemView.findViewById(R.id.tv_source_tag);
             btnRemove = itemView.findViewById(R.id.btn_remove);
             
             // Make sure card view is the root element

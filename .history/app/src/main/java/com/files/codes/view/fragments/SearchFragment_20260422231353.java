@@ -139,22 +139,6 @@ public class SearchFragment extends SearchSupportFragment implements SearchSuppo
         } catch (Exception e) { /* ignore */ }
 
         showRecentSearchHistory();
-
-        if (searchHistoryManager != null) {
-            searchHistoryManager.syncFromServer(new SearchHistoryManager.SyncCallback() {
-                @Override
-                public void onSuccess() {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> refreshSearchAfterHistoryChange());
-                    }
-                }
-
-                @Override
-                public void onError(String error) {
-                    // Keep local data if remote sync fails.
-                }
-            });
-        }
     }
     
     // Helper method to find view by resource name

@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.leanback.app.SearchSupportFragment;
 import androidx.leanback.widget.ObjectAdapter;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -103,7 +102,7 @@ public class SearchFragment extends SearchSupportFragment implements SearchSuppo
 
             @Override
             public void onDelete(String query) {
-                confirmRemoveSearchHistoryItem(query);
+                removeSearchHistoryItem(query);
             }
         }));
         setSearchResultProvider(this);
@@ -139,22 +138,6 @@ public class SearchFragment extends SearchSupportFragment implements SearchSuppo
         } catch (Exception e) { /* ignore */ }
 
         showRecentSearchHistory();
-
-        if (searchHistoryManager != null) {
-            searchHistoryManager.syncFromServer(new SearchHistoryManager.SyncCallback() {
-                @Override
-                public void onSuccess() {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> refreshSearchAfterHistoryChange());
-                    }
-                }
-
-                @Override
-                public void onError(String error) {
-                    // Keep local data if remote sync fails.
-                }
-            });
-        }
     }
     
     // Helper method to find view by resource name
@@ -765,19 +748,6 @@ public class SearchFragment extends SearchSupportFragment implements SearchSuppo
             searchHistoryManager.removeSearchQuery(query);
         }
         refreshSearchAfterHistoryChange();
-    }
-
-    private void confirmRemoveSearchHistoryItem(String query) {
-        if (getActivity() == null || TextUtils.isEmpty(query)) {
-            return;
-        }
-
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Xóa tìm kiếm gần đây")
-                .setMessage("Bạn có muốn xóa \"" + query + "\" không?")
-                .setPositiveButton("Xóa", (dialog, which) -> removeSearchHistoryItem(query))
-                .setNegativeButton("Hủy", null)
-                .show();
     }
 
     private void refreshSearchAfterHistoryChange() {

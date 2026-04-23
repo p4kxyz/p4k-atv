@@ -27,5 +27,5 @@ public class AppConfig {
 
     // Search history cloud worker (local-first + remote sync for logged in users)
     public static final String SEARCH_HISTORY_WORKER_URL = "https://ks.phim4k.lol/v1/search-history";
-    public static final String SEARCH_HISTORY_LIST_KEY = "123456789";
+    public static final String SEARCH_HISTORY_LIST_KEY = "REPLACE_WITH_APP_LIST_KEY";
 }

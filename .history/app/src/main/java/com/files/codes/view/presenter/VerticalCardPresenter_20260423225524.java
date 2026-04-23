@@ -74,6 +74,7 @@ public class VerticalCardPresenter extends Presenter {
         
         public LinearLayout llDuration;
         public TextView tvDuration;
+        public TextView tvSource;
         public TextView tvQuality;
         public TextView tvYear;
         public TextView tvImdb;
@@ -88,6 +89,7 @@ public class VerticalCardPresenter extends Presenter {
             
             llDuration = view.findViewById(R.id.ll_duration);
             tvDuration = view.findViewById(R.id.tv_duration);
+            tvSource = view.findViewById(R.id.tv_source);
             tvQuality = view.findViewById(R.id.tv_quality);
             tvYear = view.findViewById(R.id.tv_year);
             tvImdb = view.findViewById(R.id.tv_imdb);
@@ -151,12 +153,14 @@ public class VerticalCardPresenter extends Presenter {
 
         public void bindMovie(Movie movie) {
             setupTitles(movie.getTitle());
+            hideSourceTag();
             setupTags(movie.getRuntime(), movie.getVideoQuality(), movie.getRelease(), movie.getImdbRating());
             loadImage(movie.getThumbnailUrl(), movie.getPosterUrl());
         }
 
         public void bindVideoContent(VideoContent vc) {
             setupTitles(vc.getTitle());
+            setupSourceTag(vc);
             setupTags(vc.getRuntime(), vc.getVideoQuality(), vc.getRelease(), vc.getImdbRating());
             loadImage(vc.getThumbnailUrl(), vc.getPosterUrl());
         }
@@ -263,9 +267,61 @@ public class VerticalCardPresenter extends Presenter {
 
         private void hideAllTags() {
             llDuration.setVisibility(View.GONE);
+            hideSourceTag();
             tvQuality.setVisibility(View.GONE);
             tvYear.setVisibility(View.GONE);
             tvImdb.setVisibility(View.GONE);
+        }
+
+        private void hideSourceTag() {
+            if (tvSource != null) {
+                tvSource.setVisibility(View.GONE);
+            }
+        }
+
+        private void setupSourceTag(VideoContent vc) {
+            if (tvSource == null) {
+                return;
+            }
+
+            String sourceType = determineSourceType(vc);
+            tvSource.setVisibility(View.VISIBLE);
+            tvSource.setText(sourceType);
+
+            if ("Premium".equals(sourceType)) {
+                tvSource.setBackgroundResource(R.drawable.bg_tag_yellow);
+                tvSource.setTextColor(Color.BLACK);
+            } else if ("Free 1".equals(sourceType)) {
+                tvSource.setBackgroundResource(R.drawable.bg_tag_blue);
+                tvSource.setTextColor(Color.WHITE);
+            } else {
+                tvSource.setBackgroundResource(R.drawable.bg_tag_green);
+                tvSource.setTextColor(Color.BLACK);
+            }
+        }
+
+        private String determineSourceType(VideoContent vc) {
+            if (vc == null) {
+                return "Premium";
+            }
+
+            String idLower = vc.getId() != null ? vc.getId().toLowerCase() : "";
+            String urlLower = vc.getVideoUrl() != null ? vc.getVideoUrl().toLowerCase() : "";
+            String isPaid = vc.getIsPaid() != null ? vc.getIsPaid().trim() : "";
+
+            // Explicit mapping requested by user:
+            // oxoo -> Premium, kkphim4k -> Free 2, phim4k -> Free 1
+            if (idLower.contains("oxoo") || urlLower.contains("oxoo") || "1".equals(isPaid)) {
+                return "Premium";
+            }
+            if (idLower.contains("kkphim4k") || urlLower.contains("kkphim4k") || idLower.contains("kkphim") || urlLower.contains("kkphim")) {
+                return "Free 2";
+            }
+            if (idLower.contains("phim4k") || urlLower.contains("phim4k") || "0".equals(isPaid)) {
+                return "Free 1";
+            }
+
+            return "Premium";
         }
         private void loadImage(String primaryUrl, String fallbackUrl) {
             String url = (primaryUrl != null && !primaryUrl.trim().isEmpty()) ? primaryUrl : fallbackUrl;

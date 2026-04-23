@@ -74,6 +74,7 @@ public class VerticalCardPresenter extends Presenter {
         
         public LinearLayout llDuration;
         public TextView tvDuration;
+        public TextView tvSource;
         public TextView tvQuality;
         public TextView tvYear;
         public TextView tvImdb;
@@ -88,6 +89,7 @@ public class VerticalCardPresenter extends Presenter {
             
             llDuration = view.findViewById(R.id.ll_duration);
             tvDuration = view.findViewById(R.id.tv_duration);
+            tvSource = view.findViewById(R.id.tv_source);
             tvQuality = view.findViewById(R.id.tv_quality);
             tvYear = view.findViewById(R.id.tv_year);
             tvImdb = view.findViewById(R.id.tv_imdb);
@@ -157,6 +159,7 @@ public class VerticalCardPresenter extends Presenter {
 
         public void bindVideoContent(VideoContent vc) {
             setupTitles(vc.getTitle());
+            setupSourceTag(vc);
             setupTags(vc.getRuntime(), vc.getVideoQuality(), vc.getRelease(), vc.getImdbRating());
             loadImage(vc.getThumbnailUrl(), vc.getPosterUrl());
         }
@@ -263,9 +266,83 @@ public class VerticalCardPresenter extends Presenter {
 
         private void hideAllTags() {
             llDuration.setVisibility(View.GONE);
+            tvSource.setVisibility(View.GONE);
             tvQuality.setVisibility(View.GONE);
             tvYear.setVisibility(View.GONE);
             tvImdb.setVisibility(View.GONE);
+        }
+
+        private void setupSourceTag(VideoContent vc) {
+            if (vc == null || tvSource == null) {
+                return;
+            }
+
+            String sourceType = determineSourceType(vc);
+            if (sourceType != null && !sourceType.isEmpty()) {
+                tvSource.setVisibility(View.VISIBLE);
+                tvSource.setText(sourceType);
+                tvSource.setTextColor(Color.WHITE);
+                
+                // Set background color based on source type
+                String sourceLower = sourceType.toLowerCase();
+                if (sourceLower.contains("premium")) {
+                    tvSource.setBackgroundResource(R.drawable.bg_tag_yellow);
+                    tvSource.setTextColor(Color.BLACK);
+                } else if (sourceLower.contains("free 1")) {
+                    tvSource.setBackgroundResource(R.drawable.bg_tag_blue);
+                    tvSource.setTextColor(Color.WHITE);
+                } else if (sourceLower.contains("free 2")) {
+                    tvSource.setBackgroundResource(R.drawable.bg_tag_green);
+                    tvSource.setTextColor(Color.BLACK);
+                } else {
+                    tvSource.setBackgroundResource(R.drawable.bg_tag_gray);
+                    tvSource.setTextColor(Color.WHITE);
+                }
+            } else {
+                tvSource.setVisibility(View.GONE);
+            }
+        }
+
+        private String determineSourceType(VideoContent vc) {
+            // Check streamLabel first (if it contains source info)
+            String streamLabel = vc.getStreamLabel();
+            if (streamLabel != null && !streamLabel.isEmpty()) {
+                String labelLower = streamLabel.toLowerCase();
+                if (labelLower.contains("oxoo") || labelLower.contains("premium")) {
+                    return "Premium";
+                } else if (labelLower.contains("phim4k")) {
+                    return "Free 1";
+                } else if (labelLower.contains("kkphim") || labelLower.contains("free 2")) {
+                    return "Free 2";
+                }
+            }
+
+            // Check streamFrom field
+            String streamFrom = vc.getStreamFrom();
+            if (streamFrom != null && !streamFrom.isEmpty()) {
+                String fromLower = streamFrom.toLowerCase();
+                if (fromLower.contains("oxoo") || fromLower.contains("premium")) {
+                    return "Premium";
+                } else if (fromLower.contains("phim4k")) {
+                    return "Free 1";
+                } else if (fromLower.contains("kkphim") || fromLower.contains("free")) {
+                    return "Free 2";
+                }
+            }
+
+            // Check isPaid field
+            String isPaid = vc.getIsPaid();
+            if (isPaid != null) {
+                if (isPaid.equals("1")) {
+                    return "Premium";
+                } else if (isPaid.equals("0")) {
+                    // For free content, try to determine which source
+                    // Default to Free 1 if we can't determine
+                    return "Free 1";
+                }
+            }
+
+            return null;
         }
         private void loadImage(String primaryUrl, String fallbackUrl) {
             String url = (primaryUrl != null && !primaryUrl.trim().isEmpty()) ? primaryUrl : fallbackUrl;

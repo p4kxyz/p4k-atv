@@ -1,0 +1,16 @@
+name = "search-history-worker"
+main = "src/index.js"
+compatibility_date = "2026-04-22"
+
+# Create and bind this KV namespace before deploy:
+# wrangler kv namespace create "SEARCH_HISTORY_KV"
+# Then put the returned id below.
+[[kv_namespaces]]
+binding = "SEARCH_HISTORY_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+# Maximum items to keep per user.
+MAX_HISTORY_ITEMS = "10"
+# Optional CORS origin, set to your app domain in production.
+ALLOWED_ORIGIN = "*"

@@ -10,8 +10,8 @@ android {
         applicationId "com.oxootv.spagreen"
         minSdk 21
         targetSdk 33
-        versionCode 67
-        versionName "2.5.7"
+        versionCode 66
+        versionName "2.5.6"
         // resConfigs "vi"
         
         // Memory optimization for 4K MKV
